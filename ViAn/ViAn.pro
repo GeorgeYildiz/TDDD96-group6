@@ -14,17 +14,26 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = ViAn
 TEMPLATE = app
 
-
+#
+# GUI
+#
 SOURCES += main.cpp \
     GUI/mainwindow.cpp \
     GUI/icononbuttonhandler.cpp \
     Video/video_player.cpp \
-    Test/test_video_player.cpp
+    Test/test_video_player.cpp \
+    Test/filehandlertest.cpp \
+    Filehandler/filehandler.cpp \
+    Filehandler/project.cpp \
 
 HEADERS  += GUI/mainwindow.h \
     GUI/icononbuttonhandler.h \
     Video/video_player.h \
-    Test/test_video_player.h
+    Test/test_video_player.h \
+    Test/filehandlertest.h \
+    Filehandler/filehandler.h \
+    Filehandler/project.h \
+    Filehandler/dir.h
 
 FORMS    += GUI/mainwindow.ui
 
@@ -50,3 +59,29 @@ unix {
     LIBS += -lopencv_videoio
     LIBS += -lopencv_highgui
 }
+
+
+#
+# FILEHANDLER
+#
+
+win32{
+
+SOURCES += Filehandler/stringhelper.cpp\
+    Filehandler/win32dir.cpp
+
+
+HEADERS += Filehandler/stringhelper.h
+}
+
+macx {
+SOURCES += Filehandler/macdir.cpp
+}
+
+linux {
+    SOURCES += Filehandler/linuxdir.cpp\
+    Filehandler/macdir.cpp
+}
+
+
+
