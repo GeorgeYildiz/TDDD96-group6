@@ -17,15 +17,14 @@ TEMPLATE = app
 # GENERAL
 #
 SOURCES += main.cpp \
+    Video/video_producer.cpp
 
 #
 # TEST
-#
-SOURCES += Test/test_video_player.cpp\
-    Test/filehandlertest.cpp\
+# TODO add videoplayer test paths
+SOURCES += Test/filehandlertest.cpp\
     Test/test_mainwindow.cpp
-HEADERS += Test/test_video_player.h \
-    Test/filehandlertest.h \
+HEADERS += Test/filehandlertest.h \
     Test/test_mainwindow.h
 
 #
@@ -59,7 +58,9 @@ SOURCES += Video/video_player.cpp \
     Video/shapes/circle.cpp \
     Video/shapes/arrow.cpp \
     Video/shapes/line.cpp \
-    Video/shapes/pen.cpp
+    Video/shapes/pen.cpp \
+    Video/video_controller.cpp \
+    Video/video_thread.cpp
 HEADERS += Video/video_player.h \
     Video/overlay.h \
     Video/shapes/shape.h \
@@ -67,7 +68,10 @@ HEADERS += Video/video_player.h \
     Video/shapes/circle.h \
     Video/shapes/arrow.h \
     Video/shapes/line.h \
-    Video/shapes/pen.h
+    Video/shapes/pen.h \
+    Video/video_controller.h \
+    Video/video_thread.h \
+    Video/video_producer.h
 win32 {
     INCLUDEPATH += C:\opencv\release\install\include
     LIBS += C:\opencv\release\bin\libopencv_core320.dll

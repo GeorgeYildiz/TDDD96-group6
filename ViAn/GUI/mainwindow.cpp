@@ -9,6 +9,8 @@
 #include "icononbuttonhandler.h"
 #include "inputwindow.h"
 #include "Video/shapes/shape.h"
+#include "Video/video_controller.h"
+#include "Video/video_thread.h"
 
 using namespace std;
 using namespace cv;
@@ -32,6 +34,12 @@ MainWindow::MainWindow(QWidget *parent) :
     // Add this object as a listener to videoFrame.
     ui->videoFrame->installEventFilter(this);
 
+    video_controller* controller = new video_controller;
+    video_thread* videoThread = new video_thread(controller);
+    videoThread->start();
+
+    /**
+    TODO add correct video player function calls
     mvideo_player = new video_player();
     QObject::connect(mvideo_player, SIGNAL(processedImage(QImage)),
                                   this, SLOT(update_video(QImage)));
@@ -41,6 +49,7 @@ MainWindow::MainWindow(QWidget *parent) :
     //Used for rescaling the source image for video playback
     mvideo_player->set_frame_height(ui->videoFrame->height());
     mvideo_player->set_frame_width(ui->videoFrame->width());
+    **/
 }
 
 /**
@@ -88,6 +97,8 @@ void MainWindow::on_fastBackwardButton_clicked(){
  * The button supposed to play and pause the video
  */
 void MainWindow::on_playPauseButton_clicked() {
+    /**
+      TODO
     if (mvideo_player->is_paused() || mvideo_player->is_stopped()) {
         set_status_bar("Playing");
         iconOnButtonHandler->set_icon("pause", ui->playPauseButton);//changes the icon on the play button to a pause-icon
@@ -98,6 +109,7 @@ void MainWindow::on_playPauseButton_clicked() {
         mvideo_player->play_pause();
         mvideo_player->wait();
     }
+    **/
 }
 
 
@@ -115,11 +127,13 @@ void MainWindow::on_fastForwardButton_clicked(){
  */
 void MainWindow::on_stopButton_clicked() {
     set_status_bar("Stopped");
+    /**
     if (!mvideo_player->is_paused()) {
         iconOnButtonHandler->set_icon("play", ui->playPauseButton);
     }
 
     mvideo_player->stop_video();
+    **/
 }
 
 /**
@@ -127,12 +141,14 @@ void MainWindow::on_stopButton_clicked() {
  * The button supposed to play the next frame of the video
  */
 void MainWindow::on_nextFrameButton_clicked() {
+    /** TODO
     if (mvideo_player->is_paused()) {
         set_status_bar("Went forward a frame");
         mvideo_player->next_frame();
     } else {
         set_status_bar("Needs to be paused");
     }
+    **/
 }
 
 /**
@@ -140,12 +156,14 @@ void MainWindow::on_nextFrameButton_clicked() {
  * The button supposed to play the previous frame of the video
  */
 void MainWindow::on_previousFrameButton_clicked() {
+    /** TODO
     if (mvideo_player->is_paused()) {
         set_status_bar("Went back a frame");
         mvideo_player->previous_frame();
     } else {
         set_status_bar("Needs to be paused");
     }
+    **/
 }
 
 /**
@@ -175,8 +193,10 @@ void MainWindow::set_video_slider_pos(int pos) {
  */
 void MainWindow::resizeEvent(QResizeEvent* event) {
    QMainWindow::resizeEvent(event);
+   /**
    mvideo_player->set_frame_height(ui->videoFrame->height());
    mvideo_player->set_frame_width(ui->videoFrame->width());
+   **/
 }
 
 /**
@@ -239,10 +259,12 @@ void MainWindow::on_bookmarkButton_clicked(){
     // The code here is only temporary and should be moved/removed
     // once a proper video selector is added
 
+    /** TODO
     mvideo_player->load_video("seq_01.mp4");
     iconOnButtonHandler->set_icon("pause", ui->playPauseButton);
     video_slider->setMaximum(mvideo_player->get_num_frames());
     mvideo_player->set_playback_frame(700);
+    **/
 }
 
 /**
@@ -294,12 +316,14 @@ void MainWindow::on_ProjectTree_itemClicked(QTreeWidgetItem *item, int column) {
  * Invoked by menu item.
  */
 void MainWindow::on_actionShow_hide_overview_triggered() {
+    /** TODO
     mvideo_player->toggle_overlay();
     if (mvideo_player->is_showing_overlay()) {
         set_status_bar("Overlay: On.");
     } else {
         set_status_bar("Overlay: Off.");
     }
+    **/
 }
 
 /**
@@ -308,10 +332,12 @@ void MainWindow::on_actionShow_hide_overview_triggered() {
  */
 void MainWindow::on_actionColour_triggered() {
     QColor col = QColorDialog::getColor();
+    /** TODO
     mvideo_player->set_overlay_colour(col);
     string msg = "Color: ";
     msg.append(col.name().toStdString());
     set_status_bar(msg);
+    **/
 }
 
 /**
@@ -319,8 +345,10 @@ void MainWindow::on_actionColour_triggered() {
  * Selects the rectangle shape for the overlay drawing tool.
  */
 void MainWindow::on_actionRectangle_triggered() {
+    /** TODO
     mvideo_player->set_overlay_tool(RECTANGLE);
     set_status_bar("Tool: rectangle.");
+    **/
 }
 
 /**
@@ -328,8 +356,10 @@ void MainWindow::on_actionRectangle_triggered() {
  * Selects the circle shape for the overlay drawing tool.
  */
 void MainWindow::on_actionCircle_triggered() {
+    /** TODO
     mvideo_player->set_overlay_tool(CIRCLE);
     set_status_bar("Tool: circle.");
+    **/
 }
 
 /**
@@ -337,8 +367,10 @@ void MainWindow::on_actionCircle_triggered() {
  * Selects the line shape for the overlay drawing tool.
  */
 void MainWindow::on_actionLine_triggered() {
+    /** TODO
     mvideo_player->set_overlay_tool(LINE);
     set_status_bar("Tool: line.");
+    **/
 }
 
 /**
@@ -346,8 +378,10 @@ void MainWindow::on_actionLine_triggered() {
  * Selects the arrow shape for the overlay drawing tool.
  */
 void MainWindow::on_actionArrow_triggered() {
+    /**
     mvideo_player->set_overlay_tool(ARROW);
     set_status_bar("Tool: arrow.");
+    **/
 }
 
 /**
@@ -355,8 +389,10 @@ void MainWindow::on_actionArrow_triggered() {
  * Selects the pen for the overlay drawing tool.
  */
 void MainWindow::on_actionPen_triggered() {
+    /** TODO
     mvideo_player->set_overlay_tool(PEN);
     set_status_bar("Tool: pen.");
+    **/
 }
 
 /**
@@ -364,8 +400,10 @@ void MainWindow::on_actionPen_triggered() {
  * Undo the drawings on the overlay.
  */
 void MainWindow::on_actionUndo_triggered() {
+    /** TODO
     mvideo_player->undo_overlay();
     set_status_bar("Undo drawing.");
+    **/
 }
 
 /**
@@ -373,8 +411,10 @@ void MainWindow::on_actionUndo_triggered() {
  * Clear the drawings on the overlay.
  */
 void MainWindow::on_actionClear_triggered() {
+    /** TODO
     mvideo_player->clear_overlay();
     set_status_bar("Cleared drawings.");
+    **/
 }
 
 /**
@@ -393,6 +433,7 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event) {
         // Cast to a mouse event to get the mouse position.
         QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
         QPoint pos = mouseEvent->pos();
+        /** TODO
         // Check what kind of event.
         if (event->type() == QEvent::MouseButtonPress) {
             mvideo_player->video_mouse_pressed(pos);
@@ -404,6 +445,7 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event) {
             mvideo_player->video_mouse_moved(pos);
             return true;
         }
+        **/
     }
     return false;
 }
