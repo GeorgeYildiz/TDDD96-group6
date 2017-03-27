@@ -95,7 +95,7 @@
              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Decrease play speed&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
             <property name="text">
-             <string>&lt;&lt;</string>
+             <string/>
             </property>
            </widget>
           </item>
@@ -114,7 +114,7 @@
              <string notr="true"/>
             </property>
             <property name="text">
-             <string/>
+             <string>&lt;</string>
             </property>
            </widget>
           </item>
@@ -152,7 +152,7 @@
              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Next frame&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
             <property name="text">
-             <string/>
+             <string>&gt;</string>
             </property>
            </widget>
           </item>
@@ -174,7 +174,7 @@
              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Increase play speed&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
             <property name="text">
-             <string>&gt;&gt;</string>
+             <string/>
             </property>
            </widget>
           </item>
