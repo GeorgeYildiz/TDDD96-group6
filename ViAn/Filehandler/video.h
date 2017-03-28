@@ -4,15 +4,15 @@
 #include <fstream>
 #include <sstream>
 typedef int ID;
-class Video
+class video
 {
 public:
-    Video();
-    Video(std::string filepath);
+    video();
+    video(std::string filepath);
     std::string filepath;
-    friend std::stringstream& operator>>(std::stringstream& is, Video& vid);
-    friend std::stringstream& operator<<(std::stringstream& os, const Video& vid);
-    friend bool operator==(Video v1, Video v2);
+    friend std::stringstream& operator>>(std::stringstream& is, video& vid);
+    friend std::stringstream& operator<<(std::stringstream& os, const video& vid);
+    friend bool operator==(video v1, video v2);
 };
 
 #endif // VIDEO_H

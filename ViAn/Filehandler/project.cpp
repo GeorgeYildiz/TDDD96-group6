@@ -4,9 +4,9 @@
  * @param id
  * @param name
  */
-Project::Project(ID id, std::string name)
+project::project(ID id, std::string name)
 {
-    this->files = new ProjFiles();
+    this->files = new proj_files();
     this->name = name;
     this->id = id;
     this->videos.clear();
@@ -15,8 +15,8 @@ Project::Project(ID id, std::string name)
 /**
  * @brief Project::Project
  */
-Project::Project(){
-    this->files = new ProjFiles();
+project::project(){
+    this->files = new proj_files();
     this->name = "";
     this->id = -1;
     this->videos.clear();
@@ -27,7 +27,7 @@ Project::Project(){
 * @param vid
 * add given video to project
 */
-void Project::add_video(Video* vid)
+void project::add_video(video* vid)
 {
     this->videos.push_back(vid);
 }
@@ -38,19 +38,19 @@ void Project::add_video(Video* vid)
  * @param proj
  * @return stringstream containing project information
  */
-ProjectStream& operator>>(ProjectStream& ps, Project& proj){
+ProjectStream& operator>>(ProjectStream& ps, project& proj){
     //write files
     //Read project id and name
     ps.projfile >> proj.name;
 
     // read videos
     int vid_counter = 0;
-    std::vector<Video*> temp; // used to preserve order ov videos, important for == operator
+    std::vector<video*> temp; // used to preserve order ov videos, important for == operator
     ps.videos >> vid_counter;
     if( vid_counter < 0) return ps; // if negative number of videos, loop below will
                                    // be infinite. This is unlikely to happen. but just in case!
     while(vid_counter--){
-        Video* v = new Video();
+        video* v = new video();
         ps.videos >> *v;
         temp.push_back(v);
     }
@@ -66,14 +66,14 @@ ProjectStream& operator>>(ProjectStream& ps, Project& proj){
  * @return stream
  * used for writing videos to file
  */
-ProjectStream& operator<<(ProjectStream &ps, const Project& proj){
+ProjectStream& operator<<(ProjectStream &ps, const project& proj){
     //write name and id;   
     ps.projfile << proj.name.c_str() << " ";
     //write videos
     int vidcounter = proj.videos.size();
     ps.videos << vidcounter << " ";
     for(auto vid = proj.videos.rbegin(); vid != proj.videos.rend(); ++vid){
-        Video* v = *vid;
+        video* v = *vid;
         ps.videos << *v << " ";
         vidcounter++;
     }
@@ -91,7 +91,7 @@ ProjectStream& operator<<(ProjectStream &ps, const Project& proj){
  * isnt currently used but works as intended.
  * kept just in case.
  */
-ProjectStream& operator<<(ProjectStream &ps,const ProjFiles& pf){
+ProjectStream& operator<<(ProjectStream &ps,const proj_files& pf){
     ps.projfile << pf.f_analysis << " ";
     ps.projfile << pf.f_drawings << " ";
     ps.projfile << pf.f_videos << " ";
@@ -109,7 +109,7 @@ ProjectStream& operator<<(ProjectStream &ps,const ProjFiles& pf){
  * isnt currently used but works as intended.
  * kept just in case.
  */
-ProjectStream& operator>>(ProjectStream &ps, ProjFiles& pf){
+ProjectStream& operator>>(ProjectStream &ps, proj_files& pf){
     std::string dummy;
     ps.projfile >> pf.f_analysis;
     ps.projfile >> pf.f_drawings;

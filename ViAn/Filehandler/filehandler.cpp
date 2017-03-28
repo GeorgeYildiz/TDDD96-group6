@@ -3,7 +3,7 @@
 /**
  * @brief FileHandler::FileHandler
  */
-FileHandler::FileHandler() {
+file_handler::file_handler() {
     this->pid = 0; // zero out counter ids
     this->fid = 0;
     this->did = 0;
@@ -17,8 +17,8 @@ FileHandler::FileHandler() {
  * @param std::string name
  * @return Project* created project
  */
-Project* FileHandler::create_project(std::string proj_name){
-    Project* proj =  new Project(this->pid, proj_name);
+project* file_handler::create_project(std::string proj_name){
+    project* proj =  new project(this->pid, proj_name);
     this->projects.insert(std::make_pair(proj->id, proj));
     save_project(proj);
     this->pid++;
@@ -30,7 +30,7 @@ Project* FileHandler::create_project(std::string proj_name){
  * @param dirpath
  * @return unique directory ID
  */
-ID FileHandler::create_directory(std::string dirpath){
+ID file_handler::create_directory(std::string dirpath){
     this->lastError = make_dir(dirpath); //varying implementation, OS dependant
     ID id = this->add_dir(dirpath);
     return id;
@@ -42,7 +42,7 @@ ID FileHandler::create_directory(std::string dirpath){
  * @return errorcode, if deletion was done code is 0;
  * otherwise see OS relevant directoryfile.
  */
-FH_ERROR FileHandler::delete_directory(ID id){
+FH_ERROR file_handler::delete_directory(ID id){
     FH_ERROR err = remove_dir(this->get_dir(id)); //varying implementation, OS dependant
     return err;
 }
@@ -51,7 +51,7 @@ FH_ERROR FileHandler::delete_directory(ID id){
  * @brief FileHandler::save_project
  * @param id
  */
-void FileHandler::save_project(ID id){
+void file_handler::save_project(ID id){
     save_project(get_project(id));
 }
 
@@ -63,7 +63,7 @@ void FileHandler::save_project(ID id){
  * Creates project and associated files.
  * @return void
  */
-void FileHandler::save_project(Project* proj){
+void file_handler::save_project(project* proj){
     std::string proj_file = proj->name + std::string(".txt"); //filename
     if(!proj->saved){
         ID dir_id = create_directory(std::string(WORKSPACE) + "/"+ proj->name);//project directory
@@ -95,7 +95,7 @@ void FileHandler::save_project(Project* proj){
  * Creates project and associated files.
  * @return void
  */
-void FileHandler::update_proj_files(Project* proj){
+void file_handler::update_proj_files(project* proj){
     ProjectStream ps;
     ps << *proj;
     write_file(proj->files->f_proj, ps.projfile.str(), WRITE_OPTION::OVERWRITE);
@@ -103,7 +103,7 @@ void FileHandler::update_proj_files(Project* proj){
     write_file(proj->files->f_analysis, ps.analyzes.str(), WRITE_OPTION::OVERWRITE);
     write_file(proj->files->f_drawings, ps.drawings.str(), WRITE_OPTION::OVERWRITE);
 }
-void FileHandler::load_proj_files(std::string str){
+void file_handler::load_proj_files(std::string str){
     ID id;
     std::string filepath;
     std::stringstream sstr;
@@ -119,7 +119,7 @@ void FileHandler::load_proj_files(std::string str){
  * @param dirpath
  * @return
  */
-Project* FileHandler::load_project(std::string full_project_path){
+project* file_handler::load_project(std::string full_project_path){
     std::string dirpath = full_project_path.substr(0, full_project_path.find_last_of("/"));
     std::string proj_name = full_project_path.substr(full_project_path.find_last_of("/")+1, full_project_path.length());
     proj_name = proj_name.substr(0, proj_name.find(".txt"));
@@ -134,8 +134,8 @@ Project* FileHandler::load_project(std::string full_project_path){
  * @param dirpath
  * @return project
  */
-Project* FileHandler::load_project(std::string projname, std::string dirpath){
-    Project* proj = new Project();
+project* file_handler::load_project(std::string projname, std::string dirpath){
+    project* proj = new project();
     proj->id = this->pid;
     proj->files->dir = add_dir(dirpath);
 
@@ -168,7 +168,7 @@ Project* FileHandler::load_project(std::string projname, std::string dirpath){
  * @param projFileStream
  * @return ID
  */
-ID FileHandler::load_project_file(std::string filepath, std::stringstream& proj_file_stream){
+ID file_handler::load_project_file(std::string filepath, std::stringstream& proj_file_stream){
     std::string buf;
     ID projFileID = add_file(filepath);
     read_file(projFileID, buf);
@@ -183,8 +183,8 @@ ID FileHandler::load_project_file(std::string filepath, std::stringstream& proj_
  * @param Project*
  * @return FH_ERROR errorcode
  */
-FH_ERROR FileHandler::delete_project(Project* proj){
-    ProjFiles* pf = proj->files;
+FH_ERROR file_handler::delete_project(project* proj){
+    proj_files* pf = proj->files;
     delete_file(pf->f_proj);
     delete_file(pf->f_videos);
     delete_file(pf->f_analysis);
@@ -201,8 +201,8 @@ FH_ERROR FileHandler::delete_project(Project* proj){
  * Add a video filepath to a given project.
  * Creates Video object which is accessed further by returned id.
  */
-void FileHandler::add_video(Project* proj, std::string filepath){
-    Video* v = new Video(filepath);
+void file_handler::add_video(project* proj, std::string filepath){
+    video* v = new video(filepath);
     proj->add_video(v);
     this->add_file(filepath);
 }
@@ -214,7 +214,7 @@ void FileHandler::add_video(Project* proj, std::string filepath){
   * @param std::string file name, ID directory id
   */
 
-ID FileHandler::create_file(std::string filename, ID dir_id){
+ID file_handler::create_file(std::string filename, ID dir_id){
     std::ofstream f;
     std::string filePath = this->get_dir(dir_id)+"/"+filename;
     f.open(filePath.c_str());
@@ -227,7 +227,7 @@ ID FileHandler::create_file(std::string filename, ID dir_id){
  * delete application tracked file
  * @param ID file id
  */
- FH_ERROR FileHandler::delete_file(ID id){
+ FH_ERROR file_handler::delete_file(ID id){
     std::string file = this->get_file(id);
     return std::remove(file.c_str());
  }
@@ -239,7 +239,7 @@ ID FileHandler::create_file(std::string filename, ID dir_id){
   * @param ID file id, std::string text
   * @return void
   */
- void FileHandler::write_file(ID id, std::string text, WRITE_OPTION opt){
+ void file_handler::write_file(ID id, std::string text, WRITE_OPTION opt){
     std::string fileName = this->get_file(id);
     std::ofstream f;
     switch(opt){
@@ -264,7 +264,7 @@ ID FileHandler::create_file(std::string filename, ID dir_id){
   *  @param ID file id, std::string text
   *  @return voi
   */
- void FileHandler::read_file(ID id,  std::string& buf, int linesToRead){
+ void file_handler::read_file(ID id,  std::string& buf, int linesToRead){
      std::ifstream f(this->get_file(id));
      std::string temp;
      if(f.is_open()){
@@ -280,9 +280,9 @@ ID FileHandler::create_file(std::string filename, ID dir_id){
   * @param ID project id
   * @return Project*
   */
- Project* FileHandler::get_project(ID pid){
+ project* file_handler::get_project(ID pid){
     this->proj_map_lock.lock();
-    Project* p = this->projects.at(pid);
+    project* p = this->projects.at(pid);
     this->proj_map_lock.unlock();
     return p;
  }
@@ -293,7 +293,7 @@ ID FileHandler::create_file(std::string filename, ID dir_id){
   * @param ID project file id
   * @return std::string filepath
   */
- std::string FileHandler::get_file(ID id){
+ std::string file_handler::get_file(ID id){
     this->file_map_lock.lock();
     std::string file = this->file_map.at(id);
     this->file_map_lock.unlock();
@@ -305,7 +305,7 @@ ID FileHandler::create_file(std::string filename, ID dir_id){
   * @param ID directory id
   * @return directory path
   */
- std::string FileHandler::get_dir(ID id){
+ std::string file_handler::get_dir(ID id){
     this->dir_map_lock.lock();
     std::string dir = this->dir_map.at(id);
     this->dir_map_lock.unlock();
@@ -317,7 +317,7 @@ ID FileHandler::create_file(std::string filename, ID dir_id){
   * @param std::pari<<ID, Project*> pair
   * @return void
   */
- void FileHandler::add_project(std::pair<ID,Project*> pair){
+ void file_handler::add_project(std::pair<ID,project*> pair){
     this->proj_map_lock.lock();
     this->projects.insert(pair);
     this->proj_map_lock.unlock();
@@ -329,7 +329,7 @@ ID FileHandler::create_file(std::string filename, ID dir_id){
   * @param std::string filepath
   * @return unique file identifier
   */
-ID FileHandler::add_file(std::string filepath){
+ID file_handler::add_file(std::string filepath){
     add_file(this->fid, filepath);
     return this->fid++;
  }
@@ -339,7 +339,7 @@ ID FileHandler::add_file(std::string filepath){
  * @param id
  * @param filepath
  */
-void FileHandler::add_file(ID id ,std::string filepath){
+void file_handler::add_file(ID id ,std::string filepath){
     std::pair<ID,std::string> pair = std::make_pair(id, filepath);
     this->file_map_lock.lock();
     this->file_map.insert(pair);
@@ -351,7 +351,7 @@ void FileHandler::add_file(ID id ,std::string filepath){
   * @param std::string dirpath
   * @return unique directory identifier
   */
-ID FileHandler::add_dir(std::string dirpath){
+ID file_handler::add_dir(std::string dirpath){
     std::pair<ID,std::string> pair = std::make_pair(this->did, dirpath);
     this->dir_map_lock.lock();
     this->dir_map.insert(pair);
@@ -365,10 +365,10 @@ ID FileHandler::add_dir(std::string dirpath){
  * @param proj2
  * @return true if project contents are the same
  */
-bool FileHandler::proj_equals(Project& proj, Project& proj2){
+bool file_handler::proj_equals(project& proj, project& proj2){
     bool videoEquals =  std::equal(proj.videos.begin(), proj.videos.end(),
                proj2.videos.begin(),
-               [](const Video* v, const Video* v2){return *v == *v2;}); // lambda function comparing using video==
+               [](const video* v, const video* v2){return *v == *v2;}); // lambda function comparing using video==
                                                                         // by dereferencing pointers in vector
     return projfiles_equal(*proj.files , *proj2.files) && //probably unnecessary as projfiles have projname followed by default suffix
            proj.name == proj2.name &&
@@ -381,7 +381,7 @@ bool FileHandler::proj_equals(Project& proj, Project& proj2){
  * @param pf2
  * @return true if files are the same paths
  */
-bool FileHandler::projfiles_equal(ProjFiles& pf, ProjFiles& pf2){
+bool file_handler::projfiles_equal(proj_files& pf, proj_files& pf2){
     return dirs_equal(pf.dir, pf2.dir) &&
         this->files_equal(pf.f_proj, pf2.f_proj) &&
         this->files_equal(pf.f_analysis, pf2.f_analysis)&&
@@ -395,7 +395,7 @@ bool FileHandler::projfiles_equal(ProjFiles& pf, ProjFiles& pf2){
  * @param id2
  * @return
  */
-bool FileHandler::files_equal(ID id, ID id2){
+bool file_handler::files_equal(ID id, ID id2){
     return this->get_file(id) == this->get_file(id2);
 }
 
@@ -405,6 +405,6 @@ bool FileHandler::files_equal(ID id, ID id2){
  * @param id2
  * @return true if dirs are same path
  */
-bool FileHandler::dirs_equal(ID id, ID id2){
+bool file_handler::dirs_equal(ID id, ID id2){
     return this->get_dir(id) == this->get_dir(id2);
 }
