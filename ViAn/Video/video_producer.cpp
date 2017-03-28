@@ -1,27 +1,15 @@
 #include "video_producer.h"
 #include <iostream>
-video_producer::video_producer(video_player* player) {
-    mPlayer = player;
+
+VideoProducer::VideoProducer(VideoPlayer* player, QSemaphore* load_video_sema, std::string file_name) {
+    m_player = player;
+    m_file_name = file_name;
+    m_load_sema = load_video_sema;
 }
 
-void video_producer::run() {
-    QObject::connect(this, SIGNAL(fetched_frame(QImage)), mPlayer, SLOT(enqueueFrame(QImage)));
-    std::cout << "Starting producer thread" << std::endl;
 
-    capture.open("seq_01.mp4");
-    if (!capture.isOpened()) {
-        std::cout << "Could not open file" << std::endl;
-    }
 
-    cv::Mat frame, RGBframe;
-    QImage img;
-    while(capture.read(frame)) {
-        if (frame.channels() == 3) {
-            cv::cvtColor(frame, RGBframe, CV_BGR2RGB);
-            img = QImage((const unsigned char*)(frame.data), RGBframe.cols, RGBframe.rows,QImage::Format_RGB888);
-            emit fetched_frame(img);
-
-        }
-    }
-    std::cout << "Exiting capture loop" << std::endl;
+double VideoProducer::get_frame_rate() {
+    std::cout << "Video opened: " << capture.isOpened() << ", fps: " << capture.get(CV_CAP_PROP_FPS) << std::endl;
+    return capture.get(CV_CAP_PROP_FPS);
 }

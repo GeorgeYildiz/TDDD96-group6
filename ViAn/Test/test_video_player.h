@@ -34,7 +34,7 @@ private slots:
     void test_set_overlay_colour();
 
 private:
-    video_player* mvideo;
+    VideoPlayer* mvideo;
 signals:
 
 public slots:

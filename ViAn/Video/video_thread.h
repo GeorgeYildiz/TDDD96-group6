@@ -6,15 +6,16 @@
 #include "video_producer.h"
 
 
-class video_thread : public QThread {
+class VideoThread : public QThread {
 public:
-    video_thread(video_controller* controller);
+    VideoThread(VideoController* controller, VideoPlayer* player);
 
 protected:
  void run() override;
 
 private:
-    video_controller* mController;
+    VideoController* m_controller;
+    VideoPlayer* player;
 };
 
 #endif // VIDEO_THREAD_H

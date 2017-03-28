@@ -1,36 +1,59 @@
 #include "video_player.h"
 
-video_player::video_player(QObject *parent) : QObject(parent) {
-
+VideoPlayer::VideoPlayer(std::string file_name, QObject *parent) : QObject(parent) {
+    m_file_name = file_name;
 }
 
-void video_player::play() {
-    mIsPlaying = true;
+void VideoPlayer::open_video() {
+    capture = new cv::VideoCapture(m_file_name);
 }
 
-void video_player::pause() {
-    mIsPlaying = false;
+void VideoPlayer::emit_next_frame() {
+    QImage img;
+    cv::Mat frame, RGBframe;
+    if (capture->read(frame)) {
+        if (frame.channels()== 3) {
+            cv::cvtColor(frame, RGBframe, CV_BGR2RGB);
+            img = QImage((const unsigned char*)(RGBframe.data),
+                              RGBframe.cols,RGBframe.rows,QImage::Format_RGB888);
+        } else {
+            img = QImage((const unsigned char*)(frame.data),
+                                 frame.cols,frame.rows,QImage::Format_Indexed8);
+            //std::cout << "Frame size: " << img.byteCount() << std::endl;
+        }
+        emit display(img);
+    } else {
+        m_is_stopped = true;
+    }
 }
 
-void video_player::stop() {
-    mIsStopped = true;
+void VideoPlayer::play() {
+    m_is_playing = true;
 }
 
-void video_player::enqueueFrame(QImage frame) {
-    std::cout << "Buffering frame.." << std::endl;
-    buffer.push_back(frame);
-    std::cout << buffer.size() << std::endl;
-
+void VideoPlayer::pause() {
+    m_is_playing = false;
 }
 
-bool video_player::is_stopped() {
-    return mIsStopped;
+void VideoPlayer::stop() {
+    m_is_stopped = true;
 }
 
-bool video_player::is_buffer_empty() {
-    return buffer.size() == 0;
+
+bool VideoPlayer::is_playing() {
+    return m_is_playing;
 }
 
-void video_player::emit_next_frame() {
-    emit display(buffer.pop_front());
+bool VideoPlayer::is_stopped() {
+    return m_is_stopped;
+}
+
+double VideoPlayer::get_frame_rate() {
+    std::cout << "Video opened: " << capture->isOpened() << ", fps: " << capture->get(CV_CAP_PROP_FPS) << std::endl;
+    return capture->get(CV_CAP_PROP_FPS);
+}
+
+VideoPlayer::~VideoPlayer() {
+    capture->release();
+    delete capture;
 }

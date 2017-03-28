@@ -3,9 +3,9 @@
 
 #include <QObject>
 
-class video_controller : public QObject { Q_OBJECT
+class VideoController : public QObject { Q_OBJECT
 public:
-    explicit video_controller(QObject *parent = 0);
+    explicit VideoController(QObject *parent = 0);
 
 signals:
     void play();

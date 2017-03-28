@@ -17,6 +17,7 @@
 #include "Filehandler/filehandler.h"
 #include "inputwindow.h"
 #include "action.h"
+#include "Video/video_thread.h"
 
 using namespace std;
 class inputwindow;
@@ -92,7 +93,8 @@ private:
 
     Ui::MainWindow *ui;
     inputwindow *inputWindow;
-    video_player* mvideo_player;
+    VideoThread *m_video_thread;
+    VideoController *m_video_controller;
     IconOnButtonHandler *iconOnButtonHandler;
 
     QSlider *video_slider;

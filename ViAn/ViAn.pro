@@ -16,8 +16,7 @@ TEMPLATE = app
 #
 # GENERAL
 #
-SOURCES += main.cpp \
-    Video/video_producer.cpp
+SOURCES += main.cpp
 
 #
 # TEST
@@ -70,8 +69,7 @@ HEADERS += Video/video_player.h \
     Video/shapes/line.h \
     Video/shapes/pen.h \
     Video/video_controller.h \
-    Video/video_thread.h \
-    Video/video_producer.h
+    Video/video_thread.h
 win32 {
     INCLUDEPATH += C:\opencv\release\install\include
     LIBS += C:\opencv\release\bin\libopencv_core320.dll

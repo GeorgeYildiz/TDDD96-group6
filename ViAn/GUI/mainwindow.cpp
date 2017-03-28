@@ -34,10 +34,6 @@ MainWindow::MainWindow(QWidget *parent) :
     // Add this object as a listener to videoFrame.
     ui->videoFrame->installEventFilter(this);
 
-    video_controller* controller = new video_controller;
-    video_thread* videoThread = new video_thread(controller);
-    videoThread->start();
-
     /**
     TODO add correct video player function calls
     mvideo_player = new video_player();
@@ -61,7 +57,8 @@ MainWindow::~MainWindow() {
 
     delete iconOnButtonHandler;
     delete fileHandler;
-    delete mvideo_player;
+    delete m_video_controller;
+    delete m_video_thread;
     delete ui;
 }
 
@@ -172,6 +169,7 @@ void MainWindow::on_previousFrameButton_clicked() {
  * @param frame
  */
 void MainWindow::update_video(QImage frame) {
+    std::cout << frame.byteCount() << endl;
     ui->videoFrame->setPixmap(QPixmap::fromImage(frame));
 }
 
@@ -265,6 +263,13 @@ void MainWindow::on_bookmarkButton_clicked(){
     video_slider->setMaximum(mvideo_player->get_num_frames());
     mvideo_player->set_playback_frame(700);
     **/
+    m_video_controller = new VideoController();
+    VideoPlayer *player = new VideoPlayer("seq_01.mp4");
+
+    m_video_thread = new VideoThread(m_video_controller, player);
+    player->moveToThread(m_video_thread->thread());
+    QObject::connect(player, SIGNAL(display(QImage)), this, SLOT(update_video(QImage)));
+    m_video_thread->start();
 }
 
 /**
