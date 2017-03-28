@@ -2,7 +2,7 @@
 /**
  * @brief Video::Video
  */
-Video::Video()
+video::video()
 {
     this->filepath = "";
 }
@@ -11,7 +11,7 @@ Video::Video()
  * @param id
  * @param filepath
  */
-Video::Video(std::string filepath){
+video::video(std::string filepath){
     this->filepath = filepath;
 }
 /**
@@ -20,7 +20,7 @@ Video::Video(std::string filepath){
  * @param vid
  * @return UNFINISHED
  */
-std::stringstream& operator>>(std::stringstream& is, Video& vid){    
+std::stringstream& operator>>(std::stringstream& is, video& vid){
     is >> vid.filepath;  
     return is;
 }
@@ -30,7 +30,7 @@ std::stringstream& operator>>(std::stringstream& is, Video& vid){
  * @param vid
  * @return used for writing project to file
  */
-std::stringstream& operator<<(std::stringstream& os, const Video& vid){
+std::stringstream& operator<<(std::stringstream& os, const video& vid){
     os << vid.filepath.c_str() << " ";
     return os;
 }
@@ -40,6 +40,6 @@ std::stringstream& operator<<(std::stringstream& os, const Video& vid){
  * @param v2
  * @return if videos the same TRUE
  */
-bool operator==(Video v1, Video v2){
+bool operator==(video v1, video v2){
     return v1.filepath == v2.filepath;
 }

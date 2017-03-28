@@ -13,8 +13,8 @@ filehandlertest::filehandlertest(QObject *parent) : QObject(parent){
  * TODO : tests project write to file and read from file
  */
 void filehandlertest::project_handling_test(){
-    FileHandler* fh = new FileHandler();
-    Project* proj =  fh->create_project("TEST_PROJ");
+    file_handler* fh = new file_handler();
+    project* proj =  fh->create_project("TEST_PROJ");
     std::string v1 = "video1.txt"; // names for testfiles
     std::string v2 = "video2.txt";
     std::string v3 = "video3.txt";
@@ -27,7 +27,7 @@ void filehandlertest::project_handling_test(){
 
     fh->save_project(proj);
     //check file contents
-    Project* proj2 = fh->load_project("TEST_PROJ", std::string(WORKSPACE) + "/TEST_PROJ");
+    project* proj2 = fh->load_project("TEST_PROJ", std::string(WORKSPACE) + "/TEST_PROJ");
     QVERIFY(fh->proj_equals(*proj2,*proj));
     //check project contentss
     fh->delete_file(vid1);
@@ -40,7 +40,7 @@ void filehandlertest::project_handling_test(){
  * Test directory creation and deletion
  */
 void filehandlertest::directory_test(){
-    FileHandler* fh = new FileHandler();
+    file_handler* fh = new file_handler();
     std::string dirpath = std::string(WORKSPACE) + std::string("/TEST_PROJ");
     ID id = fh->create_directory(dirpath);
     QCOMPARE(fh->lastError, 0);
@@ -52,7 +52,7 @@ void filehandlertest::directory_test(){
  */
 
 void filehandlertest::file_test(){
-    FileHandler* fh = new FileHandler();
+    file_handler* fh = new file_handler();
     std::string dirpath = std::string(WORKSPACE) + "/TEST_MAP";
     std::string filename = "filetest.txt";
     ID dir = fh->create_directory(dirpath);

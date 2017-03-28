@@ -15,7 +15,7 @@ typedef int ID;
  * Importand for seperation of different types of data.
  */
 struct ProjectStream{
-    std::stringstream projFile;
+    std::stringstream projfile;
     std::stringstream videos;
     std::stringstream analyzes;
     std::stringstream drawings;
@@ -26,13 +26,13 @@ struct ProjectStream{
  * also easier to pass all files as opposed to every file
  * seperately
  */
-struct ProjFiles{
+struct proj_files{
    ID dir;
    ID f_proj;
    ID f_analysis;
    ID f_drawings;
    ID f_videos;
-   ProjFiles(){
+   proj_files(){
        this->dir = -1;
        this->f_proj = -1;
        this->f_analysis = -1;
@@ -40,8 +40,8 @@ struct ProjFiles{
        this->f_videos = -1;
    }
 
-   friend ProjectStream& operator>>(ProjectStream &ps, ProjFiles& pf);
-   friend ProjectStream& operator<<(ProjectStream &ps,const ProjFiles& pf);
+   friend ProjectStream& operator>>(ProjectStream &ps, proj_files& pf);
+   friend ProjectStream& operator<<(ProjectStream &ps,const proj_files& pf);
 };
 
 /**
@@ -50,16 +50,16 @@ struct ProjFiles{
  * along with parser functionality
  */
 
-struct Project{
+struct project{
 public:
-    Project();
-    Project(ID id, std::string name);
-    Project(std::string dirpath);
-    void add_video(Video *vid);
+    project();
+    project(ID id, std::string name);
+    project(std::string dirpath);
+    void add_video(video *vid);
 
     // read and write operator for Projects
-    friend ProjectStream& operator>>(ProjectStream& ps, Project& proj);
-    friend ProjectStream& operator<<(ProjectStream& ps, const Project& proj);
+    friend ProjectStream& operator>>(ProjectStream& ps, project& proj);
+    friend ProjectStream& operator<<(ProjectStream& ps, const project& proj);
 
 
 
@@ -67,10 +67,10 @@ public:
 //    void add_analysis();
 //    void add_drawing();      
 public:
-    ID m_id;
-    std::string m_name;
-    ProjFiles* files;
-    std::vector<Video*> m_videos;
+    ID id;
+    std::string name;
+    proj_files* files;
+    std::vector<video*> videos;
     bool saved;
 };
 

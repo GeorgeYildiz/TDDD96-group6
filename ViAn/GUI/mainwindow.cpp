@@ -30,7 +30,7 @@ MainWindow::MainWindow(QWidget *parent) :
     iconOnButtonHandler = new IconOnButtonHandler();
     iconOnButtonHandler->set_pictures_to_buttons(ui);
 
-    fileHandler = new FileHandler();
+    fileHandler = new file_handler();
     set_shortcuts();
 
     // Add this object as a listener to videoFrame.
@@ -265,7 +265,7 @@ void MainWindow::input_switch_case(ACTION action, QString qInput) {
     std::string input = qInput.toStdString();
     switch(action){
         case ADD_PROJECT: {
-            Project* proj = fileHandler->create_project(input);
+            project* proj = fileHandler->create_project(input);
             add_project_to_tree(proj);
             set_status_bar("Project " + input + " created.");
             delete inputWindow;
@@ -573,9 +573,9 @@ void MainWindow::on_actionSave_triggered() {
  */
 void MainWindow::on_actionLoad_triggered() {
     QString dir = QFileDialog::getOpenFileName(this, tr("Choose project"),"C:/",tr("*.txt"));
-    Project* loadProj= this->fileHandler->load_project(dir.toStdString());
+    project* loadProj= this->fileHandler->load_project(dir.toStdString());
     add_project_to_tree(loadProj);
-    set_status_bar("Project " + loadProj->m_name + " loaded.");
+    set_status_bar("Project " + loadProj->name + " loaded.");
 }
 
 /**
@@ -583,12 +583,12 @@ void MainWindow::on_actionLoad_triggered() {
  * @param proj to add to tree
  * also adds all videos of the project to the tree
  */
-void MainWindow::add_project_to_tree(Project* proj) {
-    MyQTreeWidgetItem *projectInTree = new MyQTreeWidgetItem(TYPE::PROJECT, QString::fromStdString(proj->m_name), proj->m_id);
-    projectInTree->setText(0, QString::fromStdString(proj->m_name));
+void MainWindow::add_project_to_tree(project* proj) {
+    MyQTreeWidgetItem *projectInTree = new MyQTreeWidgetItem(TYPE::PROJECT, QString::fromStdString(proj->name), proj->id);
+    projectInTree->setText(0, QString::fromStdString(proj->name));
     set_selected_project(projectInTree);
     ui->ProjectTree->addTopLevelItem(projectInTree);
-    for(Video *v: proj->m_videos) {
+    for(video *v: proj->videos) {
         std::stringstream filePath;
         filePath << *v;
         std::string treeName = filePath.str();

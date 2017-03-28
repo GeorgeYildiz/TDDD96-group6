@@ -1,5 +1,5 @@
 #include "analysis.h"
 
-Analysis::Analysis()
+analysis::analysis()
 {
 }
