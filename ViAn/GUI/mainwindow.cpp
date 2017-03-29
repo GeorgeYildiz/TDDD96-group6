@@ -4,6 +4,7 @@
 #include <iostream>
 #include <QCloseEvent>
 #include <QColorDialog>
+#include <QStyle>
 #include <chrono>
 #include <thread>
 #include "icononbuttonhandler.h"
@@ -27,8 +28,12 @@ MainWindow::MainWindow(QWidget *parent) :
     this->selectedVideo = nullptr;
 
     video_slider = findChild<QSlider*>("videoSlider");
-    iconOnButtonHandler = new IconOnButtonHandler();
-    iconOnButtonHandler->set_pictures_to_buttons(ui);
+    ui->stopButton->setIcon(style()->standardIcon(QStyle::SP_MediaStop));
+    ui->playPauseButton->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
+    ui->fastForwardButton->setIcon(style()->standardIcon(QStyle::SP_MediaSeekForward));
+    ui->fastBackwardButton->setIcon(style()->standardIcon(QStyle::SP_MediaSeekBackward));
+    //iconOnButtonHandler = new IconOnButtonHandler();
+    //iconOnButtonHandler->set_pictures_to_buttons(ui);
 
     fileHandler = new FileHandler();
     set_shortcuts();
@@ -59,7 +64,7 @@ MainWindow::MainWindow(QWidget *parent) :
  */
 MainWindow::~MainWindow() {
 
-    delete iconOnButtonHandler;
+    //delete iconOnButtonHandler;
     delete fileHandler;
     delete mvideo_player;
     delete ui;
@@ -101,11 +106,13 @@ void MainWindow::on_fastBackwardButton_clicked(){
 void MainWindow::on_playPauseButton_clicked() {
     if (mvideo_player->is_paused() || mvideo_player->is_stopped()) {
         set_status_bar("Playing");
-        iconOnButtonHandler->set_icon("pause", ui->playPauseButton);//changes the icon on the play button to a pause-icon
+        //iconOnButtonHandler->set_icon("pause", ui->playPauseButton);//changes the icon on the play button to a pause-icon
+        ui->playPauseButton->setIcon(style()->standardIcon(QStyle::SP_MediaPause));
         mvideo_player->start();
     } else {
         set_status_bar("Paused");
-        iconOnButtonHandler->set_icon("play", ui->playPauseButton);
+        //iconOnButtonHandler->set_icon("play", ui->playPauseButton);
+        ui->playPauseButton->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
         mvideo_player->play_pause();
         mvideo_player->wait();
     }
@@ -126,7 +133,8 @@ void MainWindow::on_fastForwardButton_clicked(){
 void MainWindow::on_stopButton_clicked() {
     set_status_bar("Stopped");
     if (!mvideo_player->is_paused()) {
-        iconOnButtonHandler->set_icon("play", ui->playPauseButton);
+        //iconOnButtonHandler->set_icon("play", ui->playPauseButton);
+        ui->playPauseButton->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
     }
     mvideo_player->stop_video();
 }
@@ -532,7 +540,8 @@ void MainWindow::on_actionAddVideo_triggered() {
 void MainWindow::play_video() {
     enable_video_buttons();
     mvideo_player->load_video(selectedVideo->name.toStdString());
-    iconOnButtonHandler->set_icon("pause", ui->playPauseButton);
+    //iconOnButtonHandler->set_icon("pause", ui->playPauseButton);
+    ui->playPauseButton->setIcon(style()->standardIcon(QStyle::SP_MediaPause));
     video_slider->setMaximum(mvideo_player->get_num_frames());
     mvideo_player->set_playback_frame(0);
 }
