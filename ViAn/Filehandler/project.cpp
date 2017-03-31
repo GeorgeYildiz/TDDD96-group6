@@ -94,12 +94,12 @@ ProjectStream& operator<<(ProjectStream &ps, const Project& proj){
     //write name and id;   
     ps.proj_file << proj.name.c_str() << " ";
     //write videos
-    int vidcounter = proj.videos.size();
-    ps.videos << vidcounter << " ";
+    int vid_counter = proj.videos.size();
+    ps.videos << vid_counter << " ";
     for(auto vid = proj.videos.rbegin(); vid != proj.videos.rend(); ++vid){
         Video* v = vid->second;
-            ps.videos << *v << " ";
-            vidcounter++;
+        ps.videos << *v << " ";
+        vid_counter++;
     }
     return ps;
 }
