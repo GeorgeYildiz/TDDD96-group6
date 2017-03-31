@@ -319,7 +319,8 @@ void MainWindow::input_switch_case(ACTION action, QString qInput) {
             break;
         }
         case ADD_VIDEO: {
-            add_video_to_tree(selectedProject, input);
+            ID id = fileHandler->add_video(fileHandler->get_project(selectedProject->id), input);
+            add_video_to_tree(selectedProject, input, id);
             set_status_bar("Video " + input + " added.");
             break;
         }
@@ -537,9 +538,13 @@ void MainWindow::prepare_menu(const QPoint & pos) {
     } else if(item->type == TYPE::VIDEO) {
         set_selected_video(item);
         QAction *load_video = new QAction(QIcon(""), tr("&Play video"), this);
+        QAction *remove_video = new QAction(QIcon(""), tr("&Remove video"), this);
         load_video->setStatusTip(tr("Play video"));
+        remove_video->setStatusTip(tr("Remove video from project"));
         menu.addAction(load_video);
+        menu.addAction(remove_video);
         connect(load_video, SIGNAL(triggered()), this, SLOT(play_video()));
+        connect(remove_video, SIGNAL(triggered()), this, SLOT(on_actionDeleteVideo_triggered()));
     }
     QPoint pt(pos);
     menu.exec( tree->mapToGlobal(pos) );
@@ -652,15 +657,17 @@ void MainWindow::on_actionLoad_triggered() {
  * also adds all videos of the project to the tree
  */
 void MainWindow::add_project_to_tree(Project* proj) {
-    MyQTreeWidgetItem *projectInTree = new MyQTreeWidgetItem(TYPE::PROJECT, QString::fromStdString(proj->name), proj->id);
-    projectInTree->setText(0, QString::fromStdString(proj->name));
-    set_selected_project(projectInTree);
-    ui->ProjectTree->addTopLevelItem(projectInTree);
-    for(Video *v: proj->videos) {
-        std::stringstream filePath;
-        filePath << *v;
-        std::string treeName = filePath.str();
-        add_video_to_tree(projectInTree, treeName);
+    MyQTreeWidgetItem *project_in_tree = new MyQTreeWidgetItem(TYPE::PROJECT, QString::fromStdString(proj->name), proj->id);
+    project_in_tree->setText(0, QString::fromStdString(proj->name));
+    set_selected_project(project_in_tree);
+    ui->ProjectTree->addTopLevelItem(project_in_tree);
+    for(auto vid = proj->videos.begin(); vid != proj->videos.end(); ++vid){
+        std::stringstream file_path;
+        Video* v = vid->second;
+        file_path << *v;
+        cout << file_path.str() << endl;
+        std::string tree_name = file_path.str();
+        add_video_to_tree(project_in_tree, tree_name, v->id);
     }
 }
 
@@ -669,9 +676,8 @@ void MainWindow::add_project_to_tree(Project* proj) {
  * @param project to add videos to
  * @param filePath of the video
  */
-void MainWindow::add_video_to_tree(MyQTreeWidgetItem *project, std::string filePath) {
-    fileHandler->add_video(fileHandler->get_project(project->id), filePath);
-    MyQTreeWidgetItem *videoInTree = new MyQTreeWidgetItem(TYPE::VIDEO, QString::fromStdString(filePath));
+void MainWindow::add_video_to_tree(MyQTreeWidgetItem *project, std::string filePath, ID id) {
+    MyQTreeWidgetItem *videoInTree = new MyQTreeWidgetItem(TYPE::VIDEO, QString::fromStdString(filePath), id);
     videoInTree->set_text_from_filepath(filePath);
     project->addChild(videoInTree);
     set_selected_video(videoInTree);
@@ -749,6 +755,28 @@ void MainWindow::toggle_toolbar() {
     }else {
         ui->toolBar->hide();
         ui->toolBar_no_overlay->show();
+    }
+}
+
+/**
+ * @brief MainWindow::on_actionDeleteVideo_triggered
+ * Removes video from a project, in both project tree and filehandler
+ */
+void MainWindow::on_actionDeleteVideo_triggered()
+{
+    if(selectedVideo != nullptr) {
+        MyQTreeWidgetItem *project = (MyQTreeWidgetItem*)selectedVideo->parent(); // Get the actual tree project
+        QMessageBox::StandardButton resBtn = QMessageBox::question( this, "Delete",
+                                                                    tr(("Are you sure you want to remove the selected video from " + project->name.toStdString() + "?\n").c_str()),
+                                                                    QMessageBox::No | QMessageBox::Yes,
+                                                                    QMessageBox::No); // Display messagebox
+
+        if (resBtn == QMessageBox::Yes) {
+            fileHandler->remove_video_from_project(project->id, selectedVideo->id); // Remove video from project
+            remove_video_from_tree(selectedVideo); //Remove video from tree
+        }
+    } else {
+        set_status_bar("No selected video to remove.");
     }
 }
 
