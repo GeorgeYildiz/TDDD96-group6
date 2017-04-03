@@ -5,6 +5,7 @@
 #include <thread>
 #include <QWaitCondition>
 #include <qpainter.h>
+#include <qdebug.h>
 
 
 using namespace std;
@@ -58,30 +59,40 @@ bool video_player::load_video(string filename) {
  * video file and sending them to the GUI.
  */
 void video_player::run()  {
+    qDebug() << "Starting video thread";
     video_stopped = false;
     video_paused = false;
     int delay = (1000/frame_rate);
     set_current_frame_num(0);
     while (!video_stopped && capture.read(frame)) {
         const clock_t begin_time = std::clock();
-
         convert_frame();
-        int conversion_time = int((std::clock()-begin_time)*1000.0 /CLOCKS_PER_SEC);
 
+        int conversion_time = int((std::clock()-begin_time)*1000.0 /CLOCKS_PER_SEC);
         if (delay - conversion_time > 0) {
             this->msleep(delay - conversion_time);
         }
         show_frame();
 
+        if (set_new_frame) {
+            // A new frame has been set outside the loop, change it
+            capture.set(CV_CAP_PROP_POS_FRAMES, new_frame_num);
+            set_new_frame = false;
+        }
 
         // Waits for the video to be resumed
         m_mutex->lock();
         if (video_paused) {
+            qDebug() << "Video paused. Sleeping thread";
             m_paused_wait->wait(m_mutex);
             video_paused = false;
         }
         m_mutex->unlock();
     }
+    video_stopped = true;
+    capture.set(CV_CAP_PROP_POS_FRAMES, 0);
+    emit update_current_frame(0);
+    qDebug() << "Terminating video thread";
 }
 
 /**
@@ -99,6 +110,16 @@ void video_player::show_frame() {
  * including the zoom and overlay.
  */
 void video_player::convert_frame() {
+    qDebug() << "Convert frame";
+    if (frame.cols == 0 || frame.rows == 0) {
+        // TODO
+        // When reaching the last frame the mat object will sometimes
+        // have cols and rows set to zero and then it cannot be coverted
+        // As a result the program crashes. This needs to be fixed
+        qDebug() << "Error with current frame";
+        qDebug() << frame.cols << " " << frame.rows;
+        return;
+    }
     cv::Mat processed_frame;
 
     // Process frame (draw overlay, zoom, scaling, contrast/brightness)
@@ -126,7 +147,9 @@ void video_player::convert_frame() {
  */
 cv::Mat video_player::process_frame(cv::Mat &frame) {
     // Copy the frame, so that we don't alter the original frame (which will be reused next draw loop).
+    qDebug() << "Process frame" << frame.rows << " " << frame.cols;
     cv::Mat processed_frame = frame.clone();
+    qDebug() << "Cloned";
     processed_frame = video_overlay->draw_overlay(processed_frame, get_current_frame_num());
     if (choosing_zoom_area) {
         processed_frame = zoom_area->draw(processed_frame);
@@ -153,12 +176,16 @@ cv::Mat video_player::process_frame(cv::Mat &frame) {
  * @return
  */
 cv::Mat video_player::scale_frame(cv::Mat &src) {
-
+    qDebug() << frame_width << " " << frame_height;
     cv::Size size;
     if (frame_width <= 0 || frame_height <= 0) {
+        // TODO
+        // Both frame_width and frame_height are unsigned ints and thus never < 0
+        // Need to check for bigger sizes
         size = cv::Size(capture.get(CV_CAP_PROP_FRAME_WIDTH),capture.get(CV_CAP_PROP_FRAME_HEIGHT));
         frame_width = capture.get(CV_CAP_PROP_FRAME_WIDTH);
         frame_height = capture.get(CV_CAP_PROP_FRAME_HEIGHT);
+        qDebug() << frame_width << " " << frame_height;
     } else {
         size = cv::Size(frame_width,frame_height);
     }
@@ -269,9 +296,13 @@ int video_player::get_current_frame_num() {
 bool video_player::set_current_frame_num(int frame_nbr) {
     if (frame_nbr >= 0 && frame_nbr < get_num_frames()) {
         // capture.set() sets the number of the frame to be read.
-        capture.set(CV_CAP_PROP_POS_FRAMES, frame_nbr);
-        // capture.read() will read the frame and advance one step.
-        capture.read(frame);
+        if (video_paused) {
+            capture.set(CV_CAP_PROP_POS_FRAMES, frame_nbr);
+            capture.read(frame);
+        } else {
+            set_new_frame = true;
+            new_frame_num = frame_nbr;
+        }
         return true;
     }
     return false;
@@ -291,6 +322,26 @@ void video_player::set_frame_width(int new_value) {
  */
 void video_player::set_frame_height(int new_value) {
     frame_height = new_value;
+}
+
+/**
+ * @brief video_player::on_set_playback_frame
+ * Updates the frame directly if the video is paused.
+ * Otherwise it saves the frame number which later on
+ * updates in the run function
+ * @param frame_num
+ */
+void video_player::on_set_playback_frame(int frame_num) {
+    if (video_paused) {
+        update_frame(frame_num - 1);
+    } else {
+        if (frame_num >= 0 && frame_num < get_num_frames()) {
+            set_new_frame = true;
+            new_frame_num = frame_num - 1;
+        } else {
+            set_new_frame = false;
+        }
+    }
 }
 
 /**
@@ -368,7 +419,17 @@ void video_player::update_overlay() {
 }
 
 /**
- * @brief video_player::reset_brightness_contrast
+ * @brief video_player::set_slider_frame
+ * @param frame_nbr
+ * This method is called when the slider is moved and is used to call the private method
+ * update_frame with the desired frame number.
+ */
+void video_player::set_slider_frame(int frame_nbr) {
+    update_frame(frame_nbr);
+}
+
+
+/** @brief video_player::reset_brightness_contrast
  * Resets contrast and brightness to default values.
  */
 void video_player::reset_brightness_contrast() {

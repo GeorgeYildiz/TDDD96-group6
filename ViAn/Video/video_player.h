@@ -18,7 +18,6 @@
 
 using namespace std;
 
-
 class video_player : public QThread {
     Q_OBJECT
 public:
@@ -39,11 +38,12 @@ public:
     void set_frame_width(int new_value);
     void set_frame_height(int new_value);
     void set_speed_multiplier(double mult);
-
     double get_speed_multiplier();
 
     void inc_playback_speed();
     void dec_playback_speed();
+
+    void set_slider_frame(int frame_nbr);
     
     void reset_brightness_contrast();
     void set_contrast(double contrast);
@@ -82,6 +82,7 @@ private slots:
     void scaling_event(int new_width, int new_height);
     void next_frame();
     void previous_frame();
+    void on_set_playback_frame(int frame_num);
 
 public slots:
     void on_play_video();
@@ -108,8 +109,9 @@ private:
     cv::Mat RGBframe;
 
     int num_frames;
-    unsigned int frame_width;
-    unsigned int frame_height;
+    int new_frame_num;
+    int frame_width; // TODO
+    int frame_height; // Change back to unsigned int?
     unsigned int qlabel_width;
     unsigned int qlabel_height;
 
@@ -119,6 +121,8 @@ private:
     bool video_stopped = false;
     bool video_paused;
     bool choosing_zoom_area = false;
+    bool set_new_frame = false;
+    bool slider_moving = false;
     bool choosing_analysis_area = false;
 
     QImage img;

@@ -65,20 +65,10 @@ void test_video_player::test_set_frame_height() {
 }
 
 /**
- * @brief test_video_player::test_set_current_frame
- */
-void test_video_player::test_set_current_frame() {
-    mvideo->set_current_frame_num(100);
-    QVERIFY(mvideo->get_current_frame_num() == 100);
-    mvideo->set_current_frame_num(10);
-    mvideo->set_current_frame_num(-10);
-    QVERIFY(mvideo->get_current_frame_num() == 10);
-}
-
-/**
  * @brief test_video_player::test_next_frame
  */
 void test_video_player::test_next_frame() {
+    mvideo->video_paused = true;
     mvideo->set_current_frame_num(100);
     mvideo->next_frame();
     QVERIFY(mvideo->get_current_frame_num() == 101);
@@ -88,6 +78,7 @@ void test_video_player::test_next_frame() {
  * @brief test_video_player::test_previous_frame
  */
 void test_video_player::test_previous_frame() {
+    mvideo->video_paused = true;
     mvideo->set_current_frame_num(100);
     mvideo->previous_frame();
     QVERIFY(mvideo->get_current_frame_num() == 99);
@@ -127,12 +118,14 @@ void test_video_player::test_dec_playback_speed(){
  * @brief test_toggle_overlay
  */
 void test_video_player::test_toggle_overlay() {
-    mvideo->on_stop_video();
-    mvideo->video_overlay->set_showing_overlay(false);
-    mvideo->toggle_overlay();
-    QVERIFY(mvideo->is_showing_overlay());
-    mvideo->toggle_overlay();
-    QVERIFY(!mvideo->is_showing_overlay());
+    QMutex mutex;
+    QWaitCondition wait;
+    video_player *v_player = new video_player(&mutex, &wait);
+    v_player->video_overlay->set_showing_overlay(false);
+    v_player->toggle_overlay();
+    QVERIFY(v_player->is_showing_overlay());
+    v_player->toggle_overlay();
+    QVERIFY(!v_player->is_showing_overlay());
 }
 
 /**
@@ -330,4 +323,38 @@ void test_video_player::test_set_stop_video() {
     QVERIFY(!mvideo->video_paused);
     QVERIFY(mvideo->get_current_frame_num() == 0);
     QVERIFY(mvideo->video_stopped);
+}
+
+/**
+ * @brief test_video_player::test_on_set_playback_frame_pass
+ * Test on_set_playback_frame with valid inputs
+ */
+void test_video_player::test_on_set_playback_frame_pass() {
+    mvideo->video_paused = false;
+    mvideo->on_set_playback_frame(100);
+    QVERIFY(mvideo->new_frame_num == 100);
+    QVERIFY(mvideo->set_new_frame);
+
+    mvideo->video_paused = true;
+    mvideo->on_set_playback_frame(100);
+    QVERIFY(mvideo->capture.get(CV_CAP_PROP_POS_FRAMES) == 100);
+}
+
+/**
+ * @brief test_video_player::test_on_set_playback_frame_fail
+ * Test on_set_playback_frame with non valid inputs
+ */
+void test_video_player::test_on_set_playback_frame_fail() {
+    int out_of_bounds = mvideo->get_num_frames() + 100;
+    int test_frames[] = {-100, out_of_bounds};
+    for (int &frame : test_frames) {
+        mvideo->video_paused = false;
+        mvideo->on_set_playback_frame(frame);
+        QVERIFY(mvideo->new_frame_num != frame);
+        QVERIFY(!mvideo->set_new_frame);
+
+        mvideo->video_paused = true;
+        mvideo->on_set_playback_frame(frame);
+        QVERIFY(mvideo->capture.get(CV_CAP_PROP_POS_FRAMES) != frame);
+    }
 }
