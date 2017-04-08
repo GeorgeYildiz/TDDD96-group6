@@ -95,6 +95,7 @@ void MainWindow::set_shortcuts(){
     ui->actionExit->setShortcut(tr("Ctrl+e"));
     ui->actionSave->setShortcut(tr("Ctrl+s"));
     ui->actionLoad->setShortcut(tr("Ctrl+l"));
+    ui->actionUndo->setShortcut(tr("Ctrl+z"));
     ui->actionAddProject->setShortcut(tr("Ctrl+Shift+p"));
     ui->actionAddVideo->setShortcut(tr("Ctrl+Shift+v"));
 }
