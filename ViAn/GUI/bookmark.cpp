@@ -7,7 +7,8 @@
  * @param string Text description of the bookmark.
  * @param view Parent widget of the bookmark.
  */
-Bookmark::Bookmark(int frame_nbr, QImage img, QString string, QListWidget* view) : QListWidgetItem(string, view) {
+Bookmark::Bookmark(std::string vid_name, int frame_nbr, QImage img, QString string, QListWidget* view) : QListWidgetItem(string, view) {
+    video_name = vid_name;
     frame_number = frame_nbr;
     setData(Qt::DecorationRole, QPixmap::fromImage(img));
 }
@@ -18,4 +19,12 @@ Bookmark::Bookmark(int frame_nbr, QImage img, QString string, QListWidget* view)
  */
 int Bookmark::get_frame_number() {
     return frame_number;
+}
+
+/**
+ * @brief Bookmark::get_video_name
+ * @return Returns the name of the video that the bookmark is taken from
+ */
+std::string Bookmark::get_video_name() {
+    return video_name;
 }
