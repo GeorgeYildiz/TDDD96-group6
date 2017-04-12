@@ -161,6 +161,7 @@ private:
 
     void setup_video_player(video_player *mplayer);
     void add_project_to_tree(Project* proj);
+    void change_playback_video(string filename);
 
     void add_video_to_tree(string file_path, ID id);
 
