@@ -94,6 +94,8 @@ void MainWindow::setup_video_player(video_player *mplayer) {
                      mplayer, SLOT(on_stop_video()));
     QObject::connect(this, SIGNAL(set_playback_frame(int)),
                      mplayer, SLOT(on_set_playback_frame(int)));
+    QObject::connect(mplayer, SIGNAL(finished()),
+                     mplayer, SLOT(deleteLater()));
 }
 
 /**
@@ -671,6 +673,7 @@ void MainWindow::load_new_video(std::string video_name, int start_frame) {
     if (mvideo_player->isRunning()) {
         emit set_stop_video(); //This signal will make the QThread finish executing
         mvideo_player->wait();
+        delete mvideo_player;
         mvideo_player = new video_player(&mutex, &paused_wait);
         setup_video_player(mvideo_player);
         set_status_bar("Switch playback to video: " + video_name);
