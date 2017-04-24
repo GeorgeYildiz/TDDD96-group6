@@ -55,7 +55,6 @@ MainWindow::MainWindow(QWidget *parent) :
  * Destructor
  */
 MainWindow::~MainWindow() {
-
     delete iconOnButtonHandler;
     delete fileHandler;
 
@@ -96,6 +95,8 @@ void MainWindow::setup_video_player(video_player *mplayer) {
                      mplayer, SLOT(on_set_playback_frame(int)));
     QObject::connect(mplayer, SIGNAL(finished()),
                      mplayer, SLOT(deleteLater()));
+    QObject::connect(this, SIGNAL(set_abort_video()),
+                     mplayer, SLOT(on_abort_video()));
 }
 
 /**
@@ -357,7 +358,7 @@ void MainWindow::on_bookmarkButton_clicked() {
         std::string file_name = std::to_string(bookmark_view->get_num_bookmarks());
         std::string file_path = mvideo_player->export_current_frame(dir_path, file_name);
 
-        bookmark_view->add_bookmark(mvideo_player->get_video_name() , mvideo_player->get_current_frame_num(), file_path);
+        bookmark_view->add_bookmark(mvideo_player->get_video_name() , mvideo_player->get_current_frame_num()+1, file_path);
         set_status_bar("Saved bookmark.");
     }
 }
@@ -671,7 +672,7 @@ void MainWindow::load_new_video(std::string video_name, int start_frame) {
         paused_wait.wakeOne();
 
     if (mvideo_player->isRunning()) {
-        emit set_stop_video(); //This signal will make the QThread finish executing
+        emit set_abort_video(); //This signal will make the QThread finish executing
         mvideo_player->wait();
         delete mvideo_player;
         mvideo_player = new video_player(&mutex, &paused_wait);

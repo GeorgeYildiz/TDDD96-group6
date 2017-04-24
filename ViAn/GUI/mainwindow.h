@@ -51,6 +51,7 @@ signals:
     void set_play_video();
     void set_pause_video();
     void set_stop_video();
+    void set_abort_video();
     void resize_video_frame(int width, int height);
     void next_video_frame();
     void prev_video_frame();

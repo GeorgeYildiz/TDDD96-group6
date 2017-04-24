@@ -72,7 +72,7 @@ void video_player::run()  {
     video_paused = false;
     int delay = (1000/frame_rate);
     set_current_frame_num(m_start_frame);
-    while (!video_stopped && capture.read(frame)) {
+    while (!video_stopped && !video_aborted && capture.read(frame)) {
         const clock_t begin_time = std::clock();
 
         convert_frame(true);
@@ -100,10 +100,13 @@ void video_player::run()  {
         }
         m_mutex->unlock();
     }
-    video_stopped = true;
-    m_start_frame = 0;
-    capture.set(CV_CAP_PROP_POS_FRAMES, 0);
-    emit update_current_frame(0);
+
+    if (!video_aborted) {
+        video_stopped = true;
+        m_start_frame = 0;
+        capture.set(CV_CAP_PROP_POS_FRAMES, 0);
+        emit update_current_frame(0);
+    }
 }
 
 /**
@@ -851,3 +854,10 @@ std::string video_player::get_video_name() {
     return video_name;
 }
 
+/**
+ * @brief video_player::on_abort_video
+ * Sets the bool for aborting the execution of the video_player thread.
+ */
+void video_player::on_abort_video() {
+    video_aborted = true;
+}

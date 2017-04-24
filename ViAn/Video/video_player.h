@@ -90,6 +90,7 @@ public slots:
     void on_play_video();
     void on_pause_video();
     void on_stop_video();
+    void on_abort_video();
 
 
 protected:
@@ -128,6 +129,7 @@ private:
     double speed_multiplier = DEFAULT_SPEED_MULT;
 
     bool video_stopped = false;
+    bool video_aborted = false;
     bool video_paused;
     bool choosing_zoom_area = false;
     bool set_new_frame = false;
