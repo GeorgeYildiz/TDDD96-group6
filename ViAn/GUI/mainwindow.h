@@ -162,7 +162,7 @@ private:
 
     void setup_video_player(video_player *mplayer);
     void add_project_to_tree(Project* proj);
-    void load_new_video(std::string video_name, int start_frame = 0);
+    void load_new_video(std::string video_name, int start_frame = 0, bool start_paused = false);
 
     void add_video_to_tree(string file_path, ID id);
 

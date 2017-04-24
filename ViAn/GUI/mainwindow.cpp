@@ -667,7 +667,7 @@ void MainWindow::play_video() {
  * and starts playing the video specified by video_name parameter.
  * @param video_name
  */
-void MainWindow::load_new_video(std::string video_name, int start_frame) {
+void MainWindow::load_new_video(std::string video_name, int start_frame, bool start_paused) {
     if (mvideo_player->is_paused())
         paused_wait.wakeOne();
 
@@ -675,7 +675,7 @@ void MainWindow::load_new_video(std::string video_name, int start_frame) {
         emit set_abort_video(); //This signal will make the QThread finish executing
         mvideo_player->wait();
         delete mvideo_player;
-        mvideo_player = new video_player(&mutex, &paused_wait);
+        mvideo_player = new video_player(&mutex, &paused_wait, start_paused);
         setup_video_player(mvideo_player);
         set_status_bar("Switch playback to video: " + video_name);
     }
@@ -684,7 +684,10 @@ void MainWindow::load_new_video(std::string video_name, int start_frame) {
     //Used for rescaling the source image for video playback
     emit resize_video_frame(ui->videoFrame->width(),ui->videoFrame->height());
     enable_video_buttons();
-    iconOnButtonHandler->set_icon("pause", ui->playPauseButton);
+    if (mvideo_player->is_paused())
+        iconOnButtonHandler->set_icon("play", ui->playPauseButton);
+    else
+        iconOnButtonHandler->set_icon("pause", ui->playPauseButton);
     video_slider->setMaximum(mvideo_player->get_num_frames() - 1);
 }
 
@@ -952,8 +955,10 @@ void MainWindow::on_actionRotate_left_triggered() {
  */
 void MainWindow::on_documentList_itemClicked(QListWidgetItem *item) {
     Bookmark* bookmark = (Bookmark*) item;
-    if (!mvideo_player->isRunning() || bookmark->get_video_name() != mvideo_player->get_video_name()) {
-        load_new_video(bookmark->get_video_name(), bookmark->get_frame_number());
+    if (!mvideo_player->isRunning()) {
+        load_new_video(bookmark->get_video_name(), bookmark->get_frame_number(), true);
+    } else if (bookmark->get_video_name() != mvideo_player->get_video_name()) {
+        load_new_video(bookmark->get_video_name(), bookmark->get_frame_number(), mvideo_player->is_paused());
     } else {
         emit set_playback_frame(bookmark->get_frame_number());
     }

@@ -21,7 +21,7 @@ using namespace std;
 class video_player : public QThread {
     Q_OBJECT
 public:
-    video_player(QMutex* mutex, QWaitCondition* paused_wait, QObject* parent = 0);
+    video_player(QMutex* mutex, QWaitCondition* paused_wait, bool start_paused = false, QObject* parent = 0);
     ~video_player();
     bool load_video(string filename, int start_frame = 0);
     bool is_paused();

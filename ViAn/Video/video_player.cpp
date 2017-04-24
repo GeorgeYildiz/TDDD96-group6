@@ -16,7 +16,9 @@ using namespace cv;
  * @brief video_player::video_player
  * @param parent
  */
-video_player::video_player(QMutex* mutex, QWaitCondition* paused_wait, QObject* parent) : QThread(parent) {
+video_player::video_player(QMutex* mutex, QWaitCondition* paused_wait, bool start_paused, QObject* parent) : QThread(parent) {
+    cout << "Start paused: " << start_paused << endl;
+    video_paused = start_paused;
     m_mutex = mutex;
     m_paused_wait = paused_wait;
     QRect rec = QApplication::desktop()->screenGeometry();
@@ -51,7 +53,7 @@ bool video_player::load_video(string filename, int start_frame) {
         m_start_frame = start_frame;
         frame_rate = capture.get(CV_CAP_PROP_FPS);
         num_frames = capture.get(CAP_PROP_FRAME_COUNT);
-        video_paused = false;
+        //video_paused = false;
         zoom_area->set_size(capture.get(CAP_PROP_FRAME_WIDTH), capture.get(CAP_PROP_FRAME_HEIGHT));
         start();
         return true;
@@ -68,8 +70,8 @@ bool video_player::load_video(string filename, int start_frame) {
  * video file and sending them to the GUI.
  */
 void video_player::run()  {
+    cout << "Video paused: " << video_paused << endl;
     video_stopped = false;
-    video_paused = false;
     int delay = (1000/frame_rate);
     set_current_frame_num(m_start_frame);
     while (!video_stopped && !video_aborted && capture.read(frame)) {
@@ -96,6 +98,7 @@ void video_player::run()  {
         m_mutex->lock();
         if (video_paused) {
             m_paused_wait->wait(m_mutex);
+            cout << "Got here" << endl;
             video_paused = false;
         }
         m_mutex->unlock();
