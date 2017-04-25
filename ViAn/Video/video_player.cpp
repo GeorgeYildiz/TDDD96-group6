@@ -713,7 +713,7 @@ void video_player::video_mouse_released(QPoint pos) {
             zoom_area->update_drawing_pos(pos);
             zoom_area->choose_area();
             choosing_zoom_area = false;
-            QApplication::restoreOverrideCursor();
+            QApplication::setOverrideCursor(Qt::ArrowCursor);
         } else if (choosing_analysis_area) {
             analysis_area->add_point(pos);
         } else if (is_paused()) {
