@@ -350,7 +350,7 @@ void MainWindow::on_bookmark_button_clicked() {
         my_project = (MyQTreeWidgetItem*)get_project_from_object(item);
         // Add bookmarks-folder to the project-folder.
         Project* proj = fileHandler->get_project(my_project->id);
-        QDir dir = fileHandler->get_dir(proj->bookmark_dir);
+        QDir dir = fileHandler->get_dir(proj->dir_bookmarks);
         // Export the current frame in the bookmarks-folder.
         // Get bookmark description
         QString bookmark_text("");

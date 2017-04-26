@@ -91,9 +91,9 @@ void Project::delete_artifacts(){
  */
 void Project::read(const QJsonObject& json){
     this->name = json["name"].toString().toStdString();
-    this->dir = file_handler->add_dir(json["root_dir"].toString().toStdString());
-    this->dir_bookmarks = file_handler->add_dir(json["bookmark_dir"].toString().toStdString());
-    this->name = file_handler->add_dir(json["video_dir"].toString().toStdString());
+    this->dir = file_handler->create_directory(json["root_dir"].toString());
+    this->dir_bookmarks = file_handler->create_directory(json["bookmark_dir"].toString());
+    this->dir_videos = file_handler->create_directory(json["video_dir"].toString());
     this->save_name = this->name;
     QJsonArray json_vid_projs = json["videos"].toArray();
     for (int i = 0; i < json_vid_projs.size(); ++i) {

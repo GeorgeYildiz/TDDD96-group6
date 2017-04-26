@@ -15,16 +15,16 @@
 #include "video.h"
 #include "saveable.h"
 typedef int ID;
+class FileHandler;
 
 /**
  * @brief The Project struct
  * incomplete struct, will be added on
  * along with parser functionality
  */
-
 struct Project : Saveable{
     std::string name;
-    FileHandler* filehandler;
+    FileHandler* file_handler;
 public:    
     Project(FileHandler* file_handler);
     Project(FileHandler* file_handler, ID id, std::string name);
