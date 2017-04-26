@@ -252,6 +252,7 @@ Project* FileHandler::load_project(std::string full_project_path){
      proj->id = add_project(proj);
      proj->dir = add_dir(QDir(QString::fromStdString(full_project_path.substr(0, full_project_path.find_last_of("/")))));
      proj->bookmark_dir = add_dir(QDir(QString::fromStdString(full_project_path.substr(0, full_project_path.find_last_of("/")) + "/Bookmarks")));
+     proj->dir_videos = this->work_space;
      return proj;
 }
 

@@ -12,7 +12,7 @@ Project::Project(ID id, std::string name)
     this->dir = -1;
     this->dir_videos = -1;
     this->bookmark_dir = -1;
-    this->v_id = 0;
+    this->v_id = 0;    
     this->videos.clear();
     this->saved = false;
 }
@@ -106,7 +106,7 @@ void Project::read(const QJsonObject& json){
  */
 void Project::write(QJsonObject& json){
     QJsonArray json_proj;
-    json["name"] = QString::fromStdString(this->name);
+    json["name"] = QString::fromStdString(this->name);    
     for(auto it = this->videos.begin(); it != this->videos.end(); it++){
         QJsonObject json_vid_proj;
         VideoProject* v = it->second;
