@@ -27,3 +27,18 @@ cv::Mat Arrow::draw(cv::Mat &frame) {
  */
 void Arrow::handle_new_pos(QPoint pos) {
 }
+
+/**
+ * @brief Arrow::read_shape
+ * Stores specific information associated
+ * @param json
+ */
+void Arrow::read_shape(const QJsonObject &json) {
+}
+
+/**
+ * @brief Arrow::write_shape
+ * @param json
+ */
+void Arrow::write_shape(QJsonObject &json) {
+}

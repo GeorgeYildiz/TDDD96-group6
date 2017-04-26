@@ -19,7 +19,9 @@ public:
     virtual cv::Mat draw(cv::Mat &frame) = 0;
 
     void read(const QJsonObject& json);
+    virtual void read_shape(const QJsonObject& json) = 0;
     void write(QJsonObject& json);
+    virtual void write_shape(QJsonObject& json) = 0;
 
     static cv::Scalar qcolor_to_scalar(QColor col);
     static cv::Point qpoint_to_point(QPoint pnt);
