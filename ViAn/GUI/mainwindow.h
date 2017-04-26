@@ -148,6 +148,10 @@ private slots:
 
     void on_action_invert_analysis_area_triggered();
 
+    void on_action_close_project_triggered();
+
+    void on_action_show_hide_analysis_overlay_triggered();
+
 private:
 
     Ui::MainWindow *ui;
