@@ -130,7 +130,7 @@ void FileHandler::write(QJsonObject &json){
  * @param std::string name
  * @return Project* created project
  */
-Project* FileHandler::create_project(QString proj_name, std::string dir_path){
+Project* FileHandler::create_project(QString proj_name, std::string dir_path, std::string vid_path){
     Project* proj =  new Project(this->project_id, proj_name.toStdString());   
     ID root_dir;
     if(dir_path != "")                          //Directory name provided
@@ -140,10 +140,12 @@ Project* FileHandler::create_project(QString proj_name, std::string dir_path){
     else if(dir_path == "" && proj->dir != -1)  // No Directory provided and project previosuly saved
         root_dir = proj->dir;                        // Use present save location
     else
-        root_dir = this->work_space;
-
+        root_dir = this->work_space;    
     proj->bookmark_dir = create_directory(get_dir(root_dir).absoluteFilePath(QString::fromStdString(proj->name+"/Bookmarks")));
     proj->dir = create_directory(get_dir(root_dir).absoluteFilePath(QString::fromStdString(proj->name)));
+    if(vid_path != "")
+        proj->dir_videos = create_directory(get_dir(root_dir).absoluteFilePath(QString::fromStdString(vid_path)));
+
     add_project(proj);                          // Add project to file sytstem
     save_project(proj);                         // Save project file
     open_project(proj->id);                     // Open project
