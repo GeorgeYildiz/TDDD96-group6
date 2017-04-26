@@ -17,7 +17,7 @@ public:
     virtual void handle_new_pos(QPoint pos) = 0;
     virtual cv::Mat draw(cv::Mat &frame) = 0;
 
-    void read(const QJsonObject& json);
+    virtual void read(const QJsonObject& json) = 0;
     virtual void write(QJsonObject& json) = 0;
 
     static cv::Scalar qcolor_to_scalar(QColor col);
@@ -33,6 +33,7 @@ protected:
     cv::Point draw_end;
 
     void write_shape(QJsonObject& json);
+    void read_shape(const QJsonObject& json);
 };
 
 #endif // SHAPES_H

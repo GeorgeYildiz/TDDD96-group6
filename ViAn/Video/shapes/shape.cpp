@@ -52,7 +52,8 @@ cv::Point Shape::qpoint_to_point(QPoint pnt) {
  * Reads a shape from a Json object.
  */
 void Shape::read_shape(const QJsonObject& json){
-    this->shape = json["shape"].toInt();
+    int shape_i = json["shape"].toInt();
+    this->shape = static_cast<SHAPES>(shape_i);
     this->colour[0] = json["b"].toInt();
     this->colour[1] = json["g"].toInt();
     this->colour[2] = json["r"].toInt();
