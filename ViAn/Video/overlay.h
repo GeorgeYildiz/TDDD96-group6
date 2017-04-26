@@ -33,6 +33,9 @@ public:
     void undo(int frame_nr);
     void clear(int frame_nr);
 
+    void read(const QJsonObject& json);
+    void write(QJsonObject& json);
+
 private:
     void update_drawing_position(QPoint pos, int frame_nr);
 

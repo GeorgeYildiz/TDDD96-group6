@@ -7,7 +7,7 @@
  * @param strng String to be displayed
  * @param fnt_scl Font scale of the string
  */
-Text::Text(QColor col, QPoint pos, QString strng, double fnt_scl) : Shape(col, pos) {
+Text::Text(QColor col, QPoint pos, QString strng, double fnt_scl) : Shape(SHAPES::TEXT, col, pos) {
     string = strng;
     font_scale = fnt_scl;
 }
@@ -31,4 +31,13 @@ cv::Mat Text::draw(cv::Mat &frame) {
  * @param pos
  */
 void Text::handle_new_pos(QPoint pos) {
+}
+
+/**
+ * @brief Text::write
+ * @param json
+ * Writes to a Json object.
+ */
+void Text::write(QJsonObject& json) {
+    write_shape(json);
 }

@@ -6,7 +6,8 @@
  * @param col Colour of the new object
  * @param pos Starting point for the new object
  */
-Shape::Shape(QColor col, QPoint pos) {
+Shape::Shape(SHAPES s, QColor col, QPoint pos) {
+    shape = s;
     colour = qcolor_to_scalar(col);
     draw_start = qpoint_to_point(pos);
     draw_end = qpoint_to_point(pos);
@@ -50,7 +51,8 @@ cv::Point Shape::qpoint_to_point(QPoint pnt) {
  * @param json
  * Reads a shape from a Json object.
  */
-void Shape::read(const QJsonObject& json){
+void Shape::read_shape(const QJsonObject& json){
+    this->shape = json["shape"].toInt();
     this->colour[0] = json["b"].toInt();
     this->colour[1] = json["g"].toInt();
     this->colour[2] = json["r"].toInt();
@@ -65,7 +67,8 @@ void Shape::read(const QJsonObject& json){
  * @param json
  * Writes a shape to a Json object.
  */
-void Shape::write(QJsonObject& json){
+void Shape::write_shape(QJsonObject& json){
+    json["shape"] = this->shape;
     json["b"] = this->colour[0];
     json["g"] = this->colour[1];
     json["r"] = this->colour[2];

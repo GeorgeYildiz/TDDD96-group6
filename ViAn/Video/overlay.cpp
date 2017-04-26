@@ -195,3 +195,28 @@ void Overlay::clear(int frame_nr) {
         overlays[frame_nr].clear();
     }
 }
+
+/**
+ * @brief Overlay::read
+ * @param json
+ * Reads the overlay from a Json object.
+ */
+void Overlay::read(const QJsonObject& json){
+    this->draw_end.y = json["p2y"].toInt();
+}
+
+/**
+ * @brief Overlay::write
+ * @param json
+ * Writes the overlay to a Json object.
+ */
+void Overlay::write(QJsonObject& json){
+    QJsonArray json_drawings;
+    foreach (Shape* s, overlays[frame_nr]) {
+        QJsonObject json_shape;
+        s->write(json_shape);
+        json_drawings.append(json_shape);
+    }
+    json["bookmarks"] = json_drawings;
+}
+
