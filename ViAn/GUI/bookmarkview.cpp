@@ -21,21 +21,12 @@ int BookmarkView::get_num_bookmarks() {
 
 /**
  * @brief BookmarkView::add_bookmark
- * Adds a bookmark containing an image (thumbnail)
- * and a text description of the bookmark.
- * @param frame_nbr Frame number associated with the bookmark.
- * @param img_file_path Path to the image of the bookmark.
+ * Adds a bookmark to the bookmark view.
+ * @param bookmark Bookmark to add.
  */
-void BookmarkView::add_bookmark(std::string video_name, int frame_nbr, std::string img_file_path) {
-    QImage img = QImage(QString::fromStdString(img_file_path), "TIFF");
-    img = img.scaledToHeight(BOOKMARK_THUMBNAIL_HEIGHT);
-
-    bool ok;
-    QString bookmark_text = get_input_text(&ok);
-    if (ok) {
-        Bookmark* bookmark = new Bookmark(video_name, frame_nbr, img, bookmark_text, view);
-        view->addItem(bookmark);
-    }
+void BookmarkView::add_bookmark(Bookmark* bookmark) {
+    BookmarkItem* bookmark_item = new BookmarkItem(bookmark, view);
+    view->addItem(bookmark_item);
 }
 
 /**
