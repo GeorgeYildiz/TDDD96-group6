@@ -44,3 +44,34 @@ cv::Scalar Shape::qcolor_to_scalar(QColor col) {
 cv::Point Shape::qpoint_to_point(QPoint pnt) {
     return cv::Point(pnt.x(), pnt.y());
 }
+
+/**
+ * @brief Shape::read
+ * @param json
+ * Reads a shape from a Json object.
+ */
+void Shape::read(const QJsonObject& json){
+    this->colour[0] = json["b"].toInt();
+    this->colour[1] = json["g"].toInt();
+    this->colour[2] = json["r"].toInt();
+    this->draw_start.x = json["p1x"].toInt();
+    this->draw_start.y = json["p1y"].toInt();
+    this->draw_end.x = json["p2x"].toInt();
+    this->draw_end.y = json["p2y"].toInt();
+}
+
+/**
+ * @brief Shape::write
+ * @param json
+ * Writes a shape to a Json object.
+ */
+void Shape::write(QJsonObject& json){
+    json["b"] = this->colour[0];
+    json["g"] = this->colour[1];
+    json["r"] = this->colour[2];
+    json["p1x"] = this->draw_start.x;
+    json["p1y"] = this->draw_start.y;
+    json["p2x"] = this->draw_end.x;
+    json["p2y"] = this->draw_end.y;
+}
+

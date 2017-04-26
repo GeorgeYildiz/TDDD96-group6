@@ -86,7 +86,7 @@ void Overlay::set_tool(SHAPES s) {
  * @param col New colour to be set.
  */
 void Overlay::set_colour(QColor col) {
-    current_colour = col;
+    current_nt_colour = col;
 }
 
 /**
