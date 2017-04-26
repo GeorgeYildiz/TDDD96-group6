@@ -141,7 +141,7 @@ Project* FileHandler::create_project(QString proj_name, std::string dir_path, st
         root_dir = proj->dir;                        // Use present save location
     else
         root_dir = this->work_space;    
-    proj->bookmark_dir = create_directory(get_dir(root_dir).absoluteFilePath(QString::fromStdString(proj->name+"/Bookmarks")));
+    proj->dir_bookmarks = create_directory(get_dir(root_dir).absoluteFilePath(QString::fromStdString(proj->name+"/Bookmarks")));
     proj->dir = create_directory(get_dir(root_dir).absoluteFilePath(QString::fromStdString(proj->name)));
     if(vid_path != "")
         proj->dir_videos = create_directory(get_dir(root_dir).absoluteFilePath(QString::fromStdString(vid_path)));
@@ -221,6 +221,7 @@ void FileHandler::save_project(Project *proj){
 bool FileHandler::save_saveable(Saveable *saveable, ID dir_id, FileHandler::SAVE_FORMAT save_format){
     QDir dir = get_dir(dir_id);
     std::string file_path = dir.absoluteFilePath(QString::fromStdString(saveable->save_name)).toStdString();
+
     QFile save_file(save_format == JSON
                     ? QString::fromStdString(file_path + ".json")
                     : QString::fromStdString(file_path + ".dat"));    
@@ -246,13 +247,10 @@ bool FileHandler::save_saveable(Saveable *saveable, ID dir_id, FileHandler::SAVE
  * for hiding save format.
  */
 Project* FileHandler::load_project(std::string full_project_path){
-     Project* proj = new Project();
+     Project* proj = new Project(this);
      load_saveable(proj, full_project_path, JSON); // Decide format internally, here for flexibility
      proj->saved = true;
-     proj->id = add_project(proj);
-     proj->dir = add_dir(QDir(QString::fromStdString(full_project_path.substr(0, full_project_path.find_last_of("/")))));
-     proj->bookmark_dir = add_dir(QDir(QString::fromStdString(full_project_path.substr(0, full_project_path.find_last_of("/")) + "/Bookmarks")));
-     proj->dir_videos = this->work_space;
+     proj->id = add_project(proj);     
      return proj;
 }
 
@@ -263,7 +261,7 @@ Project* FileHandler::load_project(std::string full_project_path){
  * @return loaded Project
  * Loads project from json file and returns it
  */
-Saveable *FileHandler::load_saveable(Saveable *saveable, std::string full_path, FileHandler::SAVE_FORMAT save_form){
+Saveable *FileHandler::load_saveable(Saveable *saveable, std::string full_path, FileHandler::SAVE_FORMAT save_form){    
     QFile load_file(save_form == JSON
         ? QString::fromStdString(full_path)
         : QString::fromStdString(full_path));
@@ -272,7 +270,6 @@ Saveable *FileHandler::load_saveable(Saveable *saveable, std::string full_path, 
         return nullptr;
     }
     QByteArray save_data = load_file.readAll();
-
     QJsonDocument load_doc(save_form == JSON
         ? QJsonDocument::fromJson(save_data)
         : QJsonDocument::fromBinaryData(save_data));
@@ -294,7 +291,7 @@ bool FileHandler::delete_project(ID proj_id){
         temp->delete_artifacts();
         QFile file (get_dir(temp->dir).absoluteFilePath(QString::fromStdString(temp->name + ".json")));
         file.remove();
-        delete_directory(temp->bookmark_dir);
+        delete_directory(temp->dir_bookmarks);
         delete_directory(temp->dir);
         delete temp;        
         this->proj_map_lock.unlock();

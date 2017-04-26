@@ -4,14 +4,14 @@
  * @param id
  * @param name
  */
-Project::Project(ID id, std::string name)
-{
+Project::Project(FileHandler* file_handler, ID id, std::string name){
+    this->file_handler = file_handler;
     this->name = name;
     this->save_name = name;
     this->id = id;
     this->dir = -1;
     this->dir_videos = -1;
-    this->bookmark_dir = -1;
+    this->dir_bookmarks = -1;
     this->v_id = 0;    
     this->videos.clear();
     this->saved = false;
@@ -19,13 +19,14 @@ Project::Project(ID id, std::string name)
 /**
  * @brief Project::Project
  */
-Project::Project(){
+Project::Project(FileHandler* file_handler){
+    this->file_handler = file_handler;
     this->name = "";
     this->save_name = "";
     this->id = -1;
     this->id = 0;
     this->dir = -1;
-    this->bookmark_dir = -1;
+    this->dir_bookmarks = -1;
     this->dir_videos = -1;
     this->videos.clear();
 }
@@ -38,6 +39,7 @@ Project::~Project(){
     for (auto vidIt = this->videos.begin(); vidIt != this->videos.end(); ++vidIt) {
         delete vidIt->second;
     }
+
 }
 
 /**
@@ -89,6 +91,9 @@ void Project::delete_artifacts(){
  */
 void Project::read(const QJsonObject& json){
     this->name = json["name"].toString().toStdString();
+    this->dir = file_handler->add_dir(json["root_dir"].toString().toStdString());
+    this->dir_bookmarks = file_handler->add_dir(json["bookmark_dir"].toString().toStdString());
+    this->name = file_handler->add_dir(json["video_dir"].toString().toStdString());
     this->save_name = this->name;
     QJsonArray json_vid_projs = json["videos"].toArray();
     for (int i = 0; i < json_vid_projs.size(); ++i) {
@@ -106,7 +111,10 @@ void Project::read(const QJsonObject& json){
  */
 void Project::write(QJsonObject& json){
     QJsonArray json_proj;
-    json["name"] = QString::fromStdString(this->name);    
+    json["name"] = QString::fromStdString(this->name);
+    json["root_dir"] =  file_handler->get_dir(this->dir).absolutePath();
+    json["bookmark_dir"] = file_handler->get_dir(this->dir_bookmarks).absolutePath();
+    json["video_dir"] = file_handler->get_dir(this->dir_videos).absolutePath();
     for(auto it = this->videos.begin(); it != this->videos.end(); it++){
         QJsonObject json_vid_proj;
         VideoProject* v = it->second;

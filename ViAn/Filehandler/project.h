@@ -24,10 +24,11 @@ typedef int ID;
 
 struct Project : Saveable{
     std::string name;
+    FileHandler* filehandler;
 public:    
-    Project();
-    Project(ID id, std::string name);
-    Project(std::string dir_path);
+    Project(FileHandler* file_handler);
+    Project(FileHandler* file_handler, ID id, std::string name);
+    Project(FileHandler* file_handler, std::string dir_path);
     ~Project();
     ID add_video(Video *vid);
     ID add_video_project(VideoProject* vid_proj);
@@ -47,7 +48,7 @@ public:
     ID v_id;
     std::map<ID,VideoProject*> videos;
     ID dir;
-    ID bookmark_dir;
+    ID dir_bookmarks;
     ID dir_videos;
     bool saved;
 };
