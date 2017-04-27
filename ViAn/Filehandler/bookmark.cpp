@@ -62,7 +62,7 @@ void Bookmark::read(const QJsonObject& json){
     this->frame_number = json["frame"].toInt();
     this->dir_path = json["dir"].toString();
     this->file_name = json["path"].toString();
-    this->description = json["note"].toString();
+    this->description = json["note"].toString();    
     frame.load(file_name);
 }
 
@@ -89,7 +89,8 @@ void Bookmark::export_frame() {
     // Update file path in case there's already a file with this file name
     std::cout << dir_path.toStdString() << std::endl;
     std::cout << QDir(dir_path).absoluteFilePath(file_name+ ".tiff").toStdString() << std::endl;
-    QImageWriter writer(QDir(dir_path).absoluteFilePath(file_name), "tiff");
+    QString bm_fname = QString::fromStdString(file_name.toStdString().substr(0,file_name.toStdString().find_last_of(".")) + "_" +  std::to_string(frame_number) +".tiff");
+    QImageWriter writer(QDir(dir_path).absoluteFilePath(QString::fromStdString("aids.tiff")), "tiff");
     writer.write(frame);
 }
 

@@ -366,8 +366,8 @@ void MainWindow::on_bookmark_button_clicked() {
         QImage frame = mvideo_player->get_current_frame_unscaled();
         std::string video_path = proj->videos.at(my_video->id)->get_video()->file_path;
         std::string video_name = video_path.substr(video_path.find_last_of("/"),video_path.length());
-        QString file_name = QFile(QString::fromStdString(video_name+ "_"+ std::to_string(frame_number))).fileName();
-        Bookmark* bookmark = new Bookmark(dir.absolutePath(),file_name,bookmark_text,frame_number,frame);
+        QString file_name = QFile(QString::fromStdString(video_name)).fileName();
+        Bookmark* bookmark = new Bookmark(dir.absolutePath(),file_name,bookmark_text,frame_number, frame);
         proj->add_bookmark(((MyQTreeWidgetItem*)my_video)->id, bookmark);
         bookmark_view->add_bookmark(bookmark);
         set_status_bar("Bookmark created.");
