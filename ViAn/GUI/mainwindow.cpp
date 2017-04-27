@@ -357,14 +357,12 @@ void MainWindow::on_bookmark_button_clicked() {
         bool ok;
         bookmark_text = bookmark_view->get_input_text(&ok);
         if(!ok) return;
-        // The names of the stored files will have increasing numbers.
-        std::string file_name = std::to_string(bookmark_view->get_num_bookmarks());
-        std::string file_path = mvideo_player->export_current_frame(dir.absolutePath().toStdString(), file_name);
-        int frame = mvideo_player->get_current_frame_num();
-        Bookmark* bookmark = new Bookmark(frame ,QString::fromStdString(file_path), bookmark_text);
+        int frame_number = mvideo_player->get_current_frame_num();
+        QImage frame = mvideo_player->get_current_frame_unscaled();
+        Bookmark* bookmark = new Bookmark(frame_number, frame, dir.absolutePath(), bookmark_text);
         proj->add_bookmark(((MyQTreeWidgetItem*)item)->id, bookmark);
         bookmark_view->add_bookmark(bookmark);
-        set_status_bar("Saved bookmark.");
+        set_status_bar("Bookmark created.");
     }
 }
 
@@ -636,8 +634,8 @@ void MainWindow::on_actionAddVideo_triggered() {
         MyQTreeWidgetItem *my_project = (MyQTreeWidgetItem*) project;
         if (my_project->type == TYPE::PROJECT){
             Project *proj = this->fileHandler->get_project(my_project->id);
-            std::string video_map_path = this->fileHandler->get_dir(proj->dir_videos).absolutePath().toStdString();
-            QString q_video_file_path = QFileDialog::getOpenFileName(this, tr("Choose video"), video_map_path.c_str(),
+            std::string video_dir_path = this->fileHandler->get_dir(proj->dir_videos).absolutePath().toStdString();
+            QString q_video_file_path = QFileDialog::getOpenFileName(this, tr("Choose video"), video_dir_path.c_str(),
                                                        tr("Videos (*.avi *.mkv *.mov *.mp4 *.3gp *.flv *.webm *.ogv *.m4v)"));
             if(!q_video_file_path.isEmpty()) { // Check if you have selected something.
                 std::string video_file_path = q_video_file_path.toStdString();
@@ -837,6 +835,7 @@ void MainWindow::enable_video_buttons() {
     ui->increase_speed_button->setEnabled(true);
     ui->previous_frame_button->setEnabled(true);
     ui->stop_button->setEnabled(true);
+    ui->bookmark_button->setEnabled(true);
 }
 
 /**

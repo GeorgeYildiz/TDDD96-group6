@@ -138,7 +138,6 @@ Project* FileHandler::create_project(QString proj_name, std::string dir_path, st
     proj->dir = create_directory(get_dir(root_dir).absoluteFilePath(QString::fromStdString(proj->name)));
     if(vid_path != "")
         proj->dir_videos = create_directory(get_dir(root_dir).absoluteFilePath(QString::fromStdString(vid_path)));
-    std::cout << vid_path << std::endl;
     add_project(proj);                          // Add project to file sytstem
     save_project(proj);                         // Save project file
     open_project(proj->id);                     // Open project
@@ -243,7 +242,7 @@ Project* FileHandler::load_project(std::string full_project_path){
      Project* proj = new Project(this);
      load_saveable(proj, full_project_path, JSON); // Decide format internally, here for flexibility
      proj->saved = true;
-     proj->id = add_project(proj);     
+     proj->id = add_project(proj);
      return proj;
 }
 
