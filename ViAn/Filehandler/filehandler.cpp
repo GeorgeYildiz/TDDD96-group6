@@ -423,9 +423,9 @@ ID FileHandler::create_file(QString file_name, QDir dir){
   */
  QString FileHandler::get_file(ID id){
     this->file_map_lock.lock();
-    QString file = this->file_map.at(id);
+    QString file_name = this->file_map.at(id);
     this->file_map_lock.unlock();
-    return file;
+    return file_name;
  }
 
  /**
@@ -440,6 +440,7 @@ ID FileHandler::create_file(QString file_name, QDir dir){
     this->dir_map_lock.unlock();
     return dir;
  }
+
 
  /**
   * @brief FileHandler::add_project

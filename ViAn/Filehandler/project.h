@@ -24,6 +24,7 @@ typedef int ID;
 
 struct Project : Saveable{
     std::string name;
+    std::map<ID,VideoProject*> videos;
 public:
     Project();
     Project(ID id, std::string name);
@@ -45,7 +46,6 @@ public:
 public:
     ID id;
     ID v_id;
-    std::map<ID,VideoProject*> videos;
     ID dir;
     ID bookmark_dir;
     ID dir_videos;

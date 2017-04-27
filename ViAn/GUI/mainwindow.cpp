@@ -358,7 +358,8 @@ void MainWindow::on_bookmark_button_clicked() {
         if(!ok) return;
         int frame_number = mvideo_player->get_current_frame_num();
         QImage frame = mvideo_player->get_current_frame_unscaled();
-        Bookmark* bookmark = new Bookmark(frame_number, frame, dir.absolutePath(), bookmark_text);
+
+        Bookmark* bookmark = new Bookmark(frame_number, frame, dir.absolutePath(item->i), bookmark_text);
         proj->add_bookmark(((MyQTreeWidgetItem*)item)->id, bookmark);
         bookmark_view->add_bookmark(bookmark);
         set_status_bar("Bookmark created.");

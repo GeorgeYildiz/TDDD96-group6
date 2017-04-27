@@ -62,10 +62,6 @@ public:
     bool proj_equals(Project& proj, Project& proj2);
     friend bool operator==(Project& proj, Project& proj2);
 
-    //  Video methods
-    void remove_video_from_project(ID proj_id, ID vid_id);
-    ID add_video(Project* proj, std::string file_path);
-
     //  Directory methods
     ID create_directory(QString dir_path);
     bool delete_directory(ID id);
