@@ -242,7 +242,7 @@ Project* FileHandler::load_project(std::string full_project_path){
      Project* proj = new Project(this);
      load_saveable(proj, full_project_path, JSON); // Decide format internally, here for flexibility
      proj->saved = true;
-     proj->id = add_project(proj);     
+     proj->id = add_project(proj);
      return proj;
 }
 
