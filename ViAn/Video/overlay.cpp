@@ -99,8 +99,39 @@ QColor Overlay::get_colour() {
  * @brief Overlay::get_shape
  * @return The currently choosen shape
  */
-SHAPES Overlay::get_shape() {
+SHAPES Overlay::get_tool() {
     return current_shape;
+}
+
+/**
+ * @brief get_empty_shape
+ * @param shape_type
+ * @return Returns a new shape of the given type.
+ */
+Shape* get_empty_shape(SHAPES shape_type) {
+    switch (shape_type) {
+        case RECTANGLE:
+            return new Rectangle();
+            break;
+        case CIRCLE:
+            return new Circle();
+            break;
+        case LINE:
+            return new Line();
+            break;
+        case ARROW:
+            return new Arrow();
+            break;
+        case PEN:
+            return new Pen();
+            break;
+        case TEXT:
+            return new Text();
+            break;
+        default:
+            return nullptr;
+            break;
+    }
 }
 
 /**
@@ -209,29 +240,7 @@ void Overlay::read(const QJsonObject& json) {
             QJsonObject json_shape = json_drawings[i].toObject();
             int shape_i = json_shape["shape"].toInt();
             SHAPES shape_t = static_cast<SHAPES>(shape_i);
-            Shape* shape;
-            switch (shape_t) {
-                case RECTANGLE:
-                    shape = new Rectangle();
-                    break;
-                case CIRCLE:
-                    shape = new Circle();
-                    break;
-                case LINE:
-                    shape = new Line();
-                    break;
-                case ARROW:
-                    shape = new Arrow();
-                    break;
-                case PEN:
-                    shape = new Pen();
-                    break;
-                case TEXT:
-                    shape = new Text();
-                    break;
-                default:
-                    break;
-            }
+            Shape* shape = get_empty_shape(shape_t);
             shape->read(json_shape);
             overlays[frame_nr].append(shape);
         }

@@ -31,7 +31,7 @@ public:
     void set_tool(SHAPES s);
     void set_colour(QColor col);
     QColor get_colour();
-    SHAPES get_shape();
+    SHAPES get_tool();
     void mouse_pressed(QPoint pos, int frame_nr);
     void mouse_released(QPoint pos, int frame_nr);
     void mouse_moved(QPoint pos, int frame_nr);
@@ -43,6 +43,7 @@ public:
 
 private:
     void update_drawing_position(QPoint pos, int frame_nr);
+    Shape* get_empty_shape(SHAPES shape_type);
 
     bool show_overlay = false;
 
