@@ -15,7 +15,7 @@
  */
 class Bookmark : Saveable{
 public:
-    Bookmark(int frame_nbr, QImage frame, QString dir_path, QString string);
+    Bookmark(int frame_nbr, QImage frame, QString file_path, QString description);
     Bookmark();
     int get_frame_number();
     QImage get_frame();

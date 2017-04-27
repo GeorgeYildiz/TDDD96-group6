@@ -347,14 +347,14 @@ void MainWindow::on_actionExit_triggered() {
  * Button to add a bookmark to the bookmark view.
  */
 void MainWindow::on_bookmark_button_clicked() {
-    QTreeWidgetItem *item;
+    MyQTreeWidgetItem *my_video;
     MyQTreeWidgetItem *my_project;
     if(ui->project_tree->selectedItems().size() == 1) {
         // Get current project.
-        item = ui->project_tree->selectedItems().first();
-        my_project = (MyQTreeWidgetItem*)get_project_from_object(item);
+        my_video = (MyQTreeWidgetItem*)ui->project_tree->selectedItems().first();
+        my_project = (MyQTreeWidgetItem*)get_project_from_object(my_video);
         // Add bookmarks-folder to the project-folder.
-        Project* proj = fileHandler->get_project(my_project->id);
+        Project* proj = fileHandler->get_project(my_project->id);        
         QDir dir = fileHandler->get_dir(proj->dir_bookmarks);
         // Export the current frame in the bookmarks-folder.
         // Get bookmark description
@@ -365,8 +365,8 @@ void MainWindow::on_bookmark_button_clicked() {
         int frame_number = mvideo_player->get_current_frame_num();
         QImage frame = mvideo_player->get_current_frame_unscaled();
 
-        Bookmark* bookmark = new Bookmark(frame_number, frame, dir.absolutePath(item->i), bookmark_text);
-        proj->add_bookmark(((MyQTreeWidgetItem*)item)->id, bookmark);
+        Bookmark* bookmark = new Bookmark(frame_number, frame, dir.absolutePath(proj->videos.at(my_video->id)->video->file_path), bookmark_text);
+        proj->add_bookmark(((MyQTreeWidgetItem*)my_video)->id, bookmark);
         bookmark_view->add_bookmark(bookmark);
         set_status_bar("Bookmark created.");
     }

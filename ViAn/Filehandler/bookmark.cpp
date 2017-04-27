@@ -7,11 +7,11 @@
  * @param dir_path Path to the directory to store image in.
  * @param text Text description of the bookmark.
  */
-Bookmark::Bookmark(int frame_nbr, QImage frame, QString dir_path, QString text) {
+Bookmark::Bookmark(int frame_nbr, QImage frame, QString file_path, QString description) {
     this->frame_number = frame_nbr;
     this->frame = frame;
-    this->dir_path = dir_path;
-    this->description = text;
+    this->dir_path = file_path;
+    this->description = description;
 
     // There's no file path yet, since the frame has not been exported
     this->file_path = QString();
@@ -86,8 +86,7 @@ void Bookmark::write(QJsonObject& json){
  * Export the frame of the bookmark to a tiff-file in the project folder.
  */
 void Bookmark::export_frame() {
-    // Update file path in case there's already a file with this file name
-    create_file_path();
+    // Update file path in case there's already a file with this file name    
     QImageWriter writer(file_path, "tiff");
     writer.write(frame);
 }
