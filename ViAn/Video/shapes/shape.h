@@ -2,6 +2,8 @@
 #define SHAPES_H
 
 #include <QImage>
+#include <QJsonObject>
+#include <QJsonArray>
 #include <qpainter.h>
 #include <algorithm>
 
@@ -12,6 +14,7 @@ enum SHAPES {RECTANGLE, CIRCLE, LINE, ARROW, PEN, TEXT};
 class Shape {
 
 public:
+    Shape(SHAPES s);
     Shape(SHAPES s, QColor col, QPoint pos);
     void update_drawing_pos(QPoint pos);
     virtual void handle_new_pos(QPoint pos) = 0;

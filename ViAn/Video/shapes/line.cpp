@@ -2,6 +2,12 @@
 
 /**
  * @brief Line::Line
+ */
+Line::Line() : Shape(SHAPES::LINE) {
+}
+
+/**
+ * @brief Line::Line
  * @param col Colour of the new object
  * @param pos Starting point for the new object
  */
@@ -35,4 +41,13 @@ void Line::handle_new_pos(QPoint pos) {
  */
 void Line::write(QJsonObject& json) {
     write_shape(json);
+}
+
+/**
+ * @brief Line::read
+ * @param json
+ * Reads from a Json object.
+ */
+void Line::read(const QJsonObject& json) {
+    read_shape(json);
 }

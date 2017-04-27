@@ -1,8 +1,13 @@
 #ifndef OVERLAY_H
 #define OVERLAY_H
 
+#include <iostream>
 #include <QImage>
 #include <QColor>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
+#include <QInputDialog>
 #include "shapes/shape.h"
 #include "shapes/rectangle.h"
 #include "shapes/circle.h"

@@ -2,6 +2,14 @@
 
 /**
  * @brief Text::Text
+ */
+Text::Text() : Shape(SHAPES::TEXT) {
+    string = QString();
+    font_scale = 0;
+}
+
+/**
+ * @brief Text::Text
  * @param col Colour of the new object
  * @param pos Starting point for the new object
  * @param strng String to be displayed
@@ -40,4 +48,17 @@ void Text::handle_new_pos(QPoint pos) {
  */
 void Text::write(QJsonObject& json) {
     write_shape(json);
+    json["text"] = string;
+    json["font"] = font_scale;
+}
+
+/**
+ * @brief Text::read
+ * @param json
+ * Reads from a Json object.
+ */
+void Text::read(const QJsonObject& json) {
+    read_shape(json);
+    this->string = json["text"].toString();
+    this->font_scale = json["font"].toDouble();
 }

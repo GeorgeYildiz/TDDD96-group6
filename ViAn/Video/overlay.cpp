@@ -1,6 +1,4 @@
 #include "overlay.h"
-#include <iostream>
-#include <QInputDialog>
 
 /**
  * @brief Overlay::Overlay
@@ -86,7 +84,7 @@ void Overlay::set_tool(SHAPES s) {
  * @param col New colour to be set.
  */
 void Overlay::set_colour(QColor col) {
-    current_nt_colour = col;
+    current_colour = col;
 }
 
 /**
@@ -201,8 +199,43 @@ void Overlay::clear(int frame_nr) {
  * @param json
  * Reads the overlay from a Json object.
  */
-void Overlay::read(const QJsonObject& json){
-    this->draw_end.y = json["p2y"].toInt();
+void Overlay::read(const QJsonObject& json) {
+    QJsonArray json_overlays = json["overlays"].toArray();
+    for(int i = 0; i != json_overlays.size(); i++) {
+        QJsonObject json_overlay = json_overlays[i].toObject();
+        int frame_nr = json_overlay["frame"].toInt();
+        QJsonArray json_drawings = json_overlay["drawings"].toArray();
+        for(int i = 0; i != json_drawings.size(); i++) {
+            QJsonObject json_shape = json_drawings[i].toObject();
+            int shape_i = json_shape["shape"].toInt();
+            SHAPES shape_t = static_cast<SHAPES>(shape_i);
+            Shape* shape;
+            switch (shape_t) {
+                case RECTANGLE:
+                    shape = new Rectangle();
+                    break;
+                case CIRCLE:
+                    shape = new Circle();
+                    break;
+                case LINE:
+                    shape = new Line();
+                    break;
+                case ARROW:
+                    shape = new Arrow();
+                    break;
+                case PEN:
+                    shape = new Pen();
+                    break;
+                case TEXT:
+                    shape = new Text();
+                    break;
+                default:
+                    break;
+            }
+            shape->read(json_shape);
+            overlays[frame_nr].append(shape);
+        }
+    }
 }
 
 /**
@@ -210,13 +243,20 @@ void Overlay::read(const QJsonObject& json){
  * @param json
  * Writes the overlay to a Json object.
  */
-void Overlay::write(QJsonObject& json){
-    QJsonArray json_drawings;
-    foreach (Shape* s, overlays[frame_nr]) {
-        QJsonObject json_shape;
-        s->write(json_shape);
-        json_drawings.append(json_shape);
+void Overlay::write(QJsonObject& json) {
+    QJsonArray json_overlays;
+    for (auto const& map_entry : overlays) {
+        QJsonObject json_overlay;
+        QJsonArray json_drawings;
+        foreach (Shape* s, map_entry.second) {
+            QJsonObject json_shape;
+            s->write(json_shape);
+            json_drawings.append(json_shape);
+        }
+        json_overlay["frame"] = map_entry.first;
+        json_overlay["drawings"] = json_drawings;
+        json_overlays.append(json_overlay);
     }
-    json["bookmarks"] = json_drawings;
+    json["overlays"] = json_overlays;
 }
 

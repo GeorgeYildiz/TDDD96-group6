@@ -3,6 +3,17 @@
 
 /**
  * @brief Shape::Shape
+ * @param s
+ */
+Shape::Shape(SHAPES s) {
+    shape = s;
+    colour = cv::Scalar();
+    draw_start = cv::Point();
+    draw_end = cv::Point();
+}
+
+/**
+ * @brief Shape::Shape
  * @param col Colour of the new object
  * @param pos Starting point for the new object
  */
@@ -47,7 +58,7 @@ cv::Point Shape::qpoint_to_point(QPoint pnt) {
 }
 
 /**
- * @brief Shape::read
+ * @brief Shape::read_shape
  * @param json
  * Reads a shape from a Json object.
  */
@@ -64,7 +75,7 @@ void Shape::read_shape(const QJsonObject& json){
 }
 
 /**
- * @brief Shape::write
+ * @brief Shape::write_shape
  * @param json
  * Writes a shape to a Json object.
  */
