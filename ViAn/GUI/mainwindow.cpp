@@ -636,8 +636,8 @@ void MainWindow::on_actionAddVideo_triggered() {
         MyQTreeWidgetItem *my_project = (MyQTreeWidgetItem*) project;
         if (my_project->type == TYPE::PROJECT){
             Project *proj = this->fileHandler->get_project(my_project->id);
-            std::string video_map_path = this->fileHandler->get_dir(proj->dir_videos).absolutePath().toStdString();
-            QString q_video_file_path = QFileDialog::getOpenFileName(this, tr("Choose video"), video_map_path.c_str(),
+            std::string video_dir_path = this->fileHandler->get_dir(proj->dir_videos).absolutePath().toStdString();
+            QString q_video_file_path = QFileDialog::getOpenFileName(this, tr("Choose video"), video_dir_path.c_str(),
                                                        tr("Videos (*.avi *.mkv *.mov *.mp4 *.3gp *.flv *.webm *.ogv *.m4v)"));
             if(!q_video_file_path.isEmpty()) { // Check if you have selected something.
                 std::string video_file_path = q_video_file_path.toStdString();
