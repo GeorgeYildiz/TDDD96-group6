@@ -5,6 +5,7 @@
 #include <QImage>
 #include <QImageWriter>
 #include <QFile>
+#include <QDir>
 #include <string>
 #include <iostream>
 #include "saveable.h"
@@ -15,7 +16,7 @@
  */
 class Bookmark : Saveable{
 public:
-    Bookmark(int frame_nbr, QImage frame, QString file_path, QString description);
+    Bookmark(QString dir_path, QString file_name, QString description, int frame_nbr, QImage frame);
     Bookmark();
     int get_frame_number();
     QImage get_frame();
@@ -32,7 +33,7 @@ private:
     QString description;    // Description for the bookmark, given by user
 
     // Note that this variable can be altered when the bookmark is exported.
-    QString file_path;      // File path to the frame image associated with the bookmark
+    QString file_name;      // File path to the frame image associated with the bookmark
 };
 
 #endif // BOOKMARK_H

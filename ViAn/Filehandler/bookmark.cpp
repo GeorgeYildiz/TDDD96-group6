@@ -7,14 +7,14 @@
  * @param dir_path Path to the directory to store image in.
  * @param text Text description of the bookmark.
  */
-Bookmark::Bookmark(int frame_nbr, QImage frame, QString file_path, QString description) {
+Bookmark::Bookmark(QString dir_path, QString file_name, QString description, int frame_nbr, QImage frame) {
     this->frame_number = frame_nbr;
     this->frame = frame;
-    this->dir_path = file_path;
+    this->file_name = file_name;
     this->description = description;
 
     // There's no file path yet, since the frame has not been exported
-    this->file_path = QString();
+    this->dir_path = dir_path;
 }
 
 /**
@@ -25,7 +25,7 @@ Bookmark::Bookmark() {
     frame_number = 0;
     frame = QImage();
     dir_path = QString();
-    file_path = QString();
+    file_name = QString();
     description = QString();
 }
 
@@ -61,9 +61,9 @@ QString Bookmark::get_description() {
 void Bookmark::read(const QJsonObject& json){
     this->frame_number = json["frame"].toInt();
     this->dir_path = json["dir"].toString();
-    this->file_path = json["path"].toString();
+    this->file_name = json["path"].toString();
     this->description = json["note"].toString();
-    frame.load(file_path);
+    frame.load(file_name);
 }
 
 /**
@@ -77,7 +77,7 @@ void Bookmark::write(QJsonObject& json){
 
     json["frame"] = this->frame_number;
     json["dir"] = this->dir_path;
-    json["path"] = this->file_path;
+    json["path"] = this->file_name;
     json["note"] = this->description;
 }
 
@@ -86,8 +86,10 @@ void Bookmark::write(QJsonObject& json){
  * Export the frame of the bookmark to a tiff-file in the project folder.
  */
 void Bookmark::export_frame() {
-    // Update file path in case there's already a file with this file name    
-    QImageWriter writer(file_path, "tiff");
+    // Update file path in case there's already a file with this file name
+    std::cout << dir_path.toStdString() << std::endl;
+    std::cout << QDir(dir_path).absoluteFilePath(file_name+ ".tiff").toStdString() << std::endl;
+    QImageWriter writer(QDir(dir_path).absoluteFilePath(file_name), "tiff");
     writer.write(frame);
 }
 
@@ -116,7 +118,7 @@ void Bookmark::create_file_path() {
     }
 
     // Update file path variable
-    file_path = path;
+    file_name = path;
 }
 
 /**
@@ -125,8 +127,8 @@ void Bookmark::create_file_path() {
  */
 void Bookmark::remove_exported_image() {
     // If the file path is empty, then the frame has not been exported so there's nothing to remove.
-    if (!file_path.isEmpty()) {
-        QFile file(file_path);
+    if (!file_name.isEmpty()) {
+        QFile file(file_name);
         file.remove();
     }
 }
