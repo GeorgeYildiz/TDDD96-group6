@@ -104,11 +104,11 @@ SHAPES Overlay::get_tool() {
 }
 
 /**
- * @brief get_empty_shape
+ * @brief Overlay::get_empty_shape
  * @param shape_type
  * @return Returns a new shape of the given type.
  */
-Shape* get_empty_shape(SHAPES shape_type) {
+Shape* Overlay::get_empty_shape(SHAPES shape_type) {
     switch (shape_type) {
         case RECTANGLE:
             return new Rectangle();
