@@ -56,7 +56,7 @@ void Overlay::set_showing_overlay(bool value) {
 void Overlay::set_tool(SHAPES s) {
     current_shape = s;
 
-    // If the text option is choosen, a string and size will be entered by the user.
+    // If the text option is chosen, a string and size will be entered by the user.
     if (s == TEXT) {
         std::string input_string = current_string.toStdString();
         float input_font_scale = current_font_scale;
@@ -89,15 +89,15 @@ void Overlay::set_colour(QColor col) {
 
 /**
  * @brief Overlay::get_colour
- * @return The currenty choosen colour.
+ * @return The currenty chosen colour.
  */
 QColor Overlay::get_colour() {
     return current_colour;
 }
 
 /**
- * @brief Overlay::get_shape
- * @return The currently choosen shape
+ * @brief Overlay::get_tool
+ * @return The currently chosen tool
  */
 SHAPES Overlay::get_tool() {
     return current_shape;
@@ -136,7 +136,7 @@ Shape* Overlay::get_empty_shape(SHAPES shape_type) {
 
 /**
  * @brief Overlay::mouse_pressed
- * Creates a drawing shape with the prechoosen colour
+ * Creates a drawing shape with the prechosen colour
  * and shape, if the overlay is visible.
  * @param pos Mouse coordinates on the frame.
  * @param frame_nr Number of the frame currently shown in the video.
