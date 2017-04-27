@@ -163,7 +163,9 @@ private:
     IconOnButtonHandler *icon_on_button_handler;
     BookmarkView* bookmark_view;
     QSlider *video_slider;
+    FileHandler *fileHandler;
 
+    ID playing_video_id;
     bool slider_blocked = false;
     bool slider_paused_video = false;
     int prev_slider_pos = 0;
@@ -172,7 +174,7 @@ private:
                 std::chrono::system_clock::now().time_since_epoch()
             );
 
-    FileHandler *fileHandler;
+
     void setup_filehandler();
     void setup_video_player(video_player *mplayer);
 

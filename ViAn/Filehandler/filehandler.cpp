@@ -131,21 +131,13 @@ void FileHandler::write(QJsonObject &json){
  * @return Project* created project
  */
 Project* FileHandler::create_project(QString proj_name, std::string dir_path, std::string vid_path){
-    Project* proj =  new Project(this->project_id, proj_name.toStdString());   
+    Project* proj =  new Project(this, this->project_id, proj_name.toStdString());
     ID root_dir;
-    if(dir_path != "")                          //Directory name provided
-        root_dir = create_directory(QString::fromStdString(dir_path));
-    else if(dir_path == "" && proj->dir == -1)  // No directory name provided, project has no directory.
-        root_dir = this->work_space;                 // Default save location to workspace
-    else if(dir_path == "" && proj->dir != -1)  // No Directory provided and project previosuly saved
-        root_dir = proj->dir;                        // Use present save location
-    else
-        root_dir = this->work_space;    
-    proj->bookmark_dir = create_directory(get_dir(root_dir).absoluteFilePath(QString::fromStdString(proj->name+"/Bookmarks")));
+    root_dir = create_directory(QString::fromStdString(dir_path));
+    proj->dir_bookmarks = create_directory(get_dir(root_dir).absoluteFilePath(QString::fromStdString(proj->name+"/Bookmarks")));
     proj->dir = create_directory(get_dir(root_dir).absoluteFilePath(QString::fromStdString(proj->name)));
     if(vid_path != "")
         proj->dir_videos = create_directory(get_dir(root_dir).absoluteFilePath(QString::fromStdString(vid_path)));
-
     add_project(proj);                          // Add project to file sytstem
     save_project(proj);                         // Save project file
     open_project(proj->id);                     // Open project
@@ -221,6 +213,7 @@ void FileHandler::save_project(Project *proj){
 bool FileHandler::save_saveable(Saveable *saveable, ID dir_id, FileHandler::SAVE_FORMAT save_format){
     QDir dir = get_dir(dir_id);
     std::string file_path = dir.absoluteFilePath(QString::fromStdString(saveable->save_name)).toStdString();
+
     QFile save_file(save_format == JSON
                     ? QString::fromStdString(file_path + ".json")
                     : QString::fromStdString(file_path + ".dat"));    
@@ -246,13 +239,10 @@ bool FileHandler::save_saveable(Saveable *saveable, ID dir_id, FileHandler::SAVE
  * for hiding save format.
  */
 Project* FileHandler::load_project(std::string full_project_path){
-     Project* proj = new Project();
+     Project* proj = new Project(this);
      load_saveable(proj, full_project_path, JSON); // Decide format internally, here for flexibility
      proj->saved = true;
      proj->id = add_project(proj);
-     proj->dir = add_dir(QDir(QString::fromStdString(full_project_path.substr(0, full_project_path.find_last_of("/")))));
-     proj->bookmark_dir = add_dir(QDir(QString::fromStdString(full_project_path.substr(0, full_project_path.find_last_of("/")) + "/Bookmarks")));
-     proj->dir_videos = this->work_space;
      return proj;
 }
 
@@ -267,12 +257,11 @@ Saveable *FileHandler::load_saveable(Saveable *saveable, std::string full_path, 
     QFile load_file(save_form == JSON
         ? QString::fromStdString(full_path)
         : QString::fromStdString(full_path));
-    if (!load_file.open(QIODevice::ReadOnly)) {        
+    if (!load_file.open(QIODevice::ReadOnly)) {
         qWarning("Couldn't open load file %s. ", load_file.fileName().toStdString().c_str());
         return nullptr;
     }
     QByteArray save_data = load_file.readAll();
-
     QJsonDocument load_doc(save_form == JSON
         ? QJsonDocument::fromJson(save_data)
         : QJsonDocument::fromBinaryData(save_data));
@@ -294,7 +283,7 @@ bool FileHandler::delete_project(ID proj_id){
         temp->delete_artifacts();
         QFile file (get_dir(temp->dir).absoluteFilePath(QString::fromStdString(temp->name + ".json")));
         file.remove();
-        delete_directory(temp->bookmark_dir);
+        delete_directory(temp->dir_bookmarks);
         delete_directory(temp->dir);
         delete temp;        
         this->proj_map_lock.unlock();
@@ -423,9 +412,9 @@ ID FileHandler::create_file(QString file_name, QDir dir){
   */
  QString FileHandler::get_file(ID id){
     this->file_map_lock.lock();
-    QString file = this->file_map.at(id);
+    QString file_name = this->file_map.at(id);
     this->file_map_lock.unlock();
-    return file;
+    return file_name;
  }
 
  /**
@@ -440,6 +429,7 @@ ID FileHandler::create_file(QString file_name, QDir dir){
     this->dir_map_lock.unlock();
     return dir;
  }
+
 
  /**
   * @brief FileHandler::add_project

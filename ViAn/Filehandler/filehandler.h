@@ -51,21 +51,17 @@ public:
     //  Project* open_project(ID id); // To be added
     //  Project* close_project(ID id);
     Project* get_project(ID id);
-    Project* create_project(QString proj_name, std::string dir_path="", std::string vid_path="");
+    Project* create_project(QString proj_name, std::string dir_path, std::string vid_path);
     bool delete_project(ID proj_id);
     Project* load_project(std::string full_project_path);
     void save_project(ID id);
     void open_project(ID id);
-    void close_project(ID id);
-
-
+    void close_project(ID id);    
     bool proj_equals(Project& proj, Project& proj2);
     friend bool operator==(Project& proj, Project& proj2);
-
-    //  Video methods
+    // Video methods
     void remove_video_from_project(ID proj_id, ID vid_id);
     ID add_video(Project* proj, std::string file_path);
-
     //  Directory methods
     ID create_directory(QString dir_path);
     bool delete_directory(ID id);
