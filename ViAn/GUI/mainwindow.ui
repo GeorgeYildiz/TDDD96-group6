@@ -16,7 +16,7 @@
   <property name="windowOpacity">
    <double>1.000000000000000</double>
   </property>
-  <widget class="QWidget" name="centralWidget">
+  <widget class="QWidget" name="central_widget">
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
      <widget class="QSplitter" name="splitter">
@@ -43,12 +43,12 @@
        </column>
       </widget>
       <widget class="QWidget" name="layoutWidget">
-       <layout class="QVBoxLayout" name="verticalLayoutMiddle">
+       <layout class="QVBoxLayout" name="vertical_layout_middle">
         <property name="sizeConstraint">
          <enum>QLayout::SetNoConstraint</enum>
         </property>
         <item>
-         <widget class="QFrame" name="videoFrameContainer">
+         <widget class="QFrame" name="video_frame_container">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
             <horstretch>0</horstretch>
@@ -67,13 +67,13 @@
              <property name="widgetResizable">
               <bool>true</bool>
              </property>
-             <widget class="QWidget" name="scrollAreaWidgetContents">
+             <widget class="QWidget" name="scroll_area_widget_contents">
               <property name="geometry">
                <rect>
                 <x>0</x>
                 <y>0</y>
                 <width>232</width>
-                <height>283</height>
+                <height>281</height>
                </rect>
               </property>
               <layout class="QGridLayout" name="gridLayout_2">
@@ -110,7 +110,7 @@
          </widget>
         </item>
         <item>
-         <layout class="QHBoxLayout" name="horizontalLayoutMiddle">
+         <layout class="QHBoxLayout" name="horizontal_layout_middle">
           <property name="sizeConstraint">
            <enum>QLayout::SetNoConstraint</enum>
           </property>
@@ -278,7 +278,7 @@
            </widget>
           </item>
           <item>
-           <spacer name="horizontalSpacer">
+           <spacer name="horizontal_spacer">
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
             </property>
@@ -293,9 +293,9 @@
          </layout>
         </item>
         <item>
-         <layout class="QHBoxLayout" name="sliderLayout">
+         <layout class="QHBoxLayout" name="slider_layout">
           <item>
-           <widget class="QLabel" name="currentTimeLabel">
+           <widget class="QLabel" name="current_time_label">
             <property name="text">
              <string/>
             </property>
@@ -324,7 +324,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QLabel" name="totalTimeLabel">
+           <widget class="QLabel" name="total_time_label">
             <property name="text">
              <string/>
             </property>
@@ -346,7 +346,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="QMenuBar" name="menuBar">
+  <widget class="QMenuBar" name="menu_bar">
    <property name="geometry">
     <rect>
      <x>0</x>
@@ -358,18 +358,18 @@
    <property name="mouseTracking">
     <bool>true</bool>
    </property>
-   <widget class="QMenu" name="menuFile">
+   <widget class="QMenu" name="menu_file">
     <property name="title">
      <string>File</string>
     </property>
-    <widget class="QMenu" name="menuAdd">
+    <widget class="QMenu" name="menu_add">
      <property name="title">
       <string>Add</string>
      </property>
      <addaction name="action_add_project"/>
      <addaction name="action_add_video"/>
     </widget>
-    <addaction name="menuAdd"/>
+    <addaction name="menu_add"/>
     <addaction name="action_load"/>
     <addaction name="action_save"/>
     <addaction name="action_close_project"/>
@@ -377,19 +377,19 @@
     <addaction name="action_choose_workspace"/>
     <addaction name="action_exit"/>
    </widget>
-   <widget class="QMenu" name="menuEdit">
+   <widget class="QMenu" name="menu_edit">
     <property name="title">
      <string>Edit</string>
     </property>
     <addaction name="action_options"/>
    </widget>
-   <widget class="QMenu" name="menuHelp">
+   <widget class="QMenu" name="menu_help">
     <property name="title">
      <string>Help</string>
     </property>
     <addaction name="action_open_manual"/>
    </widget>
-   <widget class="QMenu" name="menuView">
+   <widget class="QMenu" name="menu_view">
     <property name="title">
      <string>View</string>
     </property>
@@ -404,11 +404,11 @@
     <addaction name="action_rotate_right"/>
     <addaction name="action_rotate_left"/>
    </widget>
-   <widget class="QMenu" name="menuTools">
+   <widget class="QMenu" name="menu_tools">
     <property name="title">
      <string>Tools</string>
     </property>
-    <widget class="QMenu" name="menuShape">
+    <widget class="QMenu" name="menu_shape">
      <property name="title">
       <string>Shape</string>
      </property>
@@ -420,16 +420,16 @@
      <addaction name="action_text"/>
     </widget>
     <addaction name="action_colour"/>
-    <addaction name="menuShape"/>
+    <addaction name="menu_shape"/>
     <addaction name="action_undo"/>
     <addaction name="action_clear"/>
     <addaction name="action_contrast_brightness"/>
    </widget>
-   <addaction name="menuFile"/>
-   <addaction name="menuEdit"/>
-   <addaction name="menuView"/>
-   <addaction name="menuTools"/>
-   <addaction name="menuHelp"/>
+   <addaction name="menu_file"/>
+   <addaction name="menu_edit"/>
+   <addaction name="menu_view"/>
+   <addaction name="menu_tools"/>
+   <addaction name="menu_help"/>
   </widget>
   <widget class="QStatusBar" name="status_bar"/>
   <widget class="QToolBar" name="toolbar">
