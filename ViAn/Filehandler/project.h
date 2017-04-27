@@ -24,7 +24,7 @@ typedef int ID;
 
 struct Project : Saveable{
     std::string name;
-public:    
+public:
     Project();
     Project(ID id, std::string name);
     Project(std::string dir_path);
