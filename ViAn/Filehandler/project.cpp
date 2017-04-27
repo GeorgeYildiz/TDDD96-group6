@@ -12,7 +12,7 @@ Project::Project(FileHandler* file_handler, ID id, std::string name){
     this->dir = -1;
     this->dir_videos = -1;
     this->dir_bookmarks = -1;
-    this->v_id = 0;    
+    this->v_id = 0;
     this->videos.clear();
     this->saved = false;
 }
@@ -39,7 +39,6 @@ Project::~Project(){
     for (auto vidIt = this->videos.begin(); vidIt != this->videos.end(); ++vidIt) {
         delete vidIt->second;
     }
-
 }
 
 /**
@@ -51,7 +50,6 @@ void Project::remove_video_project(ID id){
     VideoProject* temp = this->videos.at(id);
     delete temp;
     videos.erase(id);
-
 }
 
 /**

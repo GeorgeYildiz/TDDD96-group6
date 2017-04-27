@@ -253,11 +253,11 @@ Project* FileHandler::load_project(std::string full_project_path){
  * @return loaded Project
  * Loads project from json file and returns it
  */
-Saveable *FileHandler::load_saveable(Saveable *saveable, std::string full_path, FileHandler::SAVE_FORMAT save_form){    
+Saveable *FileHandler::load_saveable(Saveable *saveable, std::string full_path, FileHandler::SAVE_FORMAT save_form){
     QFile load_file(save_form == JSON
         ? QString::fromStdString(full_path)
         : QString::fromStdString(full_path));
-    if (!load_file.open(QIODevice::ReadOnly)) {        
+    if (!load_file.open(QIODevice::ReadOnly)) {
         qWarning("Couldn't open load file %s. ", load_file.fileName().toStdString().c_str());
         return nullptr;
     }
