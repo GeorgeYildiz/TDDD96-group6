@@ -138,7 +138,6 @@ Project* FileHandler::create_project(QString proj_name, std::string dir_path, st
     proj->dir = create_directory(get_dir(root_dir).absoluteFilePath(QString::fromStdString(proj->name)));
     if(vid_path != "")
         proj->dir_videos = create_directory(get_dir(root_dir).absoluteFilePath(QString::fromStdString(vid_path)));
-    std::cout << vid_path << std::endl;
     add_project(proj);                          // Add project to file sytstem
     save_project(proj);                         // Save project file
     open_project(proj->id);                     // Open project
