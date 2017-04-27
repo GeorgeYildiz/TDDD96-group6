@@ -28,7 +28,6 @@ struct Project : Saveable{
 public:    
     Project(FileHandler* file_handler);
     Project(FileHandler* file_handler, ID id, std::string name);
-    Project(FileHandler* file_handler, std::string dir_path);
     ~Project();
     ID add_video(Video *vid);
     ID add_video_project(VideoProject* vid_proj);
