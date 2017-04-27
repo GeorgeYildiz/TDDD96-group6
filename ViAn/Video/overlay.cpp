@@ -233,10 +233,14 @@ void Overlay::clear(int frame_nr) {
 void Overlay::read(const QJsonObject& json) {
     QJsonArray json_overlays = json["overlays"].toArray();
     for(int i = 0; i != json_overlays.size(); i++) {
+        // For each overlay, get the associated frame number
+        // and all drawings.
         QJsonObject json_overlay = json_overlays[i].toObject();
         int frame_nr = json_overlay["frame"].toInt();
         QJsonArray json_drawings = json_overlay["drawings"].toArray();
         for(int i = 0; i != json_drawings.size(); i++) {
+            // For each drawing, get the shape type and read
+            // a shape of that type.
             QJsonObject json_shape = json_drawings[i].toObject();
             int shape_i = json_shape["shape"].toInt();
             SHAPES shape_t = static_cast<SHAPES>(shape_i);
@@ -257,12 +261,12 @@ void Overlay::write(QJsonObject& json) {
     for (auto const& map_entry : overlays) {
         QJsonObject json_overlay;
         QJsonArray json_drawings;
-        foreach (Shape* s, map_entry.second) {
+        foreach (Shape* s, map_entry.second) { // Second member is the value, i.e. the drawings.
             QJsonObject json_shape;
             s->write(json_shape);
             json_drawings.append(json_shape);
         }
-        json_overlay["frame"] = map_entry.first;
+        json_overlay["frame"] = map_entry.first; // First member is the key, i.e. the frame number.
         json_overlay["drawings"] = json_drawings;
         json_overlays.append(json_overlay);
     }
