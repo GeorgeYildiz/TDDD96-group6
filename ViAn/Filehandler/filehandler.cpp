@@ -190,7 +190,7 @@ bool FileHandler::delete_directory(ID id){
  */
 void FileHandler::save_project(ID id){
     Project* proj = get_project(id);
-    this->save_saveable(proj, proj->dir, FileHandler::SAVE_FORMAT::JSON); // get project and save it
+    save_project(proj); // get project and save it
 }
 
 /**
@@ -201,6 +201,7 @@ void FileHandler::save_project(ID id){
  */
 void FileHandler::save_project(Project *proj){
     this->save_saveable(proj, proj->dir, FileHandler::SAVE_FORMAT::JSON);
+    proj->save_project();
 }
 
 /**
@@ -241,7 +242,7 @@ bool FileHandler::save_saveable(Saveable *saveable, ID dir_id, FileHandler::SAVE
 Project* FileHandler::load_project(std::string full_project_path){
      Project* proj = new Project(this);
      load_saveable(proj, full_project_path, JSON); // Decide format internally, here for flexibility
-     proj->saved = true;
+     proj->save_project();
      proj->id = add_project(proj);
      return proj;
 }
@@ -508,8 +509,8 @@ void FileHandler::add_dir(ID dir_id, QDir dir){
  * @return true if project contents are the same
  */
 bool FileHandler::proj_equals(Project& proj, Project& proj2){
-    bool video_equals =  std::equal(proj.videos.begin(), proj.videos.end(),
-               proj2.videos.begin(),
+    bool video_equals =  std::equal(proj.get_videos().begin(), proj.get_videos().end(),
+               proj2.get_videos().begin(),
                [](const std::pair<ID,VideoProject*> v, const std::pair<ID,VideoProject*> v2){return *(v.second->get_video()) == *(v2.second->get_video());}); // lambda function comparing using video==
                                                                                                                       // by dereferencing pointers in vector
     return proj.name == proj2.name &&
