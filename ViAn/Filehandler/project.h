@@ -22,7 +22,6 @@ class FileHandler;
  * incomplete class, will be added on
  * along with parser functionality
  */
-
 class Project : public Saveable{
     FileHandler* file_handler;
     bool saved;
@@ -32,8 +31,11 @@ public:
     ID id;
     ID v_id;
     ID dir;
-    ID bookmark_dir;
+    ID dir_bookmarks;
     ID dir_videos;
+
+
+public:
     Project(FileHandler* file_handler);
     Project(FileHandler* file_handler, ID id, std::string name);
     ~Project();

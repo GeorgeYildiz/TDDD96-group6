@@ -28,7 +28,7 @@ enum WRITE_OPTION{APPEND, OVERWRITE};
 
 typedef int ID;       // ID, defined for code readability.
 
-struct Project; // fix for include issue
+class Project; // fix for include issue
 
 class FileHandler : Saveable{
     enum SAVE_FORMAT {JSON, BINARY};    // Formats supported by save_project
