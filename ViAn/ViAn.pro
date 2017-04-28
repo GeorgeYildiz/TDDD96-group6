@@ -15,7 +15,14 @@ TEMPLATE = app
 #
 # GENERAL
 #
-SOURCES += main.cpp
+SOURCES += main.cpp \
+    GUI/projectcomponent.cpp \
+    GUI/qtreeprojectitem.cpp \
+    GUI/videocomponent.cpp \
+    GUI/drawingcomponent.cpp \
+    GUI/analysiscomponent.cpp \
+    GUI/filehandlercomponent.cpp \
+    GUI/documentlistcomponent.cpp
 
 #
 # TEST
@@ -25,7 +32,15 @@ SOURCES += Test/test_video_player.cpp\
     Test/test_mainwindow.cpp
 HEADERS += Test/test_video_player.h \
     Test/filehandlertest.h \
-    Test/test_mainwindow.h
+    Test/test_mainwindow.h \
+    GUI/projectcomponent.h \
+    GUI/qtreeprojectitem.h \
+    GUI/qtreevideoitem.h \
+    GUI/videocomponent.h \
+    GUI/drawingcomponent.h \
+    GUI/analysiscomponent.h \
+    GUI/filehandlercomponent.h \
+    GUI/documentlistcomponent.h
 
 #
 # LIBRARY

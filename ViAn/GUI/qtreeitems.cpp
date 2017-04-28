@@ -5,8 +5,8 @@
  * @param string, the name of the widget
  * @param id
  */
-MyQTreeWidgetItem::MyQTreeWidgetItem(TYPE type, QString string, int id) {
-    QTreeWidgetItem();
+MyQTreeWidgetItem::MyQTreeWidgetItem(TYPE type, QString string, int id) : QTreeWidgetItem(){
+
     this->id = id;
     this->type = type;
     this->name = string;
