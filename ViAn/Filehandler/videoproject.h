@@ -8,6 +8,8 @@
 #include <QFile>
 #include "bookmark.h"
 #include "video.h"
+#include "project.h"
+class Project;
 enum ANALYSIS_TYPE{MOVEMENT}; // Analyses have different types
 /**
  * @brief The VideoProject class
@@ -17,15 +19,13 @@ enum ANALYSIS_TYPE{MOVEMENT}; // Analyses have different types
 class VideoProject{
     std::vector<Bookmark*> bookmarks;
     Video* video = nullptr;
-
-
-
+    Project* proj;
 public:
     void read(const QJsonObject& json);
     void write(QJsonObject& json);
     void add_bookmark(Bookmark* bookmark);
     void delete_artifacts();    
-    VideoProject(Video* v); //Needs to have a video
+    VideoProject(Project *proj, Video* v); //Needs to have a video
     VideoProject();
     Video* get_video();
     std::vector<Bookmark*> get_bookmarks();

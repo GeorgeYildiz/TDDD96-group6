@@ -209,7 +209,7 @@ void FileHandler::save_project(ID id){
  */
 void FileHandler::save_project(Project *proj){
     this->save_saveable(proj, proj->dir, FileHandler::SAVE_FORMAT::JSON);
-    proj->save_project();
+    proj->changes_saved();
 }
 
 /**
@@ -253,7 +253,7 @@ Project* FileHandler::load_project(std::string full_project_path){
      proj->dir = add_dir(QDir(QString::fromStdString(full_project_path.substr(0, full_project_path.find_last_of("/")))));
      proj->bookmark_dir = add_dir(QDir(QString::fromStdString(full_project_path.substr(0, full_project_path.find_last_of("/")) + "/Bookmarks")));
      proj->dir_videos = this->work_space;
-     proj->save_project();
+     proj->changes_saved();
      return proj;
 }
 

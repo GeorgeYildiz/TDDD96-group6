@@ -5,8 +5,9 @@
  * @param v
  * Set video.
  */
-VideoProject::VideoProject(Video* v){
+VideoProject::VideoProject(Project* proj, Video* v){
     this->video = v;
+    this->proj = proj;
 }
 
 /**
@@ -77,6 +78,7 @@ void VideoProject::write(QJsonObject& json){
  */
 void VideoProject::add_bookmark(Bookmark *bookmark){
     this->bookmarks.push_back(bookmark);
+    this->proj->changes_made();
 }
 
 /**

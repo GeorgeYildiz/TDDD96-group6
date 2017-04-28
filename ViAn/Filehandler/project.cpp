@@ -58,7 +58,7 @@ void Project::remove_video_project(ID id){
  */
 ID Project::add_video(Video* vid){
     vid->id = this->v_id;
-    this->videos.insert(std::make_pair(this->v_id, new VideoProject(vid)));
+    this->videos.insert(std::make_pair(this->v_id, new VideoProject(this, vid)));
     this->saved =false;
     return this->v_id++;
 }
@@ -133,15 +133,16 @@ void Project::add_bookmark(ID id, Bookmark *bookmark){
  * @brief Project::is_saved
  * @return true if saved
  */
-bool Project::is_saved(){
-    return this->saved;
+bool Project::changes_saved(){
+    return !this->saved;
 }
+
 
 /**
  * @brief Project::save_project
  * @return sets saved =true
  */
-void Project::save_project(){
+void Project::changes_made(){
     this->saved = true;
 }
 

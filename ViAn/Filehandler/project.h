@@ -15,7 +15,7 @@
 #include "video.h"
 #include "saveable.h"
 typedef int ID;
-
+class VideoProject;
 /**
  * @brief The Project struct
  * incomplete struct, will be added on
@@ -48,8 +48,10 @@ public:
     // read and write operator for Projects
     void read(const QJsonObject& json);
     void write(QJsonObject& json);
-    bool is_saved();
+    bool changes_saved();
+    void changes_made();
     void save_project();
+
     std::map<ID, VideoProject *>& get_videos();
     bool proj_equals(Project& other);
 // TODO
