@@ -35,7 +35,6 @@ HEADERS += Test/test_video_player.h \
     Test/test_mainwindow.h \
     GUI/projectcomponent.h \
     GUI/qtreeprojectitem.h \
-    GUI/qtreevideoitem.h \
     GUI/videocomponent.h \
     GUI/drawingcomponent.h \
     GUI/analysiscomponent.h \
