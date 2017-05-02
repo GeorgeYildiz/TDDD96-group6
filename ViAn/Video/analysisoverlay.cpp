@@ -16,7 +16,7 @@ AnalysisOverlay::AnalysisOverlay() {
 cv::Mat AnalysisOverlay::draw_overlay(cv::Mat &frame, int frame_nr) {
     if (showing_overlay) {
         for (cv::Rect area : detections[frame_nr]) {
-            cv::rectangle(frame, area, cv::Scalar(255, 0, 0), 5);
+            cv::rectangle(frame, area, COLOUR, THICKNESS);
         }
     }
     return frame;
