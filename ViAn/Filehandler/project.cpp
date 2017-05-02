@@ -14,7 +14,7 @@ Project::Project(FileHandler* file_handler, ID id, std::string name){
     this->dir_bookmarks = -1;
     this->v_id = 0;
     this->videos.clear();
-    this->saved = false;
+    this->changes_made = true;
 }
 /**
  * @brief Project::Project
@@ -50,7 +50,7 @@ void Project::remove_video_project(ID id){
     VideoProject* temp = this->videos.at(id);
     delete temp;
     videos.erase(id);
-    this->saved =false;
+    this->changes_made =true;
 }
 
 /**
@@ -60,7 +60,7 @@ void Project::remove_video_project(ID id){
 ID Project::add_video(Video* vid){
     vid->id = this->v_id;
     this->videos.insert(std::make_pair(this->v_id, new VideoProject(vid)));
-    this->saved =false;
+    this->changes_made =true;
     return this->v_id++;
 }
 
@@ -71,7 +71,7 @@ ID Project::add_video(Video* vid){
 ID Project::add_video_project(VideoProject* vid_proj){
     vid_proj->get_video()->id = this->v_id;
     this->videos.insert(std::make_pair(this->v_id, vid_proj));
-    this->saved = false;
+    this->changes_made = true;
     return this->v_id++;
 }
 /**
@@ -133,7 +133,7 @@ void Project::write(QJsonObject& json){
 void Project::add_bookmark(ID id, Bookmark *bookmark){
     VideoProject* v = this->videos.at(id);
     v->add_bookmark(bookmark);
-    this->saved =false;
+    this->changes_made = true;
 }
 
 /**
@@ -141,7 +141,7 @@ void Project::add_bookmark(ID id, Bookmark *bookmark){
  * @return true if saved
  */
 bool Project::is_saved(){
-    return this->saved;
+    return !this->changes_made;
 }
 
 /**
@@ -149,7 +149,7 @@ bool Project::is_saved(){
  * @return sets saved =true
  */
 void Project::save_project(){
-    this->saved = true;
+    this->changes_made = false;
 }
 
 /**

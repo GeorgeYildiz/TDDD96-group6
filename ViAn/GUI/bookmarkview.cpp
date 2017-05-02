@@ -24,9 +24,23 @@ int BookmarkView::get_num_bookmarks() {
  * Adds a bookmark to the bookmark view.
  * @param bookmark Bookmark to add.
  */
-void BookmarkView::add_bookmark(Bookmark* bookmark) {
+int BookmarkView::add_bookmark(ID video_id, ID bookmark_id, Bookmark* bookmark) {
     BookmarkItem* bookmark_item = new BookmarkItem(bookmark, view);
     view->addItem(bookmark_item);
+    this->bookmark_items[video_id][bookmark_id] = bookmark_item;
+}
+
+/**
+ * @brief BookmarkView::remove_bookmark
+ * @param id
+ * @return void
+ * Erases bookmarkitem from bookmarkview.
+ */
+void BookmarkView::remove_bookmark(ID video_id, ID bookmark_id){
+    BookmarkItem* bookmark_item = this->bookmark_items.at(video_id).at(bookmark_id);
+    view->removeItemWidget(bookmark_item);
+    this->bookmark_items.at(video_id).erase(bookmark_id);
+    delete bookmark_item;
 }
 
 /**
