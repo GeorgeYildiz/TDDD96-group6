@@ -56,6 +56,7 @@ void AnalysisController::setup_analysis(std::string file_path, ANALYSIS_TYPE typ
  * Starts the analysis loop.
  */
 void AnalysisController::run() {
+    std::cout << "Starting controller" << std::endl;
     method->setup_analysis();
     Analysis analysis = method->run_analysis();
     emit save_analysis(analysis);

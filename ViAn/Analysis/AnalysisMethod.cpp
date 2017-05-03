@@ -48,25 +48,32 @@ bool AnalysisMethod::sample_current_frame() {
  */
 Analysis AnalysisMethod::run_analysis() {
     if (!capture.isOpened()) {
+        std::cout << "could not find video" << std::endl;
         return m_analysis;
     }
     calculate_scaling_factor();
+    std::vector<OOI> detections;
     num_frames = capture.get(CV_CAP_PROP_FRAME_COUNT);
+
+    std::cout << num_frames << std::endl;
     POI* m_POI = new POI();
     while(!aborted && capture.read(frame)) {
         // do frame analysis
-        if (sample_current_frame()) {
+        std::cout << current_frame << std::endl;
+        if (sample_current_frame() || current_frame == num_frames-1) {
             if (scaling_needed)
                 scale_frame();
 
-            std::vector<OOI> detections = analyse_frame();
-
+            detections = analyse_frame();
+            std::cout << detections.size() << " " << detecting << std::endl;
             if (detections.empty() && detecting) {
+                std::cout << "saving poi" << std::endl;
                 m_POI->set_end_frame(current_frame - 1);
                 m_analysis.add_POI(*m_POI);
                 m_POI = new POI();
                 detecting = false;
             } else if (!detections.empty()) {
+                std::cout << "Detecting" << std::endl;
                 detecting = true;
                 if (scaling_needed) {
                     for (OOI detection : detections) {
@@ -76,9 +83,17 @@ Analysis AnalysisMethod::run_analysis() {
                 m_POI->add_detections(current_frame, detections);
             }
 
-            if (current_frame == num_frames && detecting) {
+            if (current_frame == (num_frames-1) && detecting) {
+                std::cout << "Detecting on last frame" << std::endl;
                 m_POI->set_end_frame(current_frame);
+                m_analysis.add_POI(*m_POI);
             }
+        } else if (!detections.empty()) {
+            /* If the current frame is not sampled, the detections from the previously
+             * sampled frame should still be valid and should therefore be shown as
+             * detections for the current frame as well.
+             */
+            m_POI->add_detections(current_frame, detections);
         }
 
         if (paused) {
@@ -90,6 +105,7 @@ Analysis AnalysisMethod::run_analysis() {
     }
 
     capture.release();
+
     return m_analysis;
 }
 

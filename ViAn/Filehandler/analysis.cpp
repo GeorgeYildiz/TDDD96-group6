@@ -1,4 +1,5 @@
 #include "analysis.h"
+#include <iostream>
 
 /**
  * @brief POI::POI
@@ -224,12 +225,15 @@ void Analysis::write(QJsonObject &json){
  */
 std::vector<cv::Rect> Analysis::get_detections_on_frame(int frame_num) {
     std::vector<cv::Rect> rects;
+    std::cout << "Num POIs: " << POIs.size() << std::endl;
     for (POI p : POIs) {
+        std::cout << "POI start frame: "<<p.start_frame << ", End frame: "<<p.end_frame << std::endl;
         if (frame_num >= p.start_frame && frame_num <= p.end_frame) {
             std::vector<OOI> oois = p.OOIs[frame_num];
             for (OOI o : oois) {
                 rects.push_back(o.get_rect());
             }
+            std::cout << "Adding rects " << rects.size() << std::endl;
             break;
         }
     }

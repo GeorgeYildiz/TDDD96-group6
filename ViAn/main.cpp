@@ -18,7 +18,7 @@ int main(int argc, char *argv[])
     qRegisterMetaType<Analysis>();
     w.show();
 
-    bool testing = true;
+    bool testing = false;
     if (testing) {
         //For testing video player.
         test_video_player* video_test = new test_video_player();

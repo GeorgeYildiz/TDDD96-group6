@@ -46,11 +46,10 @@ MainWindow::MainWindow(QWidget *parent) :
     //Creates and prepares the video_player.
     mvideo_player = new video_player(&mutex, &paused_wait, ui->video_frame);
     setup_video_player(mvideo_player);
-
+    //mvideo_player->load_video("enghd.mp4");
     // TODO The following code is just here to test.
     // Remove when a proper implementation exists.
-    //m_acontroller = new AnalysisController("eng4k.mov",MOTION_DETECTION);
-    //m_acontroller->start();
+
 
     // Initially hide overlay and analysis toolbar
     ui->toolbar_overlay->hide();
@@ -148,6 +147,8 @@ void MainWindow::setup_video_player(video_player *mplayer) {
  */
 void MainWindow::save_analysis_to_file(Analysis analysis) {
     //TODO Add code.
+    std::cout << "Analysis done" << std::endl;
+    emit set_analysis_results(analysis);
 }
 
 /**
@@ -157,6 +158,7 @@ void MainWindow::save_analysis_to_file(Analysis analysis) {
 void MainWindow::show_analysis_progress(int progress){
     // Progress for the current analysis
     // Add to gui from here
+    std::cout << "Progress: " << progress << std::endl;
 }
 
 /**
@@ -723,6 +725,9 @@ void MainWindow::play_video() {
     enable_video_buttons();
     icon_on_button_handler->set_icon("pause", ui->play_pause_button);
     video_slider->setMaximum(mvideo_player->get_num_frames() - 1);
+    m_acontroller = new AnalysisController("Pumparna.avi",MOTION_DETECTION);
+    setup_analysis(m_acontroller);
+    m_acontroller->start();
 }
 
 /**
