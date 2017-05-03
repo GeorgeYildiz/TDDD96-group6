@@ -16,7 +16,6 @@ TEMPLATE = app
 # GENERAL
 #
 SOURCES += main.cpp
-
 #
 # TEST
 #
@@ -42,7 +41,13 @@ SOURCES += GUI/mainwindow.cpp \
     GUI/bookmarkview.cpp \
     GUI/bookmarkitem.cpp \
     GUI/makeproject.cpp \
-    GUI/fpsdialog.cpp
+    GUI/fpsdialog.cpp \
+    GUI/projectcomponent.cpp \
+    GUI/videocomponent.cpp \
+    GUI/drawingcomponent.cpp \
+    GUI/analysiscomponent.cpp \
+    GUI/filehandlercomponent.cpp \
+    GUI/documentlistcomponent.cpp
 
 
 HEADERS  += GUI/mainwindow.h \
@@ -52,7 +57,13 @@ HEADERS  += GUI/mainwindow.h \
     GUI/bookmarkview.h \
     GUI/bookmarkitem.h \
     GUI/makeproject.h \
-    GUI/fpsdialog.h
+    GUI/fpsdialog.h \
+    GUI/projectcomponent.h \
+    GUI/videocomponent.h \
+    GUI/drawingcomponent.h \
+    GUI/analysiscomponent.h \
+    GUI/filehandlercomponent.h \
+    GUI/documentlistcomponent.h
 
 FORMS    += GUI/mainwindow.ui \
     GUI/makeproject.ui
@@ -75,6 +86,7 @@ SOURCES += Video/video_player.cpp \
     Video/shapes/text.cpp \
     Video/shapes/zoomrectangle.cpp \
     Video/shapes/analysarea.cpp
+
 HEADERS += Video/video_player.h \
     Video/overlay.h \
     Video/analysisoverlay.h \

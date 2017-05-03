@@ -1,0 +1,6 @@
+#ifndef FILEHANDLERCOMPONENT_H
+#define FILEHANDLERCOMPONENT_H
+#include "mainwindow.h"
+
+
+#endif // FILEHANDLERCOMPONENT_H

@@ -1,28 +1,34 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
-
+// QT
 #include <QMainWindow>
 #include <QBasicTimer>
 #include <string>
 #include <QCloseEvent>
 #include <QSlider>
 #include <QFileDialog>
-#include "Library/customdialog.h"
-#include "Video/video_player.h"
+#include <QMutex>
+#include <QWaitCondition>
+//Open CV
 #include "opencv2/opencv.hpp"
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/videoio/videoio.hpp"
 #include "opencv2/video/video.hpp"
 #include "opencv2/core/core.hpp"
+
+#include "Library/customdialog.h"
+#include "Video/video_player.h"
 #include "icononbuttonhandler.h"
 #include "ui_mainwindow.h"
 #include "Filehandler/filehandler.h"
 #include "bookmarkview.h"
 #include "action.h"
 #include "qtreeitems.h"
-#include <QMutex>
-#include <QWaitCondition>
 #include "makeproject.h"
+#include "drawingcomponent.h"
+#include "analysiscomponent.h"
+#include "projectcomponent.h"
+#include "videocomponent.h"
 #define SCROLL_AREA_MARGIN 25
 
 using namespace std;

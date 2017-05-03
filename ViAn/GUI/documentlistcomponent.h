@@ -1,0 +1,5 @@
+#ifndef DOCUMENTLISTCOMPONENT_H
+#define DOCUMENTLISTCOMPONENT_H
+#include "mainwindow.h"
+
+#endif // DOCUMENTLISTCOMPONENT_H
