@@ -43,7 +43,6 @@ SOURCES += GUI/mainwindow.cpp \
     GUI/makeproject.cpp \
     GUI/fpsdialog.cpp \
     GUI/projectcomponent.cpp \
-    GUI/qtreeprojectitem.cpp \
     GUI/videocomponent.cpp \
     GUI/drawingcomponent.cpp \
     GUI/analysiscomponent.cpp \
@@ -60,7 +59,6 @@ HEADERS  += GUI/mainwindow.h \
     GUI/makeproject.h \
     GUI/fpsdialog.h \
     GUI/projectcomponent.h \
-    GUI/qtreeprojectitem.h \
     GUI/videocomponent.h \
     GUI/drawingcomponent.h \
     GUI/analysiscomponent.h \
