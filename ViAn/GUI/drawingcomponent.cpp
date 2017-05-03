@@ -166,15 +166,3 @@ void MainWindow::on_action_text_triggered() {
     ui->action_text->setChecked(true);
 }
 
-/**
- * @brief deselct_overlay_tool
- * Deselects all overlay tools.
- */
-void MainWindow::deselect_overlay_tool(){
-    ui->action_rectangle->setChecked(false);
-    ui->action_circle->setChecked(false);
-    ui->action_line->setChecked(false);
-    ui->action_arrow->setChecked(false);
-    ui->action_pen->setChecked(false);
-    ui->action_text->setChecked(false);
-}

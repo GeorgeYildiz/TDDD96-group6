@@ -335,3 +335,16 @@ void MainWindow::on_action_fill_screen_triggered() {
     }
 }
 
+/**
+ * @brief deselct_overlay_tool
+ * Deselects all overlay tools.
+ */
+void MainWindow::deselect_overlay_tool(){
+    ui->action_rectangle->setChecked(false);
+    ui->action_circle->setChecked(false);
+    ui->action_line->setChecked(false);
+    ui->action_arrow->setChecked(false);
+    ui->action_pen->setChecked(false);
+    ui->action_text->setChecked(false);
+}
+

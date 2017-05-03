@@ -88,6 +88,7 @@ SOURCES += Video/video_player.cpp \
     Video/shapes/text.cpp \
     Video/shapes/zoomrectangle.cpp \
     Video/shapes/analysarea.cpp
+
 HEADERS += Video/video_player.h \
     Video/overlay.h \
     Video/analysisoverlay.h \
