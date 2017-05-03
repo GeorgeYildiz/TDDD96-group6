@@ -1,8 +1,5 @@
 #include "videocomponent.h"
 
-VideoComponent::VideoComponent()
-{
-}
 /**
  * @brief MainWindow::on_previous_POI_button_clicked
  * Jump back to the previous POI.
