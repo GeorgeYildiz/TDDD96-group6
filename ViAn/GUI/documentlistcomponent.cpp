@@ -1,8 +1,5 @@
 #include "documentlistcomponent.h"
 
-DocumentListComponent::DocumentListComponent()
-{
-}
 /**
  * @brief MainWindow::on_bookmark_button_clicked
  * Button to add a bookmark to the bookmark view.

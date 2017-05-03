@@ -4,10 +4,5 @@
 #include <QColor>
 #include <QMainWindow>
 #include <QColorDialog>
-class DrawingComponent
-{
-public:
-    DrawingComponent();
-};
 
 #endif // DRAWINGCOMPONENT_H

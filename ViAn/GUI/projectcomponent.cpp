@@ -1,8 +1,5 @@
 #include "projectcomponent.h"
 
-ProjectComponent::ProjectComponent()
-{
-}
 /**
  * @brief MainWindow::on_action_add_project_triggered
  */

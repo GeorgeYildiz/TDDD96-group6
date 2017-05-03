@@ -1,9 +1,5 @@
 #include "filehandlercomponent.h"
 
-FilehandlerComponent::FilehandlerComponent()
-{
-}
-
 /**
  * @brief MainWindow::setup_filehandler
  * Sets up filehandler and loads projects.

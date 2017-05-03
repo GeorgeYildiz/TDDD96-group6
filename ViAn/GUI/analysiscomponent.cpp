@@ -1,9 +1,5 @@
 #include "analysiscomponent.h"
 
-AnalysisComponent::AnalysisComponent()
-{
-}
-
 /** @brief MainWindow::on_action_show_hide_analysis_area_triggered
  * Toggles the choosing of an analysis area.
  */

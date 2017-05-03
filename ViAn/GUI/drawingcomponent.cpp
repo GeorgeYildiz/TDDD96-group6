@@ -1,8 +1,5 @@
 #include "drawingcomponent.h"
 
-DrawingComponent::DrawingComponent()
-{
-}
 /**
  * @brief MainWindow::on_action_undo_triggered
  * Undo the drawings on the overlay.
