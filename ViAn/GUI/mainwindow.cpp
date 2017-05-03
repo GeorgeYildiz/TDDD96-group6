@@ -348,3 +348,16 @@ void MainWindow::deselect_overlay_tool(){
     ui->action_text->setChecked(false);
 }
 
+/** @brief MainWindow::on_action_show_hide_overlay_triggered
+* Toggles the showing/hiding of the overlay.
+* Invoked by menu item.
+*/
+void MainWindow::on_action_show_hide_overlay_triggered() {
+   mvideo_player->toggle_overlay();
+   toggle_toolbar();
+   if (mvideo_player->is_showing_overlay()) {
+       set_status_bar("Overlay: On.");
+   } else {
+       set_status_bar("Overlay: Off.");
+   }
+}
