@@ -225,7 +225,8 @@ void MainWindow::on_previous_frame_button_clicked() {
  */
 void MainWindow::update_video(QImage frame) {
     ui->video_frame->setPixmap(QPixmap::fromImage(frame));
-    set_slider_labels();
+    qint64 current_time = mvideo_player->get_current_frame_num()/mvideo_player->get_frame_rate();
+    set_time_to_label(ui->current_time_label, current_time);
 }
 
 /**
@@ -709,6 +710,7 @@ void MainWindow::play_video() {
     enable_video_buttons();
     icon_on_button_handler->set_icon("pause", ui->play_pause_button);
     video_slider->setMaximum(mvideo_player->get_num_frames() - 1);
+    set_slider_labels();
 }
 
 /**
