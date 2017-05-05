@@ -1078,8 +1078,8 @@ void MainWindow::on_action_create_report_triggered() {
         my_project = (MyQTreeWidgetItem*)get_project_from_object(item);
         Project* proj = file_handler->get_project(my_project->id);
         if(proj->is_saved()){
-            ReportGenerator report_generator = ReportGenerator(proj, file_handler);
-            report_generator.create_report();
+            //ReportGenerator report_generator = ReportGenerator(proj, file_handler);
+            //report_generator.create_report();
         } else {
           QMessageBox::question(this, "Project Modified", tr("Please save project before you can export a report.\n"),
                                 QMessageBox::Ok | QMessageBox::Ok);
