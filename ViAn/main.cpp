@@ -30,8 +30,8 @@ int main(int argc, char *argv[])
         test_mainwindow* window_test = new test_mainwindow(&w);
         QTest::qExec(window_test);
         //For testing the report_generator(THIS TEST WILL CREATE FILES)
-        //test_report_generator* report_test = new test_report_generator();
-        //QTest::qExec(report_test);
+        test_report_generator* report_test = new test_report_generator();
+        QTest::qExec(report_test);
     }
     return a.exec();
 }
