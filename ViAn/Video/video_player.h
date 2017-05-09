@@ -22,10 +22,11 @@ class video_player : public QThread {
 public:
     video_player(QMutex* mutex, QWaitCondition* paused_wait, QLabel* label, QObject* parent = 0);
     ~video_player();
-    bool load_video(string filename);
+    bool load_video(string filename, Overlay* o);
     bool is_paused();
     bool is_stopped();
     bool is_playing();
+    void set_showing_overlay(bool value);
     bool is_showing_overlay();
     bool is_showing_analysis_overlay();
     bool is_showing_analysis_tool();
