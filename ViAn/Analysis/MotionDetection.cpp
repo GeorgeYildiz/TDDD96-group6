@@ -20,8 +20,10 @@ void MotionDetection::setup_analysis(){
 
 /**
  * @brief MotionDetection::do_analysis
- * Motion detection specific code
- * This function is called from the interface thread loop
+ * This method detects motion in a frame, partly by comparing it to the previous frame
+ * and partly by using a background subtraction algorithm that detects things that are
+ * not part of the background. Rectangles that mark the detected areas are saved for use
+ * during video playback.
  */
 std::vector<OOI> MotionDetection::analyse_frame(){
     std::vector<OOI> OOIs;
@@ -30,12 +32,12 @@ std::vector<OOI> MotionDetection::analyse_frame(){
     shown_frame = frame.clone();
 
     cv::GaussianBlur(frame, frame, blur_size, 0);
-    pMOG2->apply(frame, fgMaskMOG2,-1);
+    pMOG2->apply(frame, fg_mask_MOG2,-1);
     pMOG2->getBackgroundImage(background);
 
     cv::Mat kernel_ero = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(dilation_degree,dilation_degree));
-    cv::threshold(fgMaskMOG2, fgMaskMOG2, 25, 255, cv::THRESH_BINARY);
-    cv::dilate(fgMaskMOG2, fgMaskMOG2, kernel_ero);
+    cv::threshold(fg_mask_MOG2, fg_mask_MOG2, 25, 255, cv::THRESH_BINARY);
+    cv::dilate(fg_mask_MOG2, fg_mask_MOG2, kernel_ero);
 
     if (!diff_prev.empty() && current_frame % sample_freq == 0) {
         cv::Mat gray_frame = shown_frame.clone();
@@ -44,11 +46,11 @@ std::vector<OOI> MotionDetection::analyse_frame(){
         cv::GaussianBlur(diff_frame, diff_frame, blur_size, 0);
         cv::threshold(diff_frame, diff_frame, 25, 255, cv::THRESH_BINARY);
         cv::dilate(diff_frame, diff_frame, kernel_ero);
-        cv::bitwise_and(diff_frame, fgMaskMOG2, result);
+        cv::bitwise_and(diff_frame, fg_mask_MOG2, result);
     } else if (!diff_prev.empty() && !diff_frame.empty()) {
-        cv::bitwise_and(diff_frame, fgMaskMOG2, result);
+        cv::bitwise_and(diff_frame, fg_mask_MOG2, result);
     } else {
-        result = fgMaskMOG2.clone();
+        result = fg_mask_MOG2.clone();
     }
 
     if (current_frame % sample_freq == 0) {

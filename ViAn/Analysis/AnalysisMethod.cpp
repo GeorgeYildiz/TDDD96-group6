@@ -61,6 +61,8 @@ Analysis AnalysisMethod::run_analysis() {
 
             std::vector<OOI> detections = analyse_frame();
 
+            // This if statement handles the sorting of OOIs detected
+            // in a frame into the correct POIs.
             if (detections.empty() && detecting) {
                 m_POI->set_end_frame(current_frame - 1);
                 m_analysis.add_POI(*m_POI);
@@ -76,6 +78,8 @@ Analysis AnalysisMethod::run_analysis() {
                 m_POI->add_detections(current_frame, detections);
             }
 
+            // Makes sure that a POI that stretches to the end of the
+            // video gets an end frame.
             if (current_frame == num_frames && detecting) {
                 m_POI->set_end_frame(current_frame);
             }
@@ -118,6 +122,14 @@ void AnalysisMethod::pause_analysis() {
     paused = true;
 }
 
+/**
+ * @brief AnalysisMethod::calculate_scaling_factor
+ * This method is used when videos with large resolutions are analysed.
+ * To handle the analysis without using too much RAM the frames are
+ * resized to fit into a resolution of 1920x1080 before they are analysed.
+ * When they are resized, a scaling factor is needed to map detections
+ * on a frame to the original resolution of the video. This method does that.
+ */
 void AnalysisMethod::calculate_scaling_factor() {
     int video_width = capture.get(CV_CAP_PROP_FRAME_WIDTH);
     int video_height = capture.get(CV_CAP_PROP_FRAME_HEIGHT);
@@ -129,7 +141,6 @@ void AnalysisMethod::calculate_scaling_factor() {
     scaling_needed = true;
     //This statement ensures that the original aspect ratio of the video is kept when scaling
     if (width_ratio >= height_ratio) {
-        std::cout << "Height bigger" << std::endl;
         scaling_ratio = height_ratio;
         scaled_width = int(video_width * scaling_ratio);
         scaled_height = FULL_HD_HEIGHT;
@@ -138,9 +149,12 @@ void AnalysisMethod::calculate_scaling_factor() {
         scaled_width = FULL_HD_WIDTH;
         scaled_height = int(video_height * scaling_ratio);
     }
-    std::cout << "Width: " << scaled_width << ", Height: " << scaled_height << ", Scaling ratio: " << scaling_ratio << std::endl;
 }
 
+/**
+ * @brief AnalysisMethod::scale_frame
+ * This method scales the frames of a video according to the scaling factor.
+ */
 void AnalysisMethod::scale_frame() {
 
     cv::Size size(scaled_width,scaled_height);
