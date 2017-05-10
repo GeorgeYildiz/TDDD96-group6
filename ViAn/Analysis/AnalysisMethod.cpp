@@ -38,7 +38,7 @@ void AnalysisMethod::set_include_exclude_area(std::vector<cv::Point> points, boo
  * @return true if the current frame should be analysed.
  */
 bool AnalysisMethod::sample_current_frame() {
-    return current_frame % sample_freq == 0;
+    return current_frame_index % sample_freq == 0;
 }
 
 /**
@@ -48,44 +48,41 @@ bool AnalysisMethod::sample_current_frame() {
  */
 Analysis AnalysisMethod::run_analysis() {
     if (!capture.isOpened()) {
-        std::cout << "could not find video" << std::endl;
         return m_analysis;
     }
     calculate_scaling_factor();
     std::vector<OOI> detections;
     num_frames = capture.get(CV_CAP_PROP_FRAME_COUNT);
-
-    std::cout << num_frames << std::endl;
     POI* m_POI = new POI();
     while(!aborted && capture.read(frame)) {
         // do frame analysis
-        std::cout << current_frame << std::endl;
-        if (sample_current_frame() || current_frame == num_frames-1) {
+        if (sample_current_frame() || current_frame_index == num_frames-1) {
             if (scaling_needed)
                 scale_frame();
 
             detections = analyse_frame();
-            std::cout << detections.size() << " " << detecting << std::endl;
+
+            // This if statement handles the sorting of OOIs detected
+            // in a frame into the correct POIs.
             if (detections.empty() && detecting) {
-                std::cout << "saving poi" << std::endl;
-                m_POI->set_end_frame(current_frame - 1);
+                m_POI->set_end_frame(current_frame_index - 1);
                 m_analysis.add_POI(*m_POI);
                 m_POI = new POI();
                 detecting = false;
             } else if (!detections.empty()) {
-                std::cout << "Detecting" << std::endl;
                 detecting = true;
                 if (scaling_needed) {
                     for (OOI detection : detections) {
                         detection.scale_coordinates(1.0/scaling_ratio);
                     }
                 }
-                m_POI->add_detections(current_frame, detections);
+                m_POI->add_detections(current_frame_index, detections);
             }
 
-            if (current_frame == (num_frames-1) && detecting) {
-                std::cout << "Detecting on last frame" << std::endl;
-                m_POI->set_end_frame(current_frame);
+            // Makes sure that a POI that stretches to the end of the
+            // video gets an end frame.
+            if (current_frame_index == (num_frames-1) && detecting) {
+                m_POI->set_end_frame(current_frame_index);
                 m_analysis.add_POI(*m_POI);
             }
         } else if (!detections.empty()) {
@@ -93,7 +90,7 @@ Analysis AnalysisMethod::run_analysis() {
              * sampled frame should still be valid and should therefore be shown as
              * detections for the current frame as well.
              */
-            m_POI->add_detections(current_frame, detections);
+            m_POI->add_detections(current_frame_index, detections);
         }
 
         if (paused) {
@@ -101,11 +98,9 @@ Analysis AnalysisMethod::run_analysis() {
             paused = false;
         }
         emit send_progress(get_progress());
-        ++current_frame;
+        ++current_frame_index;
     }
-
     capture.release();
-
     return m_analysis;
 }
 
@@ -114,7 +109,7 @@ Analysis AnalysisMethod::run_analysis() {
  * @return Progression of analysis in whole percent.
  */
 int AnalysisMethod::get_progress() {
-    return current_frame*100/num_frames;
+    return current_frame_index*100/num_frames;
 }
 
 /**
@@ -134,18 +129,24 @@ void AnalysisMethod::pause_analysis() {
     paused = true;
 }
 
+/**
+ * @brief AnalysisMethod::calculate_scaling_factor
+ * This method is used when videos with large resolutions are analysed.
+ * To handle the analysis without using too much RAM the frames are
+ * resized to fit into a resolution of 1920x1080 before they are analysed.
+ * When they are resized, a scaling factor is needed to map detections
+ * on a frame to the original resolution of the video. This method does that.
+ */
 void AnalysisMethod::calculate_scaling_factor() {
     int video_width = capture.get(CV_CAP_PROP_FRAME_WIDTH);
     int video_height = capture.get(CV_CAP_PROP_FRAME_HEIGHT);
     float height_ratio = float(FULL_HD_HEIGHT)/float(video_height);
     float width_ratio = float(FULL_HD_WIDTH)/float(video_width);
-     std::cout << "Original width: " << video_width << ", Original height: " << video_height << std::endl;
     if (height_ratio >= 1 && width_ratio >= 1) return;
 
     scaling_needed = true;
     //This statement ensures that the original aspect ratio of the video is kept when scaling
     if (width_ratio >= height_ratio) {
-        std::cout << "Height bigger" << std::endl;
         scaling_ratio = height_ratio;
         scaled_width = int(video_width * scaling_ratio);
         scaled_height = FULL_HD_HEIGHT;
@@ -154,11 +155,13 @@ void AnalysisMethod::calculate_scaling_factor() {
         scaled_width = FULL_HD_WIDTH;
         scaled_height = int(video_height * scaling_ratio);
     }
-    std::cout << "Width: " << scaled_width << ", Height: " << scaled_height << ", Scaling ratio: " << scaling_ratio << std::endl;
 }
 
+/**
+ * @brief AnalysisMethod::scale_frame
+ * This method scales the frames of a video according to the scaling factor.
+ */
 void AnalysisMethod::scale_frame() {
-
     cv::Size size(scaled_width,scaled_height);
     cv::Mat dst(size,frame.type());
     cv::resize(frame,dst,size); //resize frame
