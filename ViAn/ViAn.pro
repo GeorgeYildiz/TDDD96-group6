@@ -6,6 +6,7 @@
 
 QT       += core gui
 QT       += testlib
+QT       += axcontainer
 
 CONFIG += c++11
 
@@ -15,20 +16,21 @@ TEMPLATE = app
 #
 # GENERAL
 #
-SOURCES += main.cpp \
-
+SOURCES += main.cpp
 
 #
 # TEST
 #
 SOURCES += Test/test_video_player.cpp\
     Test/filehandlertest.cpp\
-    Test/test_mainwindow.cpp
+    Test/test_mainwindow.cpp \
+    Test/test_report_generator.cpp \
+    Test/overlayintegrationtest.cpp
 HEADERS += Test/test_video_player.h \
     Test/filehandlertest.h \
-    Test/test_mainwindow.h
-
-
+    Test/test_mainwindow.h \
+    Test/test_report_generator.h \
+    Test/overlayintegrationtest.h
 
 #
 # LIBRARY
@@ -41,23 +43,27 @@ HEADERS += Library/customdialog.h
 #
 SOURCES += GUI/mainwindow.cpp \
     GUI/icononbuttonhandler.cpp \
-    GUI/inputwindow.cpp \
     GUI/qtreeitems.cpp \
     GUI/bookmarkview.cpp \
-    GUI/bookmarkitem.cpp
+    GUI/bookmarkitem.cpp \
+    GUI/reportgenerator.cpp \
+    GUI/makeproject.cpp \
+    GUI/fpsdialog.cpp
+
 
 
 HEADERS  += GUI/mainwindow.h \
     GUI/icononbuttonhandler.h \
-    GUI/inputwindow.h \
     GUI/action.h \
     GUI/qtreeitems.h \
+    GUI/reportgenerator.h \
     GUI/bookmarkview.h \
-    GUI/bookmarkitem.h
-
+    GUI/bookmarkitem.h \
+    GUI/makeproject.h \
+    GUI/fpsdialog.h
 
 FORMS    += GUI/mainwindow.ui \
-   GUI/inputwindow.ui
+    GUI/makeproject.ui
 
 RESOURCES += resources.qrc
 #
@@ -67,6 +73,7 @@ RESOURCES += resources.qrc
 #
 SOURCES += Video/video_player.cpp \
     Video/overlay.cpp \
+    Video/analysisoverlay.cpp \
     Video/shapes/arrow.cpp \
     Video/shapes/circle.cpp \
     Video/shapes/line.cpp \
@@ -78,6 +85,7 @@ SOURCES += Video/video_player.cpp \
     Video/shapes/analysarea.cpp
 HEADERS += Video/video_player.h \
     Video/overlay.h \
+    Video/analysisoverlay.h \
     Video/shapes/arrow.h \
     Video/shapes/circle.h \
     Video/shapes/line.h \
@@ -114,14 +122,19 @@ SOURCES += Filehandler/filehandler.cpp \
     Filehandler/project.cpp \
     Filehandler/video.cpp \
     Filehandler/videoproject.cpp \
-    Filehandler/bookmark.cpp
+    Filehandler/bookmark.cpp \
+    Filehandler/saveable.cpp \
+    Filehandler/report.cpp
+
 
 HEADERS  += Filehandler/filehandler.h \
     Filehandler/project.h \
     Filehandler/dir.h \
     Filehandler/video.h \
     Filehandler/videoproject.h \
-    Filehandler/bookmark.h
+    Filehandler/bookmark.h  \
+    Filehandler/saveable.h \
+    Filehandler/report.h
 
 win32{
 

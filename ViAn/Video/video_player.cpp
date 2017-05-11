@@ -44,9 +44,11 @@ video_player::~video_player() {
  * @brief video_player::load_video
  * This method loads a video from file.
  * @param filename
+ * @param o Overlay associated to the video
  * @return whether video is loaded
  */
-bool video_player::load_video(string filename, int start_frame) {
+bool video_player::load_video(string filename, Overlay* o, int start_frame) {
+    video_overlay = o;
     if (capture.isOpened())
         capture.release();
 
@@ -57,7 +59,7 @@ bool video_player::load_video(string filename, int start_frame) {
         m_start_frame = start_frame;
         frame_rate = capture.get(CV_CAP_PROP_FPS);
         num_frames = capture.get(CAP_PROP_FRAME_COUNT);
-        //video_paused = false;
+        file_path = filename;
         zoom_area->set_size(capture.get(CAP_PROP_FRAME_WIDTH), capture.get(CAP_PROP_FRAME_HEIGHT));
         start();
         return true;
@@ -74,13 +76,11 @@ bool video_player::load_video(string filename, int start_frame) {
  * video file and sending them to the GUI.
  */
 void video_player::run()  {
-    cout << "Video paused: " << video_paused << endl;
     video_stopped = false;
     int delay = (1000/frame_rate);
     set_current_frame_num(m_start_frame);
     while (!video_stopped && !video_aborted && capture.read(frame)) {
         const clock_t begin_time = std::clock();
-
         convert_frame(true);
 
         int conversion_time = int((std::clock()-begin_time)*1000.0 /CLOCKS_PER_SEC);
@@ -95,12 +95,10 @@ void video_player::run()  {
             capture.set(CV_CAP_PROP_POS_FRAMES, new_frame_num);
             set_new_frame = false;
         }
-
         // Waits for the video to be resumed
         m_mutex->lock();
         if (video_paused) {
             m_paused_wait->wait(m_mutex);
-            cout << "Got here" << endl;
             video_paused = false;
         }
         m_mutex->unlock();
@@ -155,13 +153,14 @@ void video_player::convert_frame(bool scale) {
 /**
  * @brief video_player::process_frame
  * Draws overlay, zooms, scales, changes contrast/brightness on the frame.
- * @param frame Frame to draw on.
+ * @param src Frame to draw on.
  * @param scale Bool indicating if the frame should be scaled or not.
  * @return Returns the processed frame.
  */
 cv::Mat video_player::process_frame(cv::Mat &src, bool scale) {
     // Copy the frame, so that we don't alter the original frame (which will be reused next draw loop).
     cv::Mat processed_frame = src.clone();
+    processed_frame = analysis_overlay->draw_overlay(processed_frame, get_current_frame_num());
     processed_frame = video_overlay->draw_overlay(processed_frame, get_current_frame_num());
     if (choosing_zoom_area) {
         processed_frame = zoom_area->draw(processed_frame);
@@ -213,9 +212,9 @@ cv::Mat video_player::scale_frame(cv::Mat &src) {
 }
 
 /**
- * @brief video_overlay::zoom_frame
+ * @brief video_player::zoom_frame
  * Zooms in the frame, with the choosen zoom level.
- * @param frame Frame to zoom in on on.
+ * @param src Frame to zoom in on on.
  * @return Returns the zoomed frame.
  */
 cv::Mat video_player::zoom_frame(cv::Mat &src) {
@@ -230,7 +229,7 @@ cv::Mat video_player::zoom_frame(cv::Mat &src) {
 /**
  * @brief video_player::contrast_frame
  * Adds contrast and brightness to the frame.
- * @param frame Frame to manipulate.
+ * @param src Frame to manipulate.
  * @return Returns the manipulated frame.
  */
 cv::Mat video_player::contrast_frame(cv::Mat &src) {
@@ -271,6 +270,24 @@ bool video_player::is_stopped() {
 }
 
 /**
+ * @brief video_player::is_playing
+ * Returns a boolean value representing whether the currently played video is playing.
+ * @return
+ */
+bool video_player::is_playing(){
+    return !(video_stopped || video_paused);
+}
+
+/**
+ * @brief video_player::set_showing_overlay
+ * @param value
+ * Sets the showing/not showing state.
+ */
+void video_player::set_showing_overlay(bool value) {
+    video_overlay->set_showing_overlay(value);
+}
+
+/**
  * @brief video_player::is_showing_overlay
  * @return Returns true if the overlay tool is showing, else false.
  */
@@ -279,11 +296,27 @@ bool video_player::is_showing_overlay() {
 }
 
 /**
+ * @brief video_player::is_showing_analysis_overlay
+ * @return Returns true if the analysis overlay is showing, else false.
+ */
+bool video_player::is_showing_analysis_overlay() {
+    return analysis_overlay->is_showing_overlay();
+}
+
+/**
  * @brief video_player::is_showing_analysis_tool
  * @return Returns true if the analysis area tool is showing, else false.
  */
 bool video_player::is_showing_analysis_tool() {
     return choosing_analysis_area;
+}
+
+/**
+ * @brief video_player::get_frame_rate
+ * @return the frame rate
+ */
+double video_player::get_frame_rate() {
+    return frame_rate;
 }
 
 /**
@@ -301,6 +334,16 @@ int video_player::get_num_frames() {
 int video_player::get_current_frame_num() {
     // capture.get() gives the number of the frame to be read, hence the compensation of -1.
     return capture.get(CV_CAP_PROP_POS_FRAMES) - 1;
+}
+
+/**
+ * @brief video_player::get_file_name
+ * @return Returns the file name of the video that has
+ *         been loaded into the video player.
+ */
+std::string video_player::get_file_name() {
+    std::size_t found = file_path.find_last_of("/");
+    return file_path.substr(found+1);
 }
 
 /**
@@ -550,6 +593,16 @@ void video_player::toggle_overlay() {
 }
 
 /**
+ * @brief video_player::toggle_analysis_overlay
+ * Toggles the showing of the analysis overlay, and if video is paused updates
+ * the frame in the GUI to show with/without the overlay.
+ */
+void video_player::toggle_analysis_overlay() {
+    analysis_overlay->toggle_showing();
+    update_overlay();
+}
+
+/**
  * @brief video_player::set_overlay_tool
  * Sets the overlay tool's shape.
  * @param shape
@@ -636,6 +689,7 @@ void video_player::zoom_in() {
     if (capture.isOpened()) {
         choosing_zoom_area = true;
         zoom_area->reset_pos();
+        QApplication::setOverrideCursor(Qt::CrossCursor); // Set zoom cursor.
     }
 }
 
@@ -721,6 +775,7 @@ void video_player::video_mouse_released(QPoint pos) {
             zoom_area->update_drawing_pos(pos);
             zoom_area->choose_area();
             choosing_zoom_area = false;
+            QApplication::setOverrideCursor(Qt::ArrowCursor); // Restore cursor.
         } else if (choosing_analysis_area) {
             analysis_area->add_point(pos);
         } else if (is_paused()) {
@@ -806,26 +861,13 @@ void video_player::scale_position(QPoint &pos) {
 }
 
 /**
- * @brief video_player::export_current_frame
- * Stores the current frame in the specified folder.
- * The stored frame will have the sam resolution as the video.
- * @param path_to_folder Path to the folder to store the file in.
- * @return The path to the stored image.
+ * @brief video_player::get_current_frame_unscaled
+ * Creates, converts, processes the current frame and returns it.
  */
-std::string video_player::export_current_frame(std::string path_to_folder, std::string file_name) {
+QImage video_player::get_current_frame_unscaled() {
     convert_frame(false);
 
-    QString path = QString::fromStdString(path_to_folder);
-
-    // Add "/file_name.tiff" to the path.
-    path.append("/");
-    path.append(QString::fromStdString(file_name));
-    path.append(".tiff");
-
-    QImageWriter writer(path, "tiff");
-    writer.write(img);
-
-    return path.toStdString();
+    return img;
 }
 
 /**

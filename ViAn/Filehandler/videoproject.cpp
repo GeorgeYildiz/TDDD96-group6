@@ -27,11 +27,20 @@ Video* VideoProject::get_video(){
 }
 
 /**
+ * @brief VideoProject::get_overlay
+ * @return
+ * Returns the overlay.
+ */
+Overlay* VideoProject::get_overlay() {
+    return overlay;
+}
+
+/**
  * @brief VideoProject::get_bookmarks
  * @return bookmarks
  * Return all bookmarks.
  */
-std::vector<Bookmark *> VideoProject::get_bookmarks(){
+std::map<ID, Bookmark *> VideoProject::get_bookmarks(){
     return this->bookmarks;
 }
 
@@ -44,11 +53,13 @@ void VideoProject::read(const QJsonObject& json){
     this->video->read(json);
     QJsonArray json_bookmarks = json["bookmarks"].toArray();
     for(int i = 0; i != json_bookmarks.size(); i++){
-        Bookmark* new_bookmark = new Bookmark();
         QJsonObject json_bookmark = json_bookmarks[i].toObject();
+        Bookmark* new_bookmark = new Bookmark();
         new_bookmark->read(json_bookmark);
-        this->bookmarks.push_back(new_bookmark);
+        add_bookmark(new_bookmark);
     }
+    QJsonObject json_overlay = json["overlay"].toObject();
+    this->overlay->read(json_overlay);
 }
 
 /**
@@ -59,13 +70,18 @@ void VideoProject::read(const QJsonObject& json){
 void VideoProject::write(QJsonObject& json){
     this->video->write(json);
     QJsonArray json_bookmarks;
+    // Needs to delete bookmarks before exporting the new ones.
+    delete_artifacts();
     for(auto it = bookmarks.begin(); it != bookmarks.end(); it++){
         QJsonObject json_bookmark;
-        Bookmark* temp = *it;
+        Bookmark* temp = it->second;
         temp->write(json_bookmark);
         json_bookmarks.append(json_bookmark);
     }
     json["bookmarks"] = json_bookmarks;
+    QJsonObject json_overlay;
+    this->overlay->write(json_overlay);
+    json["overlay"] = json_overlay;
 }
 
 /**
@@ -73,8 +89,9 @@ void VideoProject::write(QJsonObject& json){
  * @param bookmark
  * Add new bookmark.
  */
-void VideoProject::add_bookmark(Bookmark *bookmark){
-    this->bookmarks.push_back(bookmark);
+ID VideoProject::add_bookmark(Bookmark *bookmark){
+    this->bookmarks.insert(std::make_pair(id_bookmark, bookmark));
+    return id_bookmark++;
 }
 
 /**
@@ -83,9 +100,8 @@ void VideoProject::add_bookmark(Bookmark *bookmark){
  */
 void VideoProject::delete_artifacts(){
     for(auto it = bookmarks.begin(); it != bookmarks.end(); it++){
-        Bookmark* temp = *it;
-        QFile file (temp->get_file_path());
-        file.remove();
+        Bookmark* temp = it->second;
+        temp->remove_exported_image();
     }
 }
 

@@ -5,12 +5,12 @@
 
 class BookmarkItem : public QListWidgetItem {
 public:
-    BookmarkItem(int frame_nbr, QString file_path, QString string, QListWidget* view);
-    BookmarkItem(Bookmark *bookmrk, QListWidget *view);
+    BookmarkItem(Bookmark *bookmark, QListWidget *view);
+    ~BookmarkItem();
     Bookmark* get_bookmark();
     int get_frame_number();
 private:
-    void create_thumbnail(QString file_path);
+    void create_thumbnail(QImage &frame);
     const int BOOKMARK_THUMBNAIL_HEIGHT = 64;
     Bookmark* bookmark;
 };

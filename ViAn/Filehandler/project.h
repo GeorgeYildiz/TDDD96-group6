@@ -6,48 +6,59 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
-#include "filehandler.h"
-#include "videoproject.h"
-#include "video.h"
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QDir>
+
+#include "filehandler.h"
+#include "videoproject.h"
+#include "video.h"
+#include "saveable.h"
 typedef int ID;
+class FileHandler;
 
 /**
- * @brief The Project struct
- * incomplete struct, will be added on
+ * @brief The Project class
+ * incomplete class, will be added on
  * along with parser functionality
  */
-
-struct Project{
+class Project : public Saveable{
+    FileHandler* file_handler;
+    bool changes_made;
+    std::map<ID,VideoProject*> videos;
+    std::vector<Report*> reports;
 public:
-    Project();
-    Project(ID id, std::string name);
-    Project(std::string dir_path);
+    std::string name;
+    ID id;
+    ID v_id;
+    ID dir;
+    ID dir_bookmarks;
+    ID dir_videos;
+
+public:
+    Project(FileHandler* file_handler);
+    Project(FileHandler* file_handler, ID id, std::string name);
     ~Project();
+    void add_report(Report* report);
     ID add_video(Video *vid);
     ID add_video_project(VideoProject* vid_proj);
-    void add_bookmark(ID id, Bookmark *bookmark);
+    ID add_bookmark(ID v_id, Bookmark *bookmark);
+
+    void add_report(std::string file_path);
+
     void delete_artifacts();
     void remove_video_project(ID id);
     // read and write operator for Projects
     void read(const QJsonObject& json);
     void write(QJsonObject& json);
-
-
+    bool is_saved();
+    void save_project();
+    std::map<ID, VideoProject *>& get_videos();
+    VideoProject* get_video(ID id);
+    bool proj_equals(Project& other);
 // TODO
 //    void add_analysis();
 //    void add_drawing();      
-public:
-    ID id;
-    ID v_id;
-    std::string name;
-    std::map<ID,VideoProject*> videos;
-    ID dir;
-    ID bookmark_dir;
-    ID dir_videos;
-    bool saved;
 };
 
 

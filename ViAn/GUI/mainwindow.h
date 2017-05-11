@@ -17,13 +17,15 @@
 #include "icononbuttonhandler.h"
 #include "ui_mainwindow.h"
 #include "Filehandler/filehandler.h"
-#include "inputwindow.h"
 #include "bookmarkview.h"
+#include "reportgenerator.h"
 #include "action.h"
 #include "qtreeitems.h"
 #include <QMutex>
 #include <QWaitCondition>
+#include "makeproject.h"
 #define SCROLL_AREA_MARGIN 25
+
 
 using namespace std;
 class inputwindow;
@@ -36,11 +38,14 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
+    friend class OverlayIntegrationTest;
+
 public:
-    void set_status_bar(string status, int timer = 750);
+    void set_status_bar(string status, int timer = 5000);
+    void add_project_to_tree(Project* proj);
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
-    void input_switch_case(ACTION action, QString qInput);
+    void input_switch_case(ACTION action, QString q_input);
     bool eventFilter(QObject *obj, QEvent *event); //can not follow namestandard, generated code
     const int SLIDER_UPDATE_TIMER = 200;
 
@@ -64,7 +69,7 @@ private slots:
 
     void on_stop_button_clicked();
 
-    void on_actionExit_triggered();
+    void on_action_exit_triggered();
 
     void closeEvent (QCloseEvent *event);//can not follow namestandard, generated code
 
@@ -90,72 +95,82 @@ private slots:
 
     void on_video_slider_valueChanged(int new_pos);
 
-    void on_actionAddProject_triggered();
+    void on_action_add_project_triggered();
     
-    void on_actionShow_hide_overlay_triggered();
+    void on_action_show_hide_overlay_triggered();
 
-    void on_actionColour_triggered();
+    void on_action_colour_triggered();
 
-    void on_actionRectangle_triggered();
+    void on_action_rectangle_triggered();
 
-    void on_actionCircle_triggered();
+    void on_action_circle_triggered();
 
-    void on_actionArrow_triggered();
+    void on_action_arrow_triggered();
 
-    void on_actionLine_triggered();
+    void on_action_line_triggered();
 
     void prepare_menu(const QPoint & pos);
 
     void play_video();
 
-    void on_actionSave_triggered();
+    void on_action_save_triggered();
 
-    void on_actionPen_triggered();
+    void on_action_pen_triggered();
 
-    void on_actionText_triggered();
+    void on_action_text_triggered();
 
-    void on_actionUndo_triggered();
+    void on_action_undo_triggered();
 
-    void on_actionClear_triggered();
+    void on_action_clear_triggered();
 
-    void on_actionZoom_in_triggered();
+    void on_action_zoom_in_triggered();
 
-    void on_actionZoom_out_triggered();
+    void on_action_zoom_out_triggered();
 
-    void on_actionLoad_triggered();
+    void on_action_load_triggered();
 
-    void on_actionAddVideo_triggered();
+    void on_action_add_video_triggered();
 
-    void on_actionChoose_Workspace_triggered();
+    void on_action_choose_workspace_triggered();
 
-    void on_project_tree_itemDoubleClicked(QTreeWidgetItem *item, int column);
+    void on_project_tree_itemDoubleClicked(QTreeWidgetItem *item, int column);//can not follow namestandard, generated code
     
-    void on_actionShow_hide_analysis_area_triggered();
+    void on_action_show_hide_analysis_area_triggered();
 
-    void on_actionContrast_Brightness_triggered();
+    void on_action_contrast_brightness_triggered();
 
     void on_action_fill_screen_triggered();
 
-    void on_actionRotate_right_triggered();
+    void on_action_rotate_right_triggered();
 
-    void on_actionRotate_left_triggered();
+    void on_action_rotate_left_triggered();
 
-    void on_document_list_itemClicked(QListWidgetItem *item);
+    void on_document_list_itemClicked(QListWidgetItem *item);//can not follow namestandard, generated code
 
-    void on_actionDelete_triggered();
+    void on_action_delete_triggered();
+
+    void on_action_create_report_triggered();
 
     void on_action_original_size_triggered();
 
-    void on_actionInvert_analysis_area_triggered();
+    void on_action_invert_analysis_area_triggered();
+
+    void on_action_close_project_triggered();
+
+    void on_action_show_hide_analysis_overlay_triggered();
+
+    void on_previous_POI_button_clicked();
+
+    void on_next_POI_button_clicked();
 
 private:
 
     Ui::MainWindow *ui;
-    inputwindow *input_window;
     video_player* mvideo_player;
     IconOnButtonHandler *icon_on_button_handler;
     BookmarkView* bookmark_view;
     QSlider *video_slider;
+    QTreeVideoItem *playing_video;
 
     bool slider_blocked = false;
     bool slider_paused_video = false;
@@ -165,15 +180,19 @@ private:
                 std::chrono::system_clock::now().time_since_epoch()
             );
 
-    FileHandler *fileHandler;
-
+    FileHandler *file_handler;
+    void setup_file_handler();
     void setup_video_player(video_player *mplayer);
-    void add_project_to_tree(Project* proj);
     void load_new_video(std::string video_name, int start_frame = 0, bool start_paused = false);
+    void add_video_to_tree(VideoProject *video);
 
-    void add_video_to_tree(string file_path, ID id);
+    void remove_bookmarks_of_project(MyQTreeWidgetItem* project_item);
+    void remove_bookmark_of_video(QTreeVideoItem* video_item);
 
     void remove_item_from_tree(MyQTreeWidgetItem *my_item);
+
+    void set_slider_labels();
+    void set_time_to_label(QLabel *label, qint64 time);
 
     void toggle_toolbar();
     void enable_video_buttons();
@@ -184,6 +203,8 @@ private:
     QTreeWidgetItem *get_project_from_object(QTreeWidgetItem *item);
 
     bool original_size;
+
+    void deselect_overlay_tool();
 
 };
 

@@ -10,9 +10,8 @@
 #include <QMutex>
 #include <QWaitCondition>
 #include <QImage>
-#include <QImageWriter>
-#include <QWaitCondition>
 #include "overlay.h"
+#include "analysisoverlay.h"
 
 #include <chrono>
 
@@ -20,24 +19,32 @@ using namespace std;
 
 class video_player : public QThread {
     Q_OBJECT
+
+    friend class OverlayIntegrationTest;
+
 public:
     video_player(QMutex* mutex, QWaitCondition* paused_wait, QLabel* label, bool start_paused = false, QObject* parent = 0);
     ~video_player();
-    bool load_video(string filename, int start_frame = 0);
+    bool load_video(string filename, Overlay* o, int start_frame = 0);
     bool is_paused();
     bool is_stopped();
+    bool is_playing();
+    void set_showing_overlay(bool value);
     bool is_showing_overlay();
+    bool is_showing_analysis_overlay();
     bool is_showing_analysis_tool();
-    std::string export_current_frame(std::string path_to_folder, std::string file_name);
+    QImage get_current_frame_unscaled();
     bool video_open();
 
     std::string get_video_name();
+    double get_frame_rate();
     int get_num_frames();    
     int get_current_frame_num();
     void set_frame_width(int new_value);
     void set_frame_height(int new_value);
     void set_speed_multiplier(double mult);
     double get_speed_multiplier();
+    std::string get_file_name();
 
     void inc_playback_speed();
     void dec_playback_speed();
@@ -50,6 +57,7 @@ public:
     double get_contrast();
     int get_brightness();
     void toggle_overlay();
+    void toggle_analysis_overlay();
     void set_overlay_tool(SHAPES shape);
     void set_overlay_colour(QColor colour);
     void undo_overlay();
@@ -124,7 +132,7 @@ private:
     cv::Mat RGBframe;
 
     std::string video_name;
-    int num_frames;
+    int num_frames = -1;
     int new_frame_num;
     int frame_width;
     int frame_height;
@@ -137,10 +145,11 @@ private:
 
     double frame_rate;
     double speed_multiplier = DEFAULT_SPEED_MULT;
+    std::string file_path;
 
     bool video_stopped = false;
     bool video_aborted = false;
-    bool video_paused;
+    bool video_paused = false;
     bool choosing_zoom_area = false;
     bool set_new_frame = false;
     bool slider_moving = false;
@@ -166,7 +175,8 @@ private:
     // Brightness, value in range BRIGHTNESS_MIN to BRIGHTNESS_MAX.
     int beta = 0;
 
-    Overlay* video_overlay = new Overlay();
+    Overlay* video_overlay;
+    AnalysisOverlay* analysis_overlay = new AnalysisOverlay();
 };
 
 #endif // VIDEO_PLAYER_H
