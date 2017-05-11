@@ -725,9 +725,6 @@ void MainWindow::play_video() {
     enable_video_buttons();
     icon_on_button_handler->set_icon("pause", ui->play_pause_button);
     video_slider->setMaximum(mvideo_player->get_num_frames() - 1);
-    m_acontroller = new AnalysisController("Pumparna.avi",MOTION_DETECTION);
-    setup_analysis(m_acontroller);
-    m_acontroller->start();
 }
 
 /**
