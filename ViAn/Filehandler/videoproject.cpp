@@ -86,7 +86,12 @@ void VideoProject::write(QJsonObject& json){
 void VideoProject::add_bookmark(Bookmark *bookmark){
     this->bookmarks.push_back(bookmark);
 }
-
+/**
+ * @brief VideoProject::add_analysis
+ * @param analysis
+ * @return ID for analysis
+ * Adds analysis to video project.
+ */
 ID VideoProject::add_analysis(Analysis analysis){
     this->analyses.insert(std::make_pair(this->vid_id, analysis));
     return this->vid_id++;
