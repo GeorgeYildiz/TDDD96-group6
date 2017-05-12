@@ -23,7 +23,7 @@
 #include <QMutex>
 #include <QWaitCondition>
 #include "makeproject.h"
-#include "Analysis/analysiscontroller.h"
+#include "Analysis/AnalysisController.h"
 #define SCROLL_AREA_MARGIN 25
 
 using namespace std;

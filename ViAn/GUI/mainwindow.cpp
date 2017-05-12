@@ -11,7 +11,6 @@
 #include "Video/shapes/shape.h"
 #include "Analysis/MotionDetection.h"
 #include "Analysis/AnalysisMethod.h"
-#include "Analysis/analysiscontroller.h"
 
 using namespace std;
 using namespace cv;
