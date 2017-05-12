@@ -27,12 +27,30 @@ Video* VideoProject::get_video(){
 }
 
 /**
+ * @brief VideoProject::get_overlay
+ * @return
+ * Returns the overlay.
+ */
+Overlay* VideoProject::get_overlay() {
+    return overlay;
+}
+
+/**
  * @brief VideoProject::get_bookmarks
  * @return bookmarks
  * Return all bookmarks.
  */
-std::vector<Bookmark *> VideoProject::get_bookmarks(){
+std::map<ID, Bookmark *> VideoProject::get_bookmarks(){
     return this->bookmarks;
+}
+
+/**
+ * @brief VideoProject::get_analyses
+ * @return analyses
+ * return all analyses.
+ */
+std::map<ID,Analysis> VideoProject::get_analyses() {
+    return analyses;
 }
 
 /**
@@ -44,11 +62,13 @@ void VideoProject::read(const QJsonObject& json){
     this->video->read(json);
     QJsonArray json_bookmarks = json["bookmarks"].toArray();
     for(int i = 0; i != json_bookmarks.size(); i++){
-        Bookmark* new_bookmark = new Bookmark();
         QJsonObject json_bookmark = json_bookmarks[i].toObject();
+        Bookmark* new_bookmark = new Bookmark();
         new_bookmark->read(json_bookmark);
-        this->bookmarks.push_back(new_bookmark);
+        add_bookmark(new_bookmark);
     }
+    QJsonObject json_overlay = json["overlay"].toObject();
+    this->overlay->read(json_overlay);
 }
 
 /**
@@ -63,11 +83,12 @@ void VideoProject::write(QJsonObject& json){
     delete_artifacts();
     for(auto it = bookmarks.begin(); it != bookmarks.end(); it++){
         QJsonObject json_bookmark;
-        Bookmark* temp = *it;
+        Bookmark* temp = it->second;
         temp->write(json_bookmark);
         json_bookmarks.append(json_bookmark);
     }
     json["bookmarks"] = json_bookmarks;
+
     QJsonArray json_analyses;
     for(auto it2 = analyses.begin(); it2 != analyses.end(); it2++){
         QJsonObject json_analysis;
@@ -75,7 +96,11 @@ void VideoProject::write(QJsonObject& json){
         an.write(json_analysis);
         json_analyses.append(json_analysis);
     }
+    json["analyses"] = json_analyses;
 
+    QJsonObject json_overlay;
+    this->overlay->write(json_overlay);
+    json["overlay"] = json_overlay;
 }
 
 /**
@@ -83,8 +108,9 @@ void VideoProject::write(QJsonObject& json){
  * @param bookmark
  * Add new bookmark.
  */
-void VideoProject::add_bookmark(Bookmark *bookmark){
-    this->bookmarks.push_back(bookmark);
+ID VideoProject::add_bookmark(Bookmark *bookmark){
+    this->bookmarks.insert(std::make_pair(id_bookmark, bookmark));
+    return id_bookmark++;
 }
 /**
  * @brief VideoProject::add_analysis
@@ -103,7 +129,7 @@ ID VideoProject::add_analysis(Analysis analysis){
  */
 void VideoProject::delete_artifacts(){
     for(auto it = bookmarks.begin(); it != bookmarks.end(); it++){
-        Bookmark* temp = *it;
+        Bookmark* temp = it->second;
         temp->remove_exported_image();
     }
 }

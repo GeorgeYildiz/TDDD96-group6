@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>616</width>
+    <width>674</width>
     <height>466</height>
    </rect>
   </property>
@@ -156,6 +156,9 @@
               <height>30</height>
              </size>
             </property>
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Previous POI&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
             <property name="text">
              <string>|&lt;&lt;</string>
             </property>
@@ -243,6 +246,9 @@
               <width>30</width>
               <height>30</height>
              </size>
+            </property>
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Next POI&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
             <property name="text">
              <string>&gt;&gt;|</string>
@@ -401,7 +407,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>616</width>
+     <width>674</width>
      <height>21</height>
     </rect>
    </property>
@@ -422,6 +428,7 @@
     <addaction name="menu_add"/>
     <addaction name="action_load"/>
     <addaction name="action_save"/>
+    <addaction name="action_create_report"/>
     <addaction name="action_close_project"/>
     <addaction name="action_delete"/>
     <addaction name="action_choose_workspace"/>
@@ -882,6 +889,17 @@
    </property>
    <property name="shortcut">
     <string>Del</string>
+   </property>
+  </action>
+  <action name="action_create_report">
+   <property name="text">
+    <string>Create report</string>
+   </property>
+   <property name="toolTip">
+    <string>Create a .docx document based on all bookmarks</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+R</string>
    </property>
   </action>
   <action name="action_invert_analysis_area">

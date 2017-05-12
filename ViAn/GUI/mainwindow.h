@@ -18,6 +18,7 @@
 #include "ui_mainwindow.h"
 #include "Filehandler/filehandler.h"
 #include "bookmarkview.h"
+#include "reportgenerator.h"
 #include "action.h"
 #include "qtreeitems.h"
 #include <QMutex>
@@ -25,6 +26,7 @@
 #include "makeproject.h"
 #include "Analysis/AnalysisController.h"
 #define SCROLL_AREA_MARGIN 25
+
 
 using namespace std;
 class inputwindow;
@@ -37,8 +39,10 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
+    friend class OverlayIntegrationTest;
+
 public:
-    void set_status_bar(string status, int timer = 750);
+    void set_status_bar(string status, int timer = 5000);
     void add_project_to_tree(Project* proj);
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
@@ -147,6 +151,8 @@ private slots:
 
     void on_action_delete_triggered();
 
+    void on_action_create_report_triggered();
+
     void on_action_original_size_triggered();
 
     void on_action_invert_analysis_area_triggered();
@@ -171,6 +177,7 @@ private:
     IconOnButtonHandler *icon_on_button_handler;
     BookmarkView* bookmark_view;
     QSlider *video_slider;
+    QTreeVideoItem *playing_video;
 
     bool slider_blocked = false;
     bool slider_paused_video = false;
@@ -184,10 +191,15 @@ private:
     void setup_file_handler();
     void setup_video_player(video_player *mplayer);
     void setup_analysis(AnalysisController *ac);
+    void add_video_to_tree(VideoProject *video);
 
-    void add_video_to_tree(string file_path, ID id);
+    void remove_bookmarks_of_project(MyQTreeWidgetItem* project_item);
+    void remove_bookmark_of_video(QTreeVideoItem* video_item);
 
     void remove_item_from_tree(MyQTreeWidgetItem *my_item);
+
+    void set_slider_labels();
+    void set_time_to_label(QLabel *label, qint64 time);
 
     void toggle_toolbar();
     void enable_video_buttons();

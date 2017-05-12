@@ -42,9 +42,11 @@ video_player::~video_player() {
  * @brief video_player::load_video
  * This method loads a video from file.
  * @param filename
+ * @param o Overlay associated to the video
  * @return whether video is loaded
  */
-bool video_player::load_video(string filename) {
+bool video_player::load_video(string filename, Overlay* o) {
+    video_overlay = o;
     if (capture.isOpened())
         capture.release();
 
@@ -53,6 +55,7 @@ bool video_player::load_video(string filename) {
     if (capture.isOpened()) {
         frame_rate = capture.get(CV_CAP_PROP_FPS);
         num_frames = capture.get(CAP_PROP_FRAME_COUNT);
+        file_path = filename;
         video_paused = false;
         zoom_area->set_size(capture.get(CAP_PROP_FRAME_WIDTH), capture.get(CAP_PROP_FRAME_HEIGHT));
         start();
@@ -146,7 +149,7 @@ void video_player::convert_frame(bool scale) {
 /**
  * @brief video_player::process_frame
  * Draws overlay, zooms, scales, changes contrast/brightness on the frame.
- * @param frame Frame to draw on.
+ * @param src Frame to draw on.
  * @param scale Bool indicating if the frame should be scaled or not.
  * @return Returns the processed frame.
  */
@@ -205,9 +208,9 @@ cv::Mat video_player::scale_frame(cv::Mat &src) {
 }
 
 /**
- * @brief video_overlay::zoom_frame
+ * @brief video_player::zoom_frame
  * Zooms in the frame, with the choosen zoom level.
- * @param frame Frame to zoom in on on.
+ * @param src Frame to zoom in on on.
  * @return Returns the zoomed frame.
  */
 cv::Mat video_player::zoom_frame(cv::Mat &src) {
@@ -222,7 +225,7 @@ cv::Mat video_player::zoom_frame(cv::Mat &src) {
 /**
  * @brief video_player::contrast_frame
  * Adds contrast and brightness to the frame.
- * @param frame Frame to manipulate.
+ * @param src Frame to manipulate.
  * @return Returns the manipulated frame.
  */
 cv::Mat video_player::contrast_frame(cv::Mat &src) {
@@ -263,6 +266,24 @@ bool video_player::is_stopped() {
 }
 
 /**
+ * @brief video_player::is_playing
+ * Returns a boolean value representing whether the currently played video is playing.
+ * @return
+ */
+bool video_player::is_playing(){
+    return !(video_stopped || video_paused);
+}
+
+/**
+ * @brief video_player::set_showing_overlay
+ * @param value
+ * Sets the showing/not showing state.
+ */
+void video_player::set_showing_overlay(bool value) {
+    video_overlay->set_showing_overlay(value);
+}
+
+/**
  * @brief video_player::is_showing_overlay
  * @return Returns true if the overlay tool is showing, else false.
  */
@@ -287,6 +308,14 @@ bool video_player::is_showing_analysis_tool() {
 }
 
 /**
+ * @brief video_player::get_frame_rate
+ * @return the frame rate
+ */
+double video_player::get_frame_rate() {
+    return frame_rate;
+}
+
+/**
  * @brief video_player::get_num_frames
  * @return number of frames in video file
  */
@@ -301,6 +330,16 @@ int video_player::get_num_frames() {
 int video_player::get_current_frame_num() {
     // capture.get() gives the number of the frame to be read, hence the compensation of -1.
     return capture.get(CV_CAP_PROP_POS_FRAMES) - 1;
+}
+
+/**
+ * @brief video_player::get_file_name
+ * @return Returns the file name of the video that has
+ *         been loaded into the video player.
+ */
+std::string video_player::get_file_name() {
+    std::size_t found = file_path.find_last_of("/");
+    return file_path.substr(found+1);
 }
 
 /**

@@ -6,6 +6,7 @@
 
 QT       += core gui
 QT       += testlib
+QT       += axcontainer
 
 CONFIG += c++11
 
@@ -22,10 +23,14 @@ SOURCES += main.cpp
 #
 SOURCES += Test/test_video_player.cpp\
     Test/filehandlertest.cpp\
-    Test/test_mainwindow.cpp
+    Test/test_mainwindow.cpp \
+    Test/test_report_generator.cpp \
+    Test/overlayintegrationtest.cpp
 HEADERS += Test/test_video_player.h \
     Test/filehandlertest.h \
-    Test/test_mainwindow.h
+    Test/test_mainwindow.h \
+    Test/test_report_generator.h \
+    Test/overlayintegrationtest.h
 
 #
 # LIBRARY
@@ -41,14 +46,17 @@ SOURCES += GUI/mainwindow.cpp \
     GUI/qtreeitems.cpp \
     GUI/bookmarkview.cpp \
     GUI/bookmarkitem.cpp \
+    GUI/reportgenerator.cpp \
     GUI/makeproject.cpp \
     GUI/fpsdialog.cpp
+
 
 
 HEADERS  += GUI/mainwindow.h \
     GUI/icononbuttonhandler.h \
     GUI/action.h \
     GUI/qtreeitems.h \
+    GUI/reportgenerator.h \
     GUI/bookmarkview.h \
     GUI/bookmarkitem.h \
     GUI/makeproject.h \
@@ -116,8 +124,8 @@ SOURCES += Filehandler/filehandler.cpp \
     Filehandler/videoproject.cpp \
     Filehandler/bookmark.cpp \
     Filehandler/saveable.cpp \
-    Filehandler/analysis.cpp
-
+    Filehandler/analysis.cpp \
+    Filehandler/report.cpp
 
 HEADERS  += Filehandler/filehandler.h \
     Filehandler/project.h \
@@ -126,13 +134,13 @@ HEADERS  += Filehandler/filehandler.h \
     Filehandler/videoproject.h \
     Filehandler/bookmark.h  \
     Filehandler/saveable.h \
-    Filehandler/analysis.h
+    Filehandler/analysis.h \
+    Filehandler/report.h
 
 win32{
 
     SOURCES += Filehandler/stringhelper.cpp\
       Filehandler/win32dir.cpp
-
 
     HEADERS += Filehandler/stringhelper.h
 }
