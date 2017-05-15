@@ -43,3 +43,12 @@ Bookmark* BookmarkItem::get_bookmark() {
 int BookmarkItem::get_frame_number() {
     return bookmark->get_frame_number();
 }
+
+/**
+ * @brief Bookmark::update_description
+ * Sets the text description of the bookmark to the specified string.
+ * @param text
+ */
+void BookmarkItem::update_description(QString text) {
+    this->bookmark->set_description(text);
+}
