@@ -132,19 +132,6 @@ void MainWindow::set_status_bar(std::string status, int timer){
 }
 
 /**
- * @brief MainWindow::on_decrease_speed_button_clicked
- * Calls upon a video player function which decreases the playback speed
- *
- */
-void MainWindow::on_decrease_speed_button_clicked(){
-    mvideo_player->dec_playback_speed();
-    double curr_speed_factor = 1/mvideo_player->get_speed_multiplier();
-    std::ostringstream speed_str;
-    speed_str << curr_speed_factor;
-    set_status_bar("Playback speed decreased (x" + speed_str.str() + ")");
-}
-
-/**
  * @brief MainWindow::on_play_pause_button_clicked
  * Calls upon video player functions based on current playback status
  * Starts/resumes a stopped/paused video, pauses a playing one
@@ -173,11 +160,31 @@ void MainWindow::on_play_pause_button_clicked() {
  * Calls upon video player function which in turn increases the playback speed
  */
 void MainWindow::on_increase_speed_button_clicked(){
+    ui->decrease_speed_button->setEnabled(true);
     mvideo_player->inc_playback_speed();
     double curr_speed_factor = 1/mvideo_player->get_speed_multiplier();
-    std::ostringstream speed_str;
-    speed_str << curr_speed_factor;
-    set_status_bar("Playback speed increased (x" + speed_str.str() + ")");
+    QString speed = QString::number(curr_speed_factor);
+    if (curr_speed_factor >= mvideo_player->MAX_SPEED_MULT) {
+        ui->increase_speed_button->setEnabled(false);
+    }
+    set_status_bar("Playback speed increased (x" + speed.toStdString() + ")");
+    ui->speed_label->setText(speed + "x");
+}
+
+/**
+ * @brief MainWindow::on_decrease_speed_button_clicked
+ * Calls upon a video player function which decreases the playback speed
+ */
+void MainWindow::on_decrease_speed_button_clicked(){
+    ui->increase_speed_button->setEnabled(true);
+    mvideo_player->dec_playback_speed();
+    double curr_speed_factor = 1/mvideo_player->get_speed_multiplier();
+    QString speed = QString::number(curr_speed_factor);
+    if (curr_speed_factor <= mvideo_player->MIN_SPEED_MULT) {
+        ui->decrease_speed_button->setEnabled(false);
+    }
+    set_status_bar("Playback speed decreased (x" + speed.toStdString() + ")");
+    ui->speed_label->setText(speed + "x");
 }
 
 /**
@@ -202,8 +209,9 @@ void MainWindow::on_stop_button_clicked() {
  */
 void MainWindow::on_next_frame_button_clicked() {
     if (mvideo_player->is_paused()) {
-        set_status_bar("Went forward a frame");
         emit next_video_frame();
+        int frame = mvideo_player->get_current_frame_num();
+        set_status_bar("Went forward a frame to number " + std::to_string(frame));
     } else {
         set_status_bar("Needs to be paused");
     }
@@ -216,7 +224,8 @@ void MainWindow::on_next_frame_button_clicked() {
 void MainWindow::on_previous_frame_button_clicked() {
     if (mvideo_player->is_paused()) {
         emit prev_video_frame();
-        set_status_bar("Went back a frame");
+        int frame = mvideo_player->get_current_frame_num();
+        set_status_bar("Went back a frame to number " + std::to_string(frame));
     } else {
         set_status_bar("Video needs to be paused");
     }
@@ -736,6 +745,7 @@ void MainWindow::play_video() {
     mvideo_player->set_showing_overlay(ui->action_show_hide_overlay->isChecked());
 
     set_slider_labels();
+    ui->speed_label->setText("1x");
 }
 
 /**
