@@ -46,9 +46,11 @@ int BookmarkItem::get_frame_number() {
 
 /**
  * @brief Bookmark::update_description
- * Sets the text description of the bookmark to the specified string.
+ * Sets the text description of the bookmark to the specified string,
+ * and updates the text shown in the widget item.
  * @param text
  */
 void BookmarkItem::update_description(QString text) {
     this->bookmark->set_description(text);
+    setText(text);
 }
