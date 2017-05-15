@@ -1191,4 +1191,5 @@ void MainWindow::on_action_change_bookmark_triggered() {
     bookmark_text = bookmark_view->get_input_text(&ok);
     if(!ok) return;
     item->update_description(bookmark_text);
+    set_status_bar("Updated bookmark");
 }
