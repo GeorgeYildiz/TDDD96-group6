@@ -670,7 +670,6 @@ void MainWindow::prepare_bookmark_menu(const QPoint & pos) {
         menu.addAction(change_bookmark);
         connect(change_bookmark, SIGNAL(triggered()), this, SLOT(on_action_change_bookmark_triggered()));
     }
-    QPoint pt(pos);
     menu.exec( list->mapToGlobal(pos) );
 }
 
