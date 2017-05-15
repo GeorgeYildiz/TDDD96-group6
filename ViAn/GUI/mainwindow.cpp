@@ -43,6 +43,9 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->project_tree->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(ui->project_tree, &QTreeWidget::customContextMenuRequested, this, &MainWindow::prepare_menu);
 
+    ui->document_list->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(ui->document_list, &QListWidget::customContextMenuRequested, this, &MainWindow::prepare_bookmark_menu);
+
     //Creates and prepares the video_player.
     mvideo_player = new video_player(&mutex, &paused_wait, ui->video_frame);
     setup_video_player(mvideo_player);
@@ -652,6 +655,26 @@ void MainWindow::prepare_menu(const QPoint & pos) {
 }
 
 /**
+ * @brief MainWindow::prepare_bookmark_menu
+ * @param pos
+ * Creates context menu on right-click in bookmark view
+ */
+void MainWindow::prepare_bookmark_menu(const QPoint & pos) {
+    QListWidget *list = ui->document_list;
+    BookmarkItem *item = (BookmarkItem*)list->itemAt( pos );
+    QMenu menu(this);
+
+    if(item != nullptr) {
+        QAction *change_bookmark = new QAction(QIcon(""), tr("&Change bookmark"), this);
+        change_bookmark->setStatusTip(tr("Change bookmark"));
+        menu.addAction(change_bookmark);
+        connect(change_bookmark, SIGNAL(triggered()), this, SLOT(on_action_change_bookmark_triggered()));
+    }
+    QPoint pt(pos);
+    menu.exec( list->mapToGlobal(pos) );
+}
+
+/**
  * @brief MainWindow::on_action_add_video_triggered
  * Prompts user with file browser to add video
  * to selected project
@@ -1156,4 +1179,17 @@ void MainWindow::on_next_POI_button_clicked() {
     } else {
         set_status_bar("Needs to be paused");
     }
+}
+
+/**
+ * @brief MainWindow::on_action_change_bookmark_triggered
+ * Lets the user change the bookmark description.
+ */
+void MainWindow::on_action_change_bookmark_triggered() {
+    BookmarkItem *item = (BookmarkItem*) ui->document_list->selectedItems().first();
+    QString bookmark_text("");
+    bool ok;
+    bookmark_text = bookmark_view->get_input_text(&ok);
+    if(!ok) return;
+    item->update_description(bookmark_text);
 }
