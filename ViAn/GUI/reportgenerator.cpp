@@ -71,9 +71,7 @@ void ReportGenerator::create_list_of_names() {
         std::map<ID, Bookmark *> bookmark_list = video.second->get_bookmarks();
         for(std::pair<ID,Bookmark*> vid_bm_pair : bookmark_list) {
             Bookmark* video_bookmark = vid_bm_pair.second;
-            std::string bookmark_path = video_bookmark->get_file_path().toStdString();
-            std::string bookmark_description = video_bookmark->get_description().toStdString();
-            all_bookmarks.push_back(std::make_pair(bookmark_path, bookmark_description));
+            all_bookmarks.push_back(video_bookmark);
         }
     }
 }
@@ -121,8 +119,8 @@ void ReportGenerator::add_paragraph(QAxObject* selection) {
  */
 void ReportGenerator::add_bookmarks(QAxObject* selection) {
     QAxObject* shapes = selection->querySubObject( "InlineShapes" );
-    for (std::pair<std::string, std::string> bookmark : all_bookmarks) {
-        QString pic_path = QString::fromStdString(bookmark.first);
+    for (Bookmark* bookmark : all_bookmarks) {
+        QString pic_path = bookmark->get_file_path();
         //Fix to make path work with windows word
         //application when spaces are involved
         pic_path.replace("/", "\\\\");
@@ -137,8 +135,18 @@ void ReportGenerator::add_bookmarks(QAxObject* selection) {
         selection->querySubObject( "ParagraphFormat" )->setProperty( "Alignment", 1 );
 
         //adds description beneath image
+        QString frame_nr = QString("Frame number: %1").arg(bookmark->get_frame_number());
+        QString bm_description = bookmark->get_description();
+        QString description = "";
+
+        if (!bm_description.isEmpty()) {
+            description = QString("Description: %1").arg(bookmark->get_description());
+        }
+
         selection->dynamicCall( "InsertParagraphAfter()" );
-        selection->dynamicCall("InsertAfter(const QString&)", QString::fromStdString(bookmark.second));
+        selection->dynamicCall("InsertAfter(const QString&)", frame_nr);
+        selection->dynamicCall( "InsertParagraphAfter()" );
+        selection->dynamicCall("InsertAfter(const QString&)", description);
 
         // Add paragraphs between images
         add_paragraph(selection);

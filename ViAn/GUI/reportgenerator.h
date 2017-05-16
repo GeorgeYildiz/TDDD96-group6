@@ -21,8 +21,7 @@ private:
     Project* proj;
     QAxObject* word;
     FileHandler *file_handler;
-    std::vector<std::pair<std::string, std::string> > all_bookmarks;
-
+    std::vector<Bookmark*> all_bookmarks;
     const double IMAGE_WIDTH_REFERENCE = 272.0;
 
     void create_list_of_names();
