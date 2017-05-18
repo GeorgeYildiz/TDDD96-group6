@@ -12,7 +12,6 @@
 Bookmark::Bookmark(int time, int frame_nbr, QImage frame, QString video_file_name, QString dir_path, QString text) {
     this->time = time;
     this->frame_number = frame_nbr;
-    std::cout << "TIME: "<<this->time<<"\n";
     this->frame = frame;
     this->video_file_name = video_file_name;
     this->dir_path = dir_path;
