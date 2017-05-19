@@ -26,7 +26,7 @@ class video_player : public QThread {
 public:
     video_player(QMutex* mutex, QWaitCondition* paused_wait, QLabel* label, QObject* parent = 0);
     ~video_player();
-    bool load_video(string filename, Overlay* o);
+    bool load_video(string filename, int start_frame = 0, bool start_paused = false);
     bool is_paused();
     bool is_stopped();
     bool is_playing();
@@ -46,6 +46,8 @@ public:
     void set_speed_multiplier(double mult);
     double get_speed_multiplier();
     std::string get_file_name();
+    std::string get_file_path();
+    void set_overlay(Overlay* o);
 
     void inc_playback_speed();
     void dec_playback_speed();
@@ -104,7 +106,7 @@ public slots:
     void on_play_video();
     void on_pause_video();
     void on_stop_video();
-
+    void on_abort_video_playback();
 
 protected:
     void run() override;
@@ -132,6 +134,7 @@ private:
 
     int num_frames;
     int new_frame_num;
+    int m_start_frame = 0;
     int frame_width;
     int frame_height;
     unsigned int qlabel_width;
@@ -149,6 +152,7 @@ private:
     bool set_new_frame = false;
     bool slider_moving = false;
     bool choosing_analysis_area = false;
+    bool playback_aborted = false;
 
     QImage img;
     QMutex* m_mutex;

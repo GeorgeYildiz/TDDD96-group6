@@ -439,7 +439,7 @@ void MainWindow::on_bookmark_button_clicked() {
     int time = mvideo_player->get_current_time();
     int frame_number = mvideo_player->get_current_frame_num();
     QImage frame = mvideo_player->get_current_frame_unscaled();
-    QString video_file_name = QString::fromStdString(mvideo_player->get_file_name());
+    QString video_file_name = QString::fromStdString(mvideo_player->get_file_path());
     // Add bookmarks-folder to the project-folder.
     Project* proj = file_handler->get_project(((MyQTreeWidgetItem*)playing_video->parent())->id);
     QDir dir = file_handler->get_dir(proj->dir_bookmarks);
@@ -761,39 +761,63 @@ void MainWindow::on_action_add_video_triggered() {
 
 /**
  * @brief MainWindow::play_video
- *  Loads selected video, flips playbutton to pause
- *  plays video from beginning
+ *  Loads selected video and start playback from first frame.
  */
 void MainWindow::play_video() {
     QTreeVideoItem *my_video;
     my_video = (QTreeVideoItem*)ui->project_tree->selectedItems().first();
     this->playing_video = my_video;
+    switching_from_bookmark = false;
+    load_new_video(my_video->name.toStdString());
+}
+
+/**
+ * @brief video_player::load_new_video
+ * This method handles all the logic behind switching playback from one video to another.
+ * @param video_path The file path of the video to be played
+ * @param start_frame The number of the frame to start playback from. Defaults to 0.
+ * @param start_paused A boolean deciding whether the playback should start in a paused state. Defaults to false.
+ */
+void MainWindow::load_new_video(std::string video_path, int start_frame, bool start_paused) {
+    cout << "1" << endl;
     if (mvideo_player->is_paused())
         paused_wait.wakeOne();
 
     if (mvideo_player->isRunning()) {
         emit set_stop_video(); //This signal will make the QThread finish executing
+        mvideo_player->wait();
+        delete mvideo_player;
         mvideo_player = new video_player(&mutex, &paused_wait, ui->video_frame);
         setup_video_player(mvideo_player);
     }
-
-    // Get the VideoProject containing info abuot the video to load.
-    MyQTreeWidgetItem *proj_item = (MyQTreeWidgetItem*)get_project_from_object(my_video);
-    Project* proj = file_handler->get_project(proj_item->id);
-    VideoProject* video_proj = proj->get_video(my_video->id);
-
-    mvideo_player->load_video(my_video->name.toStdString(), video_proj->get_overlay());
+    cout << "2" << endl;
+    if (!switching_from_bookmark) {
+        // Get the VideoProject containing info abuot the video to load.
+        QTreeVideoItem* my_video = (QTreeVideoItem*)ui->project_tree->selectedItems().first();
+        MyQTreeWidgetItem *proj_item = (MyQTreeWidgetItem*)get_project_from_object(my_video);
+        Project* proj = file_handler->get_project(proj_item->id);
+        VideoProject* video_proj = proj->get_video(my_video->id);
+        mvideo_player->set_overlay(video_proj->get_overlay());
+    }
+    cout << "3" << endl;
+    mvideo_player->load_video(video_path, start_frame, start_paused);
     //Used for rescaling the source image for video playback
     emit resize_video_frame(ui->video_frame->width(),ui->video_frame->height());
     enable_video_buttons();
-    icon_on_button_handler->set_icon("pause", ui->play_pause_button);
-    video_slider->setMaximum(mvideo_player->get_num_frames() - 1);
+    cout << "4" << endl;
+    if (mvideo_player->is_paused())
+        icon_on_button_handler->set_icon("play", ui->play_pause_button);
+    else
+        icon_on_button_handler->set_icon("pause", ui->play_pause_button);
 
+    video_slider->setMaximum(mvideo_player->get_num_frames() - 1);
+    cout << "5" << endl;
     // Updates the overlay to the state choosen in the GUI.
     mvideo_player->set_showing_overlay(ui->action_show_hide_overlay->isChecked());
 
     set_slider_labels();
     ui->speed_label->setText("1x");
+    cout << "6" << endl;
 }
 
 /**
@@ -1113,8 +1137,17 @@ void MainWindow::on_action_rotate_left_triggered() {
  * @param item The bookmark that has been clicked.
  */
 void MainWindow::on_document_list_itemClicked(QListWidgetItem *item) {
-    BookmarkItem* bookmark = (BookmarkItem*) item;
-    emit set_playback_frame(bookmark->get_frame_number());
+    BookmarkItem* bookmark_item = (BookmarkItem*) item;
+    Bookmark* bookmark = bookmark_item->get_bookmark();
+    cout << "FILE: " << mvideo_player->get_file_path() << endl;
+    if (mvideo_player->get_file_path() != bookmark->get_video_file_path()) {
+        cout << "Bookmark video: " << bookmark->get_video_file_path() << endl;
+        switching_from_bookmark = true;
+        load_new_video(bookmark->get_video_file_path(), bookmark_item->get_frame_number(), mvideo_player->is_paused());
+    } else {
+        cout << "Same video" << endl;
+        emit set_playback_frame(bookmark->get_frame_number());
+    }
     set_status_bar("Jump to frame: " + to_string(bookmark->get_frame_number()) + ".");
 }
 

@@ -45,11 +45,12 @@ video_player::~video_player() {
  * @param o Overlay associated to the video
  * @return whether video is loaded
  */
-bool video_player::load_video(string filename, Overlay* o) {
-    video_overlay = o;
+bool video_player::load_video(string filename, int start_frame, bool start_paused) {
+    m_start_frame = start_frame;
+    video_paused = start_paused;
     if (capture.isOpened())
         capture.release();
-
+    std::cout << "Video path: " << filename << endl;
     capture.open(filename);
 
     if (capture.isOpened()) {
@@ -67,6 +68,15 @@ bool video_player::load_video(string filename, Overlay* o) {
 }
 
 /**
+ * @brief video_player::set_overlay
+ * Sets the overlay
+ * @param o
+ */
+void video_player::set_overlay(Overlay* o) {
+    video_overlay = o;
+}
+
+/**
  * @brief video_player::run
  * This function is called whenever the thread is started or put out of sleep.
  * It houses the main loop for fetching frames from the currently played
@@ -76,7 +86,7 @@ void video_player::run()  {
     video_stopped = false;
     video_paused = false;
     int delay = (1000/frame_rate);
-    set_current_frame_num(0);
+    set_current_frame_num(m_start_frame);
     while (!video_stopped && capture.read(frame)) {
         const clock_t begin_time = std::clock();
 
@@ -104,8 +114,10 @@ void video_player::run()  {
         m_mutex->unlock();
     }
     video_stopped = true;
+
     capture.set(CV_CAP_PROP_POS_FRAMES, 0);
     emit update_current_frame(0);
+
 }
 
 /**
@@ -351,6 +363,15 @@ std::string video_player::get_file_name() {
 }
 
 /**
+ * @brief video_player::get_file_path
+ * @return Returns the file path of the video that has
+ *         been loaded into the video player.
+ */
+std::string video_player::get_file_path() {
+    return file_path;
+}
+
+/**
  * @brief video_player::set_current_frame_num
  * Sets the current frame to the specified number, if it's within the video.
  * @param frame_nbr The number to set the currently read frame to (0-based index).
@@ -395,10 +416,14 @@ void video_player::set_frame_height(int new_value) {
  * @param frame_num
  */
 void video_player::on_set_playback_frame(int frame_num) {
+    cout << "1" << endl;
     if (video_paused) {
+        cout << "2: video paused" << endl;
         update_frame(frame_num - 1);
     } else {
+        cout << "2: video not paused" << endl;
         if (frame_num >= 0 && frame_num < get_num_frames()) {
+            cout << "3: frame checked" << endl;
             set_new_frame = true;
             new_frame_num = frame_num;
         } else {
@@ -941,4 +966,13 @@ void video_player::on_set_analysis_results(Analysis analysis) {
         }
         std::cout << "Amount of detections: " << analysis.get_detections_on_frame(frame_num).size() << std::endl;
     }
+}
+
+/**
+ * @brief video_player::on_abort_video_playback
+ * Aborts the video playback. The difference between aborting and stopping the video playback is that a stopped video sends out
+ * one final frame before it is stopped.
+ */
+void video_player::on_abort_video_playback() {
+
 }

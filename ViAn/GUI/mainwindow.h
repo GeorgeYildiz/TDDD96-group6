@@ -64,6 +64,7 @@ signals:
     void set_playback_frame(int frame, bool show_frame = false);
     void abort_analysis();
     void set_analysis_results(Analysis analysis);
+    void abort_video_playback();
 
 private slots:
 
@@ -185,6 +186,7 @@ private:
 
     bool slider_blocked = false;
     bool slider_paused_video = false;
+    bool switching_from_bookmark = false;
     int prev_slider_pos = 0;
 
     std::chrono::milliseconds slider_timer = std::chrono::duration_cast< std::chrono::milliseconds >(
@@ -196,6 +198,7 @@ private:
     void setup_video_player(video_player *mplayer);
     void setup_analysis(AnalysisController *ac);
     void add_video_to_tree(VideoProject *video);
+    void load_new_video(std::string video_path, int start_frame = 0, bool start_paused = false);
 
     void remove_bookmarks_of_project(MyQTreeWidgetItem* project_item);
     void remove_bookmark_of_video(QTreeVideoItem* video_item);

@@ -9,11 +9,11 @@
  * @param dir_path Path to the directory to store image in.
  * @param text Text description of the bookmark.
  */
-Bookmark::Bookmark(int time, int frame_nbr, QImage frame, QString video_file_name, QString dir_path, QString text) {
+Bookmark::Bookmark(int time, int frame_nbr, QImage frame, QString video_file_path, QString dir_path, QString text) {
     this->time = time;
     this->frame_number = frame_nbr;
     this->frame = frame;
-    this->video_file_name = video_file_name;
+    this->video_file_path = video_file_path;
     this->dir_path = dir_path;
     this->description = text;
     // There's no file path yet, since the frame has not been exported
@@ -27,7 +27,7 @@ Bookmark::Bookmark(int time, int frame_nbr, QImage frame, QString video_file_nam
 Bookmark::Bookmark() {
     frame_number = 0;
     frame = QImage();
-    video_file_name = QString();
+    video_file_path = QString();
     dir_path = QString();
     file_path = QString();
     description = QString();
@@ -90,7 +90,7 @@ void Bookmark::set_description(QString text) {
  */
 void Bookmark::read(const QJsonObject& json){
     this->frame_number = json["frame"].toInt();
-    this->video_file_name = json["video_name"].toString();
+    this->video_file_path = json["video_name"].toString();
     this->dir_path = json["dir"].toString();
     this->file_path = json["path"].toString();
     this->description = json["note"].toString();
@@ -107,7 +107,7 @@ void Bookmark::write(QJsonObject& json){
     export_frame();
 
     json["frame"] = this->frame_number;
-    json["video_name"] = this->video_file_name;
+    json["video_name"] = this->video_file_path;
     json["dir"] = this->dir_path;
     json["path"] = this->file_path;
     json["note"] = this->description;
@@ -133,7 +133,7 @@ void Bookmark::create_file_path() {
     // Append FRAMENR.tiff to the directory path
     QString path = QString(dir_path);
     path.append("/");
-    path.append(video_file_name);
+    path.append(video_file_path);
     path.append("_");
     path.append(QString::number(frame_number));
     path.append(".tiff");
@@ -143,7 +143,7 @@ void Bookmark::create_file_path() {
         // If file exists, try FRAMENR(X).tiff
         path = QString(dir_path);
         path.append("/");
-        path.append(video_file_name);
+        path.append(video_file_path);
         path.append("_");
         path.append(QString::number(frame_number));
         path.append("(");
@@ -165,4 +165,8 @@ void Bookmark::remove_exported_image() {
         QFile file(file_path);
         file.remove();
     }
+}
+
+std::string Bookmark::get_video_file_path() {
+    return video_file_path.toStdString();
 }

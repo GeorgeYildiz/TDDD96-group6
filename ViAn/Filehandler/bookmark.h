@@ -16,12 +16,13 @@
  */
 class Bookmark : Saveable{
 public:
-    Bookmark(int time, int frame_nbr, QImage frame, QString video_file_name, QString dir_path, QString string);
+    Bookmark(int time, int frame_nbr, QImage frame, QString video_file_path, QString dir_path, QString string);
     Bookmark();
     int get_time();
     int get_frame_number();
     QImage get_frame();
     QString get_file_path();
+    std::string get_video_file_path();
     QString get_description();
     void set_description(QString text);
     void read(const QJsonObject& json);
@@ -34,7 +35,7 @@ private:
     QImage frame;           // Frame of the bookmark
     int frame_number;       // Frame at which the bookmark was taken
     int time;               // Time of the bookmark (in millisecs)
-    QString video_file_name;// Name of the video file.
+    QString video_file_path;// Name of the video file.
     QString dir_path;       // Path to the directory for the bookmarks
     QString description;    // Description for the bookmark, given by user
     // Note that this variable can be altered when the bookmark is exported.
