@@ -110,6 +110,21 @@ void ReportGenerator::add_paragraph(QAxObject* selection) {
     }
     selection->dynamicCall( "Collapse(int)", 0 );
 }
+/**
+ * @brief ReportGenerator::calculate_time
+ * This method will convert milliseconds into a QString with format
+ * "Hours:Minutes:Seconds"
+ * @param ms, the time in milliseconds that are to be converted
+ * @return a QString with format as specified above in @brief
+ */
+QString ReportGenerator::calculate_time(int ms) {
+    int seconds = (int) (ms / 1000) % 60 ;
+    int minutes = (int) ((ms / (1000*60)) % 60);
+    int hours   = (int) ((ms / (1000*60*60)) % 24);
+    std::cout << ms << std::endl;
+    return QString("%1:%2:%3").arg(hours, 2, 10, QChar('0'))\
+            .arg(minutes, 2, 10, QChar('0')).arg(seconds, 2, 10, QChar('0'));
+}
 
 /**
  * @brief ReportGenerator::add_bookmarks
@@ -136,6 +151,8 @@ void ReportGenerator::add_bookmarks(QAxObject* selection) {
 
         //adds description beneath image
         QString frame_nr = QString("Frame number: %1").arg(bookmark->get_frame_number());
+        QString time = QString("Time: %1").arg(calculate_time(bookmark->get_time()));
+        std::cout << time.toStdString() << std::endl;
         QString bm_description = bookmark->get_description();
         QString description = "";
 
