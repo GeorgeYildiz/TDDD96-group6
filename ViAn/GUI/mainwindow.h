@@ -24,6 +24,7 @@
 #include <QMutex>
 #include <QWaitCondition>
 #include "makeproject.h"
+#include "Analysis/AnalysisController.h"
 #define SCROLL_AREA_MARGIN 25
 
 
@@ -61,6 +62,8 @@ signals:
     void next_video_frame();
     void prev_video_frame();
     void set_playback_frame(int frame, bool show_frame = false);
+    void abort_analysis();
+    void set_analysis_results(Analysis analysis);
 
 private slots:
 
@@ -110,6 +113,8 @@ private slots:
 
     void prepare_menu(const QPoint & pos);
 
+    void prepare_bookmark_menu(const QPoint & pos);
+
     void play_video();
 
     void on_action_save_triggered();
@@ -158,14 +163,21 @@ private slots:
 
     void on_action_show_hide_analysis_overlay_triggered();
 
+    void save_analysis_to_file(Analysis analysis);
+
+    void show_analysis_progress(int progress);
+
     void on_previous_POI_button_clicked();
 
     void on_next_POI_button_clicked();
+
+    void on_action_change_bookmark_triggered();
 
 private:
 
     Ui::MainWindow *ui;
     video_player* mvideo_player;
+    AnalysisController* m_acontroller;
     IconOnButtonHandler *icon_on_button_handler;
     BookmarkView* bookmark_view;
     QSlider *video_slider;
@@ -182,6 +194,7 @@ private:
     FileHandler *file_handler;
     void setup_file_handler();
     void setup_video_player(video_player *mplayer);
+    void setup_analysis(AnalysisController *ac);
     void add_video_to_tree(VideoProject *video);
 
     void remove_bookmarks_of_project(MyQTreeWidgetItem* project_item);

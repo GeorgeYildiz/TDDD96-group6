@@ -11,14 +11,16 @@
 #include <thread>
 #include "icononbuttonhandler.h"
 #include "Video/shapes/shape.h"
+#include "Analysis/MotionDetection.h"
+#include "Analysis/AnalysisMethod.h"
 
 
 using namespace std;
 using namespace cv;
 
+
 /**
  * @brief MainWindow::MainWindow
- * Constructor
  * @param parent a QWidget variable
  */
 MainWindow::MainWindow(QWidget *parent) :
@@ -43,9 +45,16 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->project_tree->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(ui->project_tree, &QTreeWidget::customContextMenuRequested, this, &MainWindow::prepare_menu);
 
+    ui->document_list->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(ui->document_list, &QListWidget::customContextMenuRequested, this, &MainWindow::prepare_bookmark_menu);
+
     //Creates and prepares the video_player.
     mvideo_player = new video_player(&mutex, &paused_wait, ui->video_frame);
     setup_video_player(mvideo_player);
+    //mvideo_player->load_video("enghd.mp4");
+    // TODO The following code is just here to test.
+    // Remove when a proper implementation exists.
+
 
     // Initially hide overlay and analysis toolbar
     ui->toolbar_overlay->hide();
@@ -75,6 +84,21 @@ MainWindow::~MainWindow() {
     delete ui;
     delete bookmark_view;
 }
+
+/**
+ * @brief MainWindow::setup_analysis
+ * Creates the necessary connections to the analysis thread.
+ * @param ac AnalysisController for the current analysis
+ */
+void MainWindow::setup_analysis(AnalysisController* ac){
+    QObject::connect(ac, SIGNAL(save_analysis(Analysis)),
+                     this, SLOT(save_analysis_to_file(Analysis)));
+    QObject::connect(ac, SIGNAL(show_analysis_progress(int)),
+                     this, SLOT(show_analysis_progress(int)));
+    QObject::connect(this, SIGNAL(abort_analysis()),
+                     ac, SLOT(on_abort()));
+}
+
 /**
  * @brief MainWindow::setup_filehandler
  * Sets up filehandler and loads projects.
@@ -112,11 +136,34 @@ void MainWindow::setup_video_player(video_player *mplayer) {
                      mplayer, SLOT(on_stop_video()));
     QObject::connect(this, SIGNAL(set_playback_frame(int)),
                      mplayer, SLOT(on_set_playback_frame(int)));
+    QObject::connect(this, SIGNAL(set_analysis_results(Analysis)),
+                     mplayer, SLOT(on_set_analysis_results(Analysis)));
     //Will be added when functionality is in place
     /*QObject::connect(this, SIGNAL(next_video_POI()),
                      mplayer, SLOT(next_POI()));
     QObject::connect(this, SIGNAL(prev_video_POI()),
                      mplayer, SLOT(previous_POI()));*/
+}
+
+/**
+ * @brief MainWindow::save_analysis_to_file
+ * @param analysis
+ * Slot for saving analysis to file.
+ */
+void MainWindow::save_analysis_to_file(Analysis analysis) {
+    //TODO Add code.
+    std::cout << "Analysis done" << std::endl;
+    emit set_analysis_results(analysis);
+}
+
+/**
+ * @brief MainWindow::on_analysis_update
+ * @param progress current analysis progress in percent
+ */
+void MainWindow::show_analysis_progress(int progress){
+    // Progress for the current analysis
+    // Add to gui from here
+    std::cout << "Progress: " << progress << std::endl;
 }
 
 /**
@@ -386,6 +433,13 @@ void MainWindow::on_action_exit_triggered() {
  * Button to add a bookmark to the bookmark view.
  */
 void MainWindow::on_bookmark_button_clicked() {
+    // Get the info from the video object.
+    // This should be done first to ensure we get the
+    // frame at the time the user clicked the button.
+    int time = mvideo_player->get_current_time();
+    int frame_number = mvideo_player->get_current_frame_num();
+    QImage frame = mvideo_player->get_current_frame_unscaled();
+    QString video_file_name = QString::fromStdString(mvideo_player->get_file_name());
     // Add bookmarks-folder to the project-folder.
     Project* proj = file_handler->get_project(((MyQTreeWidgetItem*)playing_video->parent())->id);
     QDir dir = file_handler->get_dir(proj->dir_bookmarks);
@@ -394,10 +448,7 @@ void MainWindow::on_bookmark_button_clicked() {
     bool ok;
     bookmark_text = bookmark_view->get_input_text(&ok);
     if(!ok) return;
-    int frame_number = mvideo_player->get_current_frame_num();
-    QImage frame = mvideo_player->get_current_frame_unscaled();
-    QString video_file_name = QString::fromStdString(mvideo_player->get_file_name());
-    Bookmark* bookmark = new Bookmark(frame_number, frame, video_file_name, dir.absolutePath(), bookmark_text);
+    Bookmark* bookmark = new Bookmark(time, frame_number, frame, video_file_name, dir.absolutePath(), bookmark_text);
     ID id = proj->add_bookmark(playing_video->id, bookmark);
     bookmark_view->add_bookmark(playing_video->id, id, bookmark);
     playing_video->bookmarks.push_back(id);
@@ -658,6 +709,25 @@ void MainWindow::prepare_menu(const QPoint & pos) {
     }
     QPoint pt(pos);
     menu.exec( tree->mapToGlobal(pos) );
+}
+
+/**
+ * @brief MainWindow::prepare_bookmark_menu
+ * @param pos
+ * Creates context menu on right-click in bookmark view
+ */
+void MainWindow::prepare_bookmark_menu(const QPoint & pos) {
+    QListWidget *list = ui->document_list;
+    BookmarkItem *item = (BookmarkItem*)list->itemAt( pos );
+    QMenu menu(this);
+
+    if(item != nullptr) {
+        QAction *change_bookmark = new QAction(QIcon(""), tr("&Change bookmark"), this);
+        change_bookmark->setStatusTip(tr("Change bookmark"));
+        menu.addAction(change_bookmark);
+        connect(change_bookmark, SIGNAL(triggered()), this, SLOT(on_action_change_bookmark_triggered()));
+    }
+    menu.exec( list->mapToGlobal(pos) );
 }
 
 /**
@@ -1166,4 +1236,18 @@ void MainWindow::on_next_POI_button_clicked() {
     } else {
         set_status_bar("Needs to be paused");
     }
+}
+
+/**
+ * @brief MainWindow::on_action_change_bookmark_triggered
+ * Lets the user change the bookmark description.
+ */
+void MainWindow::on_action_change_bookmark_triggered() {
+    BookmarkItem *item = (BookmarkItem*) ui->document_list->selectedItems().first();
+    QString bookmark_text("");
+    bool ok;
+    bookmark_text = bookmark_view->get_input_text(&ok);
+    if(!ok) return;
+    item->update_description(bookmark_text);
+    set_status_bar("Updated bookmark");
 }
