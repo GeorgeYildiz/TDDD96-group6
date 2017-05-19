@@ -448,7 +448,7 @@ void MainWindow::on_bookmark_button_clicked() {
     bool ok;
     bookmark_text = bookmark_view->get_input_text(&ok);
     if(!ok) return;
-    Bookmark* bookmark = new Bookmark(time, frame_number, frame, video_file_name, dir.absolutePath(), bookmark_text);
+    Bookmark* bookmark = new Bookmark(playing_video, time, frame_number, frame, dir.absolutePath(), bookmark_text);
     ID id = proj->add_bookmark(playing_video->id, bookmark);
     bookmark_view->add_bookmark(playing_video->id, id, bookmark);
     playing_video->bookmarks.push_back(id);

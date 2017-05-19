@@ -9,11 +9,11 @@
  * @param dir_path Path to the directory to store image in.
  * @param text Text description of the bookmark.
  */
-Bookmark::Bookmark(int time, int frame_nbr, QImage frame, QString video_file_path, QString dir_path, QString text) {
+Bookmark::Bookmark(VideoProject *parent, int time, int frame_nbr, QImage frame, QString dir_path, QString text) {
+    this->parent = parent;
     this->time = time;
     this->frame_number = frame_nbr;
     this->frame = frame;
-    this->video_file_path = video_file_path;
     this->dir_path = dir_path;
     this->description = text;
     // There's no file path yet, since the frame has not been exported
@@ -24,10 +24,10 @@ Bookmark::Bookmark(int time, int frame_nbr, QImage frame, QString video_file_pat
  * @brief Bookmark::Bookmark
  * Null initializing constructor.
  */
-Bookmark::Bookmark() {
+Bookmark::Bookmark(VideoProject *parent) {
+    this->parent = parent;
     frame_number = 0;
-    frame = QImage();
-    video_file_path = QString();
+    frame = QImage();    
     dir_path = QString();
     file_path = QString();
     description = QString();

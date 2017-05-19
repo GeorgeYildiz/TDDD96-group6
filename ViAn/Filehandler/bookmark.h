@@ -9,6 +9,7 @@
 #include <iostream>
 #include "saveable.h"
 #include "video.h"
+#include "videoproject.h"
 /**
  * @brief The Bookmark class
  * Bookmark class is used for storing bookmarks, i.e. user
@@ -17,8 +18,8 @@
 class Bookmark : Saveable{
     VideoProject* parent;
 public:
-    Bookmark(int time, int frame_nbr, QImage frame, QString video_file_path, QString dir_path, QString string);
-    Bookmark();
+    Bookmark(VideoProject* parent,int time, int frame_nbr, QImage frame, QString dir_path, QString string);
+    Bookmark(VideoProject* parent);
     int get_time();
     int get_frame_number();
     QImage get_frame();

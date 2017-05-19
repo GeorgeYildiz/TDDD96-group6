@@ -136,7 +136,7 @@ void Project::read(const QJsonObject& json){
     QJsonArray json_reports = json["reports"].toArray();
     for (int i = 0; i < json_reports.size(); ++i) {
         QJsonObject json_report = json_reports[i].toObject();
-        Report* report = new Report();
+        Report* report = new Report(this);
         report->read(json_report);
         this->add_report(report);
     }
