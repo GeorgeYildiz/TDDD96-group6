@@ -15,6 +15,7 @@
  * marked points in a video and an associated frame.
  */
 class Bookmark : Saveable{
+    VideoProject* parent;
 public:
     Bookmark(int time, int frame_nbr, QImage frame, QString video_file_path, QString dir_path, QString string);
     Bookmark();

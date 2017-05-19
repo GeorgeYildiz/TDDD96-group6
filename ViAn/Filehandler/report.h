@@ -2,8 +2,10 @@
 #define REPORT_H
 #include <string>
 #include "saveable.h"
+#include "videoproject.h"
 class Report : public Saveable{
     std::string file_path;
+    VideoProject* parent;
 public:
     Report(std::string file_path);
     Report();

@@ -8,7 +8,7 @@
 #include "saveable.h"
 typedef int ID;
 class Video : Saveable{
-
+    VideoProject* parent;
 public:
     Video();
     ID id;

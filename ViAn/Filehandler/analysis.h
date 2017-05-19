@@ -8,9 +8,10 @@
 #include <map>
 #include "saveable.h"
 #include "opencv2/core/core.hpp"
-
+#include "videoproject.h"
 enum ANALYSIS_TYPE {MOTION_DETECTION = 0, FACIAL_DETECTION = 1};
 class OOI : Saveable{
+    VideoProject* parent;
     int frame;
     std::string file_path;
     std::pair<int, int> upper_left;
