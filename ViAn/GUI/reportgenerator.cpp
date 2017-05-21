@@ -121,7 +121,6 @@ QString ReportGenerator::calculate_time(int ms) {
     int seconds = (int) (ms / 1000) % 60 ;
     int minutes = (int) ((ms / (1000*60)) % 60);
     int hours   = (int) ((ms / (1000*60*60)) % 24);
-    std::cout << ms << std::endl;
     return QString("%1:%2:%3").arg(hours, 2, 10, QChar('0'))\
             .arg(minutes, 2, 10, QChar('0')).arg(seconds, 2, 10, QChar('0'));
 }
@@ -152,14 +151,14 @@ void ReportGenerator::add_bookmarks(QAxObject* selection) {
         //adds description beneath image
         QString frame_nr = QString("Frame number: %1").arg(bookmark->get_frame_number());
         QString time = QString("Time: %1").arg(calculate_time(bookmark->get_time()));
-        std::cout << time.toStdString() << std::endl;
         QString bm_description = bookmark->get_description();
         QString description = "";
 
         if (!bm_description.isEmpty()) {
             description = QString("Description: %1").arg(bookmark->get_description());
         }
-
+        selection->dynamicCall( "InsertParagraphAfter()" );
+        selection->dynamicCall("InsertAfter(const QString&)", time);
         selection->dynamicCall( "InsertParagraphAfter()" );
         selection->dynamicCall("InsertAfter(const QString&)", frame_nr);
         selection->dynamicCall( "InsertParagraphAfter()" );
