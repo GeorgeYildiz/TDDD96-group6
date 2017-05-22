@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
     qRegisterMetaType<Analysis>();
     w.show();
 
-    bool testing = false;
+    bool testing = true;
     bool integration_testing = false;
     if (testing) {
         //For testing video player.
