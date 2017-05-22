@@ -212,7 +212,7 @@ void MainWindow::on_increase_speed_button_clicked(){
         ui->increase_speed_button->setEnabled(false);
     }
     set_status_bar("Playback speed increased (x" + speed.toStdString() + ")");
-    ui->speed_label->setText(speed + "x");
+    ui->speed_label->setText("Play speed: " + speed + "x");
 }
 
 /**
@@ -228,7 +228,7 @@ void MainWindow::on_decrease_speed_button_clicked(){
         ui->decrease_speed_button->setEnabled(false);
     }
     set_status_bar("Playback speed decreased (x" + speed.toStdString() + ")");
-    ui->speed_label->setText(speed + "x");
+    ui->speed_label->setText("Play speed: " + speed + "x");
 }
 
 /**
@@ -285,6 +285,7 @@ void MainWindow::update_video(QImage frame) {
     ui->video_frame->setPixmap(QPixmap::fromImage(frame));
     qint64 current_time = mvideo_player->get_current_frame_num()/mvideo_player->get_frame_rate();
     set_time_to_label(ui->current_time_label, current_time);
+    ui->frame_line_edit->setText(QString::number(mvideo_player->get_current_frame_num()));
 }
 
 /**
@@ -793,7 +794,8 @@ void MainWindow::play_video() {
     mvideo_player->set_showing_overlay(ui->action_show_hide_overlay->isChecked());
 
     set_slider_labels();
-    ui->speed_label->setText("1x");
+    ui->speed_label->setText("Play speed: 1x");
+
 }
 
 /**
@@ -1250,4 +1252,28 @@ void MainWindow::on_action_change_bookmark_triggered() {
     if(!ok) return;
     item->update_description(bookmark_text);
     set_status_bar("Updated bookmark");
+}
+
+/**
+ * @brief MainWindow::on_jump_button_clicked
+ *
+ */
+void MainWindow::on_jump_button_clicked() {
+    string text = ui->frame_line_edit->text().toStdString();
+    //set_status_bar(to_string(mvideo_player->get_num_frames()));
+    char* p;
+    long converted = strtol(text.c_str(), &p, 10);
+    //atoi(text.c_str(), &p, 10);
+    if (*p != 0){
+        QMessageBox messageBox;
+        messageBox.critical(0,"Error","Input is not a number!");
+        messageBox.setFixedSize(500,200);
+    } else if (converted+1 >= mvideo_player->get_num_frames()) {
+        QMessageBox messageBox;
+        messageBox.critical(0,"Error","Input is too large!");
+        messageBox.setFixedSize(500,200);
+    } else {
+        emit set_playback_frame(converted, true);
+    }
+    //maxframes
 }
