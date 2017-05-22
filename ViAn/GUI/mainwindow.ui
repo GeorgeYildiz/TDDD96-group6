@@ -392,6 +392,9 @@
          <layout class="QHBoxLayout" name="label_layout">
           <item>
            <widget class="QLabel" name="frame_label">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="text">
              <string>Frame</string>
             </property>
@@ -400,7 +403,7 @@
           <item>
            <widget class="QLineEdit" name="frame_line_edit">
             <property name="enabled">
-             <bool>true</bool>
+             <bool>false</bool>
             </property>
             <property name="sizePolicy">
              <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
@@ -427,6 +430,9 @@
           </item>
           <item>
            <widget class="QPushButton" name="jump_button">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="minimumSize">
              <size>
               <width>40</width>

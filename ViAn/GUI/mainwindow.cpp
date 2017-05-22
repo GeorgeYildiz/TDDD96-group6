@@ -989,6 +989,9 @@ void MainWindow::enable_video_buttons() {
     ui->previous_POI_button->setEnabled(true);
     ui->next_POI_button->setEnabled(true);
     ui->video_slider->setEnabled(true);
+    ui->frame_line_edit->setEnabled(true);
+    ui->jump_button->setEnabled(true);
+    ui->frame_label->setEnabled(true);
 }
 
 /**
@@ -1263,20 +1266,21 @@ void MainWindow::on_action_change_bookmark_triggered() {
  */
 void MainWindow::on_jump_button_clicked() {
     string text = ui->frame_line_edit->text().toStdString();
-    set_status_bar(to_string(mvideo_player->get_num_frames()));
     char* p;
     long converted = strtol(text.c_str(), &p, 10);
-    //atoi(text.c_str(), &p, 10);
     if (*p != 0){
         QMessageBox messageBox;
         messageBox.critical(0,"Error","Input is not a number!");
         messageBox.setFixedSize(500,200);
-    } else if (converted+1 >= mvideo_player->get_num_frames()) {
+    } else if (converted+1 > mvideo_player->get_num_frames()) {
+        QString num_frames = QString::number(mvideo_player->get_num_frames());
         QMessageBox messageBox;
-        messageBox.critical(0,"Error","Input is too large!");
+        messageBox.critical(0,"Error","Input is too large! " + num_frames + " is max frame number.");
         messageBox.setFixedSize(500,200);
+    } else if (converted+1 < 0) {
+        QMessageBox messageBox;
+        messageBox.critical(0,"Error","Input is negative!");
     } else {
-        emit set_playback_frame(converted, true);
+        emit set_playback_frame(converted+1, true);
     }
-    //maxframes
 }
