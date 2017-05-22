@@ -1260,7 +1260,7 @@ void MainWindow::on_action_change_bookmark_triggered() {
  */
 void MainWindow::on_jump_button_clicked() {
     string text = ui->frame_line_edit->text().toStdString();
-    //set_status_bar(to_string(mvideo_player->get_num_frames()));
+    set_status_bar(to_string(mvideo_player->get_num_frames()));
     char* p;
     long converted = strtol(text.c_str(), &p, 10);
     //atoi(text.c_str(), &p, 10);
