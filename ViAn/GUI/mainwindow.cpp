@@ -1256,7 +1256,8 @@ void MainWindow::on_action_change_bookmark_triggered() {
 
 /**
  * @brief MainWindow::on_jump_button_clicked
- *
+ * When clicking the button, jump to frame number
+ * specified in the frame_line_edit
  */
 void MainWindow::on_jump_button_clicked() {
     string text = ui->frame_line_edit->text().toStdString();
