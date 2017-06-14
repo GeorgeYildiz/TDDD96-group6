@@ -24,7 +24,7 @@ class ProjectManager;
  * incomplete class, will be added on
  * along with parser functionality
  */
-class Project : public JsonItem, SaveableTree{
+class Project : SaveableTree{
     ProjectManager* project_manager;
     bool changes_made = true;
     std::map<ID,VideoProject*> videos;

@@ -1,5 +1,11 @@
 #include "saveablenode.h"
 
+SaveableNode::SaveableNode(const std::string& file_name, const std::string &dir_path)
+{
+    m_directory = dir_path;
+    m_file_name = file_name;
+}
+
 SaveableNode::SaveableNode()
 {
 
@@ -8,27 +14,30 @@ SaveableNode::~SaveableNode()
 {
 
 }
+
 /**
  * @brief FileHandler::save_saveable
  * @param savable
  * @param dir_path
  * @param save_format
- * @return Saves a Json file to provided directory
+ * @return Saves a file to provided directory
  */
-bool SaveableNode::save_saveable(const std::string& file_name,
-                             const std::string& dir_path, const SAVE_FORMAT& save_format){
-    QDir dir;
-    dir.mkpath(QString::fromStdString(dir_path));
+bool SaveableNode::save_node(const SAVE_FORMAT& save_format){
+    QString dir_name = QString::fromStdString(m_directory);
+    if (!dir.exists(dir_name))
+        dir.mkpath(QString::fromStdString(m_directory));
     QFile save_file(save_format == JSON
-                    ? QString::fromStdString(dir_path + "/" + file_name +".json")
-                    : QString::fromStdString(dir_path + "/" + file_name + ".dat"));
+                    ? QString::fromStdString(dir_path + "/" + m_file_name + ".json")
+                    : QString::fromStdString(dir_path + "/" + m_file_name + ".dat"));
 
     if(!save_file.open(QIODevice::WriteOnly)){
         qWarning("Couldn't open save file.");
         return false;
     }
     QJsonObject json_saveable;
-    this->write(json_saveable);
+    for(JsonItem data : m_data) {
+        m_data->write(json_saveable);
+    }
     QJsonDocument save_doc(json_saveable);
     save_file.write(save_format == JSON
             ? save_doc.toJson()
@@ -44,7 +53,7 @@ bool SaveableNode::save_saveable(const std::string& file_name,
  * @return loaded Savable
  * Loads saveable from binary or json file.
  */
-bool SaveableNode::load_saveable(const std::string& full_path, const SAVE_FORMAT& save_format){
+bool SaveableNode::load_node(const std::string& full_path, const SAVE_FORMAT& save_format){
     QFile load_file(save_format == JSON
         ? QString::fromStdString(full_path)
         : QString::fromStdString(full_path));
@@ -65,7 +74,7 @@ bool SaveableNode::load_saveable(const std::string& full_path, const SAVE_FORMAT
  * @brief SaveableTree::delete_saveable
  * @return
  */
-bool SaveableTree::delete_saveable()
+bool SaveableNode::delete_node()
 {
     QFile file(QString::fromStdString(this->save_name));
     file.remove();

@@ -28,7 +28,7 @@ bool SaveableTree::delete_tree()
     for(auto it = m_saveables.begin(); it != m_saveables.end(); it++){
         std::vector<SaveableNode> nodes = it->second;
         foreach (SaveableNode sav, nodes) {
-            sav.delete_saveable();
+            sav.delete_node();
         }
         std::string dir_path = it->first;
         dir.rmdir(QString::fromStdString(dir));
@@ -37,24 +37,42 @@ bool SaveableTree::delete_tree()
 
 bool SaveableTree::save_tree()
 {
+    save_nodes();
     for(auto it = m_saveables.begin(); it != m_saveables.end(); it++){
-        std::vector<SaveableNode> nodes = it->second;
+        std::vector<SaveableNode> nodes = it->second;        
         foreach (SaveableNode sav, nodes) {
-            //sav.save_saveable();
+            sav.save_();
         }
-        std::string dir_path = it->first;
-        dir.rmdir(QString::fromStdString(dir));
     }
 }
 
 bool SaveableTree::load_tree(const std::string &full_path_trunk)
 {
+    QFile load_file(save_format == JSON
+        ? QString::fromStdString(full_path)
+        : QString::fromStdString(full_path));
+    if (!load_file.open(QIODevice::ReadOnly)) {
+        qWarning("Couldn't open load file %s. ", load_file.fileName().toStdString().c_str());
+        return false;
+    }
+    QByteArray save_data = load_file.readAll();
+    QJsonDocument load_doc(save_format == JSON
+        ? QJsonDocument::fromJson(save_data)
+        : QJsonDocument::fromBinaryData(save_data));
+    this->read(load_doc.object());
+    this->save_name = load_file.fileName().toStdString();
+
+    load_nodes();
+    return true;
+}
+
+bool SaveableTree::load_nodes()
+{
     for(auto it = m_saveables.begin(); it != m_saveables.end(); it++){
         std::vector<SaveableNode> nodes = it->second;
         foreach (SaveableNode sav, nodes) {
-            //sav.load_saveable();
+            sav.load_node();
         }
-        std::string dir_path = it->first;
-        dir.rmdir(QString::fromStdString(dir));
     }
 }
+
