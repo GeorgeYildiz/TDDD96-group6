@@ -13,7 +13,7 @@
 #include "Filehandler/filehandler.h"
 #include "videoproject.h"
 #include "video.h"
-#include "Filehandler/saveable.h"
+#include "Filehandler/json_item.h"
 #include "Project/Analysis/analysis.h"
 #include "projectmanager.h"
 typedef int ID;
@@ -24,7 +24,7 @@ class ProjectManager;
  * incomplete class, will be added on
  * along with parser functionality
  */
-class Project : public Saveable{
+class Project : public JsonItem, SaveableTree{
     ProjectManager* project_manager;
     bool changes_made = true;
     std::map<ID,VideoProject*> videos;

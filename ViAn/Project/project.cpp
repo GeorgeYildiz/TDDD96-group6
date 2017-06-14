@@ -105,7 +105,7 @@ ID Project::add_video_project(VideoProject* vid_proj){
  * @brief Project::delete_artifacts
  * Delete all projects files.
  */
-void Project::delete_artifacts(){
+void Project::delete_artifacts(){    
     // Delete files in all videoprojects
     for(auto it = videos.begin(); it != videos.end(); it++){
         VideoProject* vp = it->second;
@@ -117,12 +117,15 @@ void Project::delete_artifacts(){
         QFile file (QString::fromStdString(temp->get_file_path()));
         file.remove();
     }
-    // Delete directories
+    // Delete top level project artifacts
     QDir directory;
     QString q_dir = QString::fromStdString(this->dir);
     QString q_dir_bookmarks = QString::fromStdString(this->dir_bookmarks);
-    directory.rmdir(qdir);
+    // Delete main project file
+    delete_saveable();
+    // Delete directories
     directory.rmdir(q_dir_bookmarks);
+    directory.rmdir(q_dir);
 }
 
 /**
@@ -218,7 +221,7 @@ bool Project::is_saved(){
  * @brief Project::save_project
  * @return sets saved =true
  */
-void Project::save_project(){
+void Project::save_project(){    
     QDir directory;
     directory.mkpath(QString::fromStdString(this->dir));
     directory.mkpath(QString::fromStdString(this->dir_bookmarks));

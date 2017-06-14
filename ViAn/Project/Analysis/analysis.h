@@ -6,7 +6,7 @@
 #include <QObject>
 #include <vector>
 #include <map>
-#include "Filehandler/saveable.h"
+#include "Filehandler/json_item.h"
 #include "opencv2/core/core.hpp"
 #include "poi.h"
 #include "ooi.h"
@@ -16,7 +16,7 @@ enum ANALYSIS_TYPE {MOTION_DETECTION = 0, FACIAL_DETECTION = 1};
 const std::vector<std::string> ANALYSIS_NAMES = {"Motion detection", "Facial detection"};
 const std::map<std::string, ANALYSIS_TYPE> ANALYSIS_NAMES_TYPE_MAP = {std::make_pair("Motion detection",MOTION_DETECTION),
                                                                      std::make_pair("Facial detection",FACIAL_DETECTION)};
-class Analysis : Saveable {
+class Analysis : JsonItem {
 public:
     ANALYSIS_TYPE type;
     Analysis();

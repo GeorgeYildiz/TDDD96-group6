@@ -27,7 +27,7 @@ typedef int ID;       // ID, defined for code readability.
 
 class Project; // fix for include issue
 
-class FileHandler : public Saveable{
+class FileHandler : public SaveableTree{
 public:
     friend class test_report_generator;
     FileHandler();

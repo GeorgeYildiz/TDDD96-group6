@@ -6,10 +6,10 @@
 #include <QObject>
 #include <vector>
 #include <map>
-#include "Filehandler/saveable.h"
+#include "Filehandler/json_item.h"
 #include "opencv2/core/core.hpp"
 #include "ooi.h"
-class POI : Saveable{
+class POI : JsonItem{
     std::map<int,std::vector<OOI>> OOIs;
 public:
     POI();

@@ -17,7 +17,10 @@ TEMPLATE = app
 # GENERAL
 #
 SOURCES += main.cpp \
-    projectmanager.cpp
+    projectmanager.cpp \
+    Filehandler/json_item.cpp \
+    Filehandler/saveablenode.cpp \
+    Filehandler/saveable.cpp
 
 
 #
@@ -33,7 +36,9 @@ HEADERS += Test/test_video_player.h \
     Test/test_mainwindow.h \
     Test/test_report_generator.h \
     Test/overlayintegrationtest.h \
-    projectmanager.h
+    projectmanager.h \
+    Filehandler/json_item.h \
+    Filehandler/saveablenode.h
 
 #
 # LIBRARY
@@ -125,7 +130,6 @@ unix {
 # START: FILEHANDLER
 #
 SOURCES += Filehandler/filehandler.cpp \
-    Filehandler/saveable.cpp \
 
 
 

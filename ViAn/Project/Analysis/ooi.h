@@ -6,10 +6,10 @@
 #include <QObject>
 #include <vector>
 #include <map>
-#include "Filehandler/saveable.h"
+#include "Filehandler/json_item.h"
 #include "opencv2/core/core.hpp"
 
-class OOI : Saveable{
+class OOI : JsonItem{
     int frame;
     std::string file_path;
     std::pair<int, int> upper_left;

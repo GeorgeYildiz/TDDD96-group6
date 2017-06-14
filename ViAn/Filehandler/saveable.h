@@ -1,7 +1,8 @@
 #ifndef SAVABLE_H
 #define SAVABLE_H
-#include <QJsonObject>
-
+#include <vector>
+#include "json_item.h"
+#include "saveablenode.h"
 // QT
 #include <QJsonObject>
 #include <QFile>
@@ -15,21 +16,16 @@
  * as a json or binary in filehandler.
  */
 typedef int ID;
-
-class Saveable
-{
+class SaveableTree : JsonItem
+{    
+    std::map<std::string,std::vector<SaveableNode> > m_saveables; // Map of directories and corresponding saveables
 public:
-    enum SAVE_FORMAT {JSON, BINARY};    // Formats supported by save_project
-    static const SAVE_FORMAT DEFAULT_SAVE_FORMAT = JSON;
-    std::string save_name;
-public:
-    Saveable();
-    // Saveable methods
-    bool load_saveable(const std::string &full_path, const SAVE_FORMAT &save_format = DEFAULT_SAVE_FORMAT);
-    bool save_saveable(const std::string &file_name, const std::string &dir_path, const SAVE_FORMAT &save_format = DEFAULT_SAVE_FORMAT);
-    virtual ~Saveable();
-    virtual void read(const QJsonObject& json) = 0;
-    virtual void write(QJsonObject& json) = 0;
+    SaveableTree();
+    // Saveable methods    
+    bool save_tree();
+    bool load_tree(const std::string& full_path_trunk);
+    bool delete_tree();
+    virtual ~SaveableTree();
 };
 
 #endif // SAVABLE_H

@@ -5,9 +5,9 @@
 #include <sstream>
 #include <QJsonObject>
 #include <QString>
-#include "Filehandler/saveable.h"
+#include "Filehandler/json_item.h"
 typedef int ID;
-class Video : Saveable{
+class Video : JsonItem{
 
 public:
     Video();

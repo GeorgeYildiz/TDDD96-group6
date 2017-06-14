@@ -7,14 +7,14 @@
 #include <QFile>
 #include <string>
 #include <iostream>
-#include "Filehandler/saveable.h"
+#include "Filehandler/json_item.h"
 #include "video.h"
 /**
  * @brief The Bookmark class
  * Bookmark class is used for storing bookmarks, i.e. user
  * marked points in a video and an associated frame.
  */
-class Bookmark : Saveable{
+class Bookmark : JsonItem{
 public:
     Bookmark(int time, int frame_nbr, QImage frame, QString video_file_name, QString dir_path, QString string);
     Bookmark();
