@@ -7,6 +7,8 @@ class Report : public JsonItem{
 public:
     Report(std::string file_path);
     Report();
+
+    virtual Report* clone() const { return new Report(*this); }
     void read(const QJsonObject& json);
     void write(QJsonObject& json);
     std::string get_file_path() const;

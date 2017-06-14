@@ -15,6 +15,11 @@ SaveableNode::~SaveableNode()
 
 }
 
+void SaveableNode::add_child(JsonItem *item)
+{
+    m_json_children.push_back(item);
+}
+
 /**
  * @brief FileHandler::save_saveable
  * @param savable
@@ -34,11 +39,14 @@ bool SaveableNode::save_node(const SAVE_FORMAT& save_format){
         qWarning("Couldn't open save file.");
         return false;
     }
-    QJsonObject json_saveable;
-    for(JsonItem data : m_data) {
-        m_data->write(json_saveable);
+    QJsonObject document_data;
+    QJsonArray children;
+    for(JsonItem json_child : m_json_children){
+        json_child.write(child);
+        children.append(child);
     }
-    QJsonDocument save_doc(json_saveable);
+    document_data["children"] = children;
+    QJsonDocument save_doc(document_data);
     save_file.write(save_format == JSON
             ? save_doc.toJson()
             : save_doc.toBinaryData());
@@ -65,6 +73,14 @@ bool SaveableNode::load_node(const std::string& full_path, const SAVE_FORMAT& sa
     QJsonDocument load_doc(save_format == JSON
         ? QJsonDocument::fromJson(save_data)
         : QJsonDocument::fromBinaryData(save_data));
+    QJsonArray json_children = json["children"].toArray();
+    for (int i = 0; i < json_children.size(); ++i) {
+        QJsonObject json_child = json_children[i].toObject();
+        JsonItem* v = new JsonItem();
+        // How do we know type?
+        v->read(json_vid_proj);
+        this->add_video_project(v);
+    }
     this->read(load_doc.object());
     this->save_name = load_file.fileName().toStdString();
     return true;

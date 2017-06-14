@@ -7,12 +7,13 @@
 #include <QString>
 #include "Filehandler/json_item.h"
 typedef int ID;
-class Video : JsonItem{
+class Video : public JsonItem{
 
 public:
     Video();
     Video(std::string file_path);
-    std::string file_path;
+    virtual Video* clone() const { return new Video(*this); }
+    std::string file_path;       
     void read(const QJsonObject& json);
     void write(QJsonObject& json);
     friend bool operator==(Video v1, Video v2);

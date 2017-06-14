@@ -14,10 +14,12 @@
  * Bookmark class is used for storing bookmarks, i.e. user
  * marked points in a video and an associated frame.
  */
-class Bookmark : JsonItem{
+class Bookmark : public JsonItem{
 public:
     Bookmark(int time, int frame_nbr, QImage frame, QString video_file_name, QString dir_path, QString string);
     Bookmark();
+    virtual Bookmark* clone() const { return new Bookmark(*this); }
+
     int get_time();
     int get_frame_number();
     QImage get_frame();

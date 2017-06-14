@@ -9,10 +9,13 @@
 #include "Filehandler/json_item.h"
 #include "opencv2/core/core.hpp"
 #include "ooi.h"
-class POI : JsonItem{
+class POI : public JsonItem{
     std::map<int,std::vector<OOI>> OOIs;
 public:
     POI();
+
+    virtual POI* clone() const { return new POI(*this); }
+
     int start_frame = -1;
     int end_frame = -1;
     void read(const QJsonObject& json);

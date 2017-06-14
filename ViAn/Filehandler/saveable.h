@@ -16,9 +16,9 @@
  * as a json or binary in filehandler.
  */
 typedef int ID;
-class SaveableTree : JsonItem
+class SaveableTree
 {    
-    std::map<std::string,std::vector<SaveableNode> > m_saveables; // Map of directories and corresponding saveables
+    std::map<std::string,std::vector<SaveableNode> > m_map_saveables; // Map of directories and corresponding saveables
 public:
     SaveableTree();
     // Saveable methods    

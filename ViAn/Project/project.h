@@ -9,13 +9,13 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QDir>
-
 #include "Filehandler/filehandler.h"
 #include "videoproject.h"
 #include "video.h"
 #include "Filehandler/json_item.h"
 #include "Project/Analysis/analysis.h"
 #include "projectmanager.h"
+
 typedef int ID;
 class FileHandler;
 class ProjectManager;

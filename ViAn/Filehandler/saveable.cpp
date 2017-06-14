@@ -25,7 +25,7 @@ SaveableTree::~SaveableTree()
  */
 bool SaveableTree::delete_tree()
 {
-    for(auto it = m_saveables.begin(); it != m_saveables.end(); it++){
+    for(auto it = m_map_saveables.begin(); it != m_map_saveables.end(); it++){
         std::vector<SaveableNode> nodes = it->second;
         foreach (SaveableNode sav, nodes) {
             sav.delete_node();
@@ -38,7 +38,7 @@ bool SaveableTree::delete_tree()
 bool SaveableTree::save_tree()
 {
     save_nodes();
-    for(auto it = m_saveables.begin(); it != m_saveables.end(); it++){
+    for(auto it = m_map_saveables.begin(); it != m_map_saveables.end(); it++){
         std::vector<SaveableNode> nodes = it->second;        
         foreach (SaveableNode sav, nodes) {
             sav.save_();
@@ -68,7 +68,7 @@ bool SaveableTree::load_tree(const std::string &full_path_trunk)
 
 bool SaveableTree::load_nodes()
 {
-    for(auto it = m_saveables.begin(); it != m_saveables.end(); it++){
+    for(auto it = m_map_saveables.begin(); it != m_map_saveables.end(); it++){
         std::vector<SaveableNode> nodes = it->second;
         foreach (SaveableNode sav, nodes) {
             sav.load_node();

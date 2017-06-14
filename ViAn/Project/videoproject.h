@@ -18,7 +18,7 @@
  * Class for storing video and all its belonging components
  * such as analyses, drawings and documentation.
  */
-class VideoProject : JsonItem{
+class VideoProject : public JsonItem{
     std::map<ID,Bookmark*> bookmarks;
     std::map<ID,Analysis> analyses;
     Overlay* overlay = new Overlay();
@@ -33,8 +33,11 @@ public:
     ID add_analysis(Analysis &analysis);
     ID add_bookmark(Bookmark* bookmark);
     void delete_artifacts();
+
     VideoProject(Video* v); //Needs to have a video
     VideoProject();
+
+    virtual VideoProject* clone() const { return new VideoProject(*this); }
     Video* get_video();
     Overlay* get_overlay();
     std::map<ID,Bookmark*> get_bookmarks();
