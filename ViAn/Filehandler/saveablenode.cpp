@@ -1,6 +1,6 @@
 #include "saveablenode.h"
 
-SaveableNode::SaveableNode(const std::string& file_name, const std::string &dir_path)
+SaveableNode::SaveableNode(const std::string file_name, const std::string dir_path)
 {
     m_directory = dir_path;
     m_file_name = file_name;
@@ -29,11 +29,12 @@ void SaveableNode::add_child(JsonItem *item)
  */
 bool SaveableNode::save_node(const SAVE_FORMAT& save_format){
     QString dir_name = QString::fromStdString(m_directory);
+    QDir dir(dir_name);
     if (!dir.exists(dir_name))
         dir.mkpath(QString::fromStdString(m_directory));
     QFile save_file(save_format == JSON
-                    ? QString::fromStdString(dir_path + "/" + m_file_name + ".json")
-                    : QString::fromStdString(dir_path + "/" + m_file_name + ".dat"));
+                    ? QString::fromStdString(m_directory + "/" + m_file_name + ".json")
+                    : QString::fromStdString(m_directory + "/" + m_file_name + ".dat"));
 
     if(!save_file.open(QIODevice::WriteOnly)){
         qWarning("Couldn't open save file.");
@@ -41,16 +42,15 @@ bool SaveableNode::save_node(const SAVE_FORMAT& save_format){
     }
     QJsonObject document_data;
     QJsonArray children;
-    for(JsonItem json_child : m_json_children){
-        json_child.write(child);
-        children.append(child);
+    for(auto it = m_json_children.begin(); it != m_json_children.end(); it++){
+        (*it)->write(child);
     }
     document_data["children"] = children;
     QJsonDocument save_doc(document_data);
     save_file.write(save_format == JSON
             ? save_doc.toJson()
             : save_doc.toBinaryData());
-    this->save_name = save_file.fileName().toStdString();
+    m_file_name = save_file.fileName().toStdString();
     return true;
 }
 
@@ -76,13 +76,14 @@ bool SaveableNode::load_node(const std::string& full_path, const SAVE_FORMAT& sa
     QJsonArray json_children = json["children"].toArray();
     for (int i = 0; i < json_children.size(); ++i) {
         QJsonObject json_child = json_children[i].toObject();
-        JsonItem* v = new JsonItem();
+        JsonItem* v;
         // How do we know type?
         v->read(json_vid_proj);
         this->add_video_project(v);
     }
     this->read(load_doc.object());
-    this->save_name = load_file.fileName().toStdString();
+    // Set m_dir here
+    m_file_name = load_file.fileName().toStdString();
     return true;
 }
 
@@ -92,7 +93,7 @@ bool SaveableNode::load_node(const std::string& full_path, const SAVE_FORMAT& sa
  */
 bool SaveableNode::delete_node()
 {
-    QFile file(QString::fromStdString(this->save_name));
+    QFile file(QString::fromStdString(m_file_name));
     file.remove();
 }
 

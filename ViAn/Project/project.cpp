@@ -188,6 +188,15 @@ void Project::write(QJsonObject& json){
 }
 
 /**
+ * @brief add_child
+ * @param item
+ */
+void add_child(JsonItem* item){
+    changes_made = true;
+    SaveableNode::add_child(item);
+}
+
+/**
  * @brief Project::add_analysis
  * @param v_id id of video to add analysis to
  * @param analysis
@@ -226,9 +235,13 @@ void Project::save_project(){
     directory.mkpath(QString::fromStdString(this->dir));
     directory.mkpath(QString::fromStdString(this->dir_bookmarks));
     save_saveable(this->name, this->dir);
+    save_node(this->dir, this-dir+ "/" + this->name);
     this->changes_made = false;
 }
 
+void Project::load_project(const std::string& file_path){
+    save
+}
 
 /**
  * @brief Project::get_videos

@@ -24,7 +24,7 @@ class ProjectManager;
  * incomplete class, will be added on
  * along with parser functionality
  */
-class Project : SaveableTree{
+class Project : SaveableNode{
     ProjectManager* project_manager;
     bool changes_made = true;
     std::map<ID,VideoProject*> videos;
@@ -56,7 +56,7 @@ public:
     void add_analysis(Analysis an);
     bool is_saved();
     void save_project();
-    void load_project();
+    void load_project(string file_path);
     std::map<ID, VideoProject *>& get_videos();
     VideoProject* get_video(ID id);
     bool proj_equals(Project& other);

@@ -123,7 +123,7 @@ void ProjectManager::remove_video_from_project(ID proj_id, ID vid_id){
 Project* ProjectManager::load_project(std::string full_project_path){
 //   maybe handle this in project class? overriding savveable?
      Project* proj = new Project(this);
-     proj->load_saveable(full_project_path); // Decide format internally, here for flexibility
+     proj->load_project(full_project_path); // Decide format internally, here for flexibility
      proj->save_project();
      proj->id = add_project(proj);
      return proj;
