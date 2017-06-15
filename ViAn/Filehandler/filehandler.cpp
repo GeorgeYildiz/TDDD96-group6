@@ -38,7 +38,7 @@ FileHandler::~FileHandler(){
  */
 void FileHandler::save(){
     QDir dir;
-    this->save_saveable(std::string("state"), dir.absolutePath().toStdString());
+    //this->save_saveable(std::string("state"), dir.absolutePath().toStdString());
 }
 
 /**
@@ -48,7 +48,7 @@ void FileHandler::save(){
 void FileHandler::load(){
     QDir dir;
     dir.cd(".");
-    load_saveable(this->save_name);
+    //load_saveable(this->save_name);
 }
 
 /**

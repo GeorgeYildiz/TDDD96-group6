@@ -22,6 +22,7 @@ public:
     Analysis();
     ~Analysis();
     Analysis(const Analysis &obj);
+
     QString name;
     void set_name(QString name);
     void add_POI(POI POI);

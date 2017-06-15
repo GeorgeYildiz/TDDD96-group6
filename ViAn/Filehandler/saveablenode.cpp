@@ -15,9 +15,17 @@ SaveableNode::~SaveableNode()
 
 }
 
-void SaveableNode::add_child(JsonItem *item)
+ID SaveableNode::add_child(JsonItem *item)
 {
     m_json_children.push_back(item);
+    return m_json_children.size();
+}
+
+void SaveableNode::remove_child(ID id)
+{
+    JsonItem* child = m_json_children.at(id);
+    m_json_children.erase(m_json_children.begin()+id);
+    delete child;
 }
 
 /**
@@ -27,14 +35,13 @@ void SaveableNode::add_child(JsonItem *item)
  * @param save_format
  * @return Saves a file to provided directory
  */
-bool SaveableNode::save_node(const SAVE_FORMAT& save_format){
-    QString dir_name = QString::fromStdString(m_directory);
-    QDir dir(dir_name);
-    if (!dir.exists(dir_name))
-        dir.mkpath(QString::fromStdString(m_directory));
+bool SaveableNode::save_node(const std::string& file_name, const std::string& dir_path, const SAVE_FORMAT& save_format){
+    QDir dir(dir_path);
+    if (!dir.exists(dir_path))
+        dir.mkpath(QString::fromStdString(dir_path));
     QFile save_file(save_format == JSON
-                    ? QString::fromStdString(m_directory + "/" + m_file_name + ".json")
-                    : QString::fromStdString(m_directory + "/" + m_file_name + ".dat"));
+                    ? QString::fromStdString(dir_path + "/" + file_name + ".json")
+                    : QString::fromStdString(dir_path + "/" + file_name + ".dat"));
 
     if(!save_file.open(QIODevice::WriteOnly)){
         qWarning("Couldn't open save file.");
@@ -43,7 +50,10 @@ bool SaveableNode::save_node(const SAVE_FORMAT& save_format){
     QJsonObject document_data;
     QJsonArray children;
     for(auto it = m_json_children.begin(); it != m_json_children.end(); it++){
+        QJsonObject child;
         (*it)->write(child);
+        //factory.set( (it*)->get_type_info(), (*it) );
+        children.append(child);
     }
     document_data["children"] = children;
     QJsonDocument save_doc(document_data);
@@ -73,15 +83,17 @@ bool SaveableNode::load_node(const std::string& full_path, const SAVE_FORMAT& sa
     QJsonDocument load_doc(save_format == JSON
         ? QJsonDocument::fromJson(save_data)
         : QJsonDocument::fromBinaryData(save_data));
+    QJsonObject json = load_doc.object();
     QJsonArray json_children = json["children"].toArray();
     for (int i = 0; i < json_children.size(); ++i) {
         QJsonObject json_child = json_children[i].toObject();
-        JsonItem* v;
+        std::string type = json_child["typeid"].toString().toStdString();
+        TypeFactory f;
+        JsonItem* json_item = f.get(type);
         // How do we know type?
-        v->read(json_vid_proj);
-        this->add_video_project(v);
+        json_item->read(json_child);
+        add_child(json_item);
     }
-    this->read(load_doc.object());
     // Set m_dir here
     m_file_name = load_file.fileName().toStdString();
     return true;

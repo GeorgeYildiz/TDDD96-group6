@@ -13,6 +13,7 @@ public:
     Video();
     Video(std::string file_path);
     virtual Video* clone() const { return new Video(*this); }
+    virtual std::string get_type_info();
     std::string file_path;       
     void read(const QJsonObject& json);
     void write(QJsonObject& json);

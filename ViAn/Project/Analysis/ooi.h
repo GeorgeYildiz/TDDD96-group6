@@ -19,6 +19,7 @@ public:
     OOI(std::pair<int,int> upper_left, std::pair<int,int> lower_right);
     OOI(std::pair<int,int> upper_left, int height, int width);
     OOI(cv::Rect rect);
+    virtual std::string get_type_info();
     virtual OOI* clone() const { return new OOI(*this); }
     void read(const QJsonObject& json);
     void write(QJsonObject& json);

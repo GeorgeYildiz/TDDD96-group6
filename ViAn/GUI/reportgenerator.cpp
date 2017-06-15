@@ -46,7 +46,7 @@ void ReportGenerator::create_report() {
 
             //5. SAVE AND CLOSE FILE
             QString file_path = save_report(active_document);
-            this->proj->add_report(file_path.toStdString());
+            this->proj->add_child(new Report(file_path.toStdString()));
         }
         close_report(doc, word);
     }else{

@@ -23,7 +23,7 @@ public:
     SaveableTree();
     // Saveable methods    
     bool save_tree();
-    bool load_tree(const std::string& full_path_trunk);
+    bool load_tree(const std::string& full_path);
     bool load_nodes();
     bool delete_tree();
 

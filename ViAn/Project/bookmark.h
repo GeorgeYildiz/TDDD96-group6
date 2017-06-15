@@ -19,7 +19,7 @@ public:
     Bookmark(int time, int frame_nbr, QImage frame, QString video_file_name, QString dir_path, QString string);
     Bookmark();
     virtual Bookmark* clone() const { return new Bookmark(*this); }
-
+    virtual std::string get_type_info();
     int get_time();
     int get_frame_number();
     QImage get_frame();

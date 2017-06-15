@@ -19,6 +19,11 @@ VideoProject::VideoProject(){
     this->id = -1;
 }
 
+std::string VideoProject::get_type_info()
+{
+    return std::string("video_project");
+}
+
 /**
  * @brief VideoProject::get_video
  * @return video

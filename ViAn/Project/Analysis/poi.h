@@ -15,7 +15,7 @@ public:
     POI();
 
     virtual POI* clone() const { return new POI(*this); }
-
+    virtual std::string get_type_info();
     int start_frame = -1;
     int end_frame = -1;
     void read(const QJsonObject& json);

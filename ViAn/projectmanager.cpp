@@ -98,7 +98,7 @@ bool ProjectManager::delete_project(ID proj_id){
  */
 ID ProjectManager::add_video(Project* proj, std::string file_path){
     Video* v = new Video(file_path);
-    return proj->add_video(v); // video id set in proj->add_video
+    return proj->add_child(v); // video id set in proj->add_video
 }
 
 /**

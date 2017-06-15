@@ -36,7 +36,7 @@ public:
 
     VideoProject(Video* v); //Needs to have a video
     VideoProject();
-
+    virtual std::string get_type_info();
     virtual VideoProject* clone() const { return new VideoProject(*this); }
     Video* get_video();
     Overlay* get_overlay();
