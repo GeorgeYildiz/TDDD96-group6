@@ -5,15 +5,18 @@
 #include <sstream>
 #include <QJsonObject>
 #include <QString>
-#include "saveable.h"
+#include "Filehandler/jsonnode.h"
 typedef int ID;
-class Video : Saveable{
+class Video : public JsonNode{
 
 public:
     Video();
-    ID id;
     Video(std::string file_path);
-    std::string file_path;
+    virtual Video* clone() const { return new Video(*this); }
+    virtual std::string get_type_info();
+    std::string file_path;       
+
+
     void read(const QJsonObject& json);
     void write(QJsonObject& json);
     friend bool operator==(Video v1, Video v2);

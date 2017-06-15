@@ -8,35 +8,42 @@
 #include <QFile>
 #include "Video/overlay.h"
 #include "bookmark.h"
+#include "Filehandler/jsonnode.h"
 #include "video.h"
-#include "analysis.h"
-#include "report.h"
+#include "Project/Analysis/analysis.h"
+#include "Project/report.h"
 
 /**
  * @brief The VideoProject class
  * Class for storing video and all its belonging components
  * such as analyses, drawings and documentation.
  */
-class VideoProject{
+class VideoProject : public JsonNode{
     std::map<ID,Bookmark*> bookmarks;
     std::map<ID,Analysis> analyses;
     Overlay* overlay = new Overlay();
     Video* video = nullptr;
-    ID vid_id;
     ID id_bookmark = 0;
+    ID id_analysis = 0;
 
 public:
+    ID id;
     void read(const QJsonObject& json);
     void write(QJsonObject& json);
-    ID add_analysis(Analysis analysis);
+    ID add_analysis(Analysis &analysis);
     ID add_bookmark(Bookmark* bookmark);
-    void delete_artifacts();    
+    void delete_artifacts();
+
     VideoProject(Video* v); //Needs to have a video
     VideoProject();
+    virtual std::string get_type_info();
+    virtual VideoProject* clone() const;
     Video* get_video();
     Overlay* get_overlay();
     std::map<ID,Bookmark*> get_bookmarks();
     std::map<ID,Analysis> get_analyses();
+    Analysis get_analysis(ID id);
+    void remove_analysis(ID id);
 };
 
 

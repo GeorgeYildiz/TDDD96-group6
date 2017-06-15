@@ -14,7 +14,6 @@
 #include "Analysis/MotionDetection.h"
 #include "Analysis/AnalysisMethod.h"
 
-
 using namespace std;
 using namespace cv;
 
@@ -43,7 +42,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->video_frame->setScaledContents(false);
 
     ui->project_tree->setContextMenuPolicy(Qt::CustomContextMenu);
-    connect(ui->project_tree, &QTreeWidget::customContextMenuRequested, this, &MainWindow::prepare_menu);
+    connect(ui->project_tree, &QTreeWidget::customContextMenuRequested, this, &MainWindow::right_click_project_tree_menu);
 
     ui->document_list->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(ui->document_list, &QListWidget::customContextMenuRequested, this, &MainWindow::prepare_bookmark_menu);
@@ -62,6 +61,10 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // The video player is not in original size.
     original_size = false;
+
+    this->analysis_window = new AnalysisWindow(this, project_manager);
+    this->current_analysis = nullptr;
+    this->analysis_queue = new QQueue<MyQTreeWidgetItem*>();
 }
 
 
@@ -72,8 +75,8 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow() {
 
     delete icon_on_button_handler;
+    delete project_manager;
     delete file_handler;
-
     if (mvideo_player->is_paused())
         paused_wait.wakeOne();
 
@@ -83,6 +86,8 @@ MainWindow::~MainWindow() {
 
     delete ui;
     delete bookmark_view;
+
+    delete analysis_window;
 }
 
 /**
@@ -91,8 +96,8 @@ MainWindow::~MainWindow() {
  * @param ac AnalysisController for the current analysis
  */
 void MainWindow::setup_analysis(AnalysisController* ac){
-    QObject::connect(ac, SIGNAL(save_analysis(Analysis)),
-                     this, SLOT(save_analysis_to_file(Analysis)));
+    QObject::connect(ac, SIGNAL(analysis_done(Analysis)),
+                     this, SLOT(analysis_finished(Analysis)));
     QObject::connect(ac, SIGNAL(show_analysis_progress(int)),
                      this, SLOT(show_analysis_progress(int)));
     QObject::connect(this, SIGNAL(abort_analysis()),
@@ -104,10 +109,11 @@ void MainWindow::setup_analysis(AnalysisController* ac){
  * Sets up filehandler and loads projects.
  */
 void MainWindow::setup_file_handler(){
+    project_manager = new ProjectManager();
     file_handler = new FileHandler();
-    for(auto it = file_handler->open_projects.begin(); it != file_handler->open_projects.end(); it++){
+    for(auto it = project_manager->open_projects.begin(); it != project_manager->open_projects.end(); it++){
         ID id = *it;
-        Project* proj = file_handler->get_project(id);
+        Project* proj = project_manager->get_project(id);
         add_project_to_tree(proj);
     }
 }
@@ -150,10 +156,20 @@ void MainWindow::setup_video_player(video_player *mplayer) {
  * @param analysis
  * Slot for saving analysis to file.
  */
-void MainWindow::save_analysis_to_file(Analysis analysis) {
-    //TODO Add code.
-    std::cout << "Analysis done" << std::endl;
-    emit set_analysis_results(analysis);
+void MainWindow::analysis_finished(Analysis analysis) {
+    if(current_analysis != nullptr) {
+        QString text = "(done)";
+        text.append(current_analysis->name);
+        current_analysis->setText(0, text);
+        // Save analysis
+        ID p_id = ((MyQTreeWidgetItem*)current_analysis->parent()->parent())->id;
+        ID v_id = ((QTreeVideoItem*)current_analysis->parent())->id;
+        analysis.name = current_analysis->name;
+        //current_analysis->id = project_manager->get_project(p_id)->(v_id, analysis);
+        project_manager->save_project(p_id);
+    }
+    start_next_analysis();
+    analysis_window->remove_analysis_from_list(0); //remove the first in the listQ
 }
 
 /**
@@ -161,9 +177,17 @@ void MainWindow::save_analysis_to_file(Analysis analysis) {
  * @param progress current analysis progress in percent
  */
 void MainWindow::show_analysis_progress(int progress){
-    // Progress for the current analysis
-    // Add to gui from here
-    std::cout << "Progress: " << progress << std::endl;
+    if(current_analysis != nullptr) {
+        if(progress != current_analysis_progress) {
+            current_analysis_progress = progress;
+            QString text = "(";
+            text.append(QString::number(progress));
+            text.append("%) ");
+            text.append(current_analysis->name);
+            current_analysis->setText(0, text);
+            analysis_window->set_progress_bar(progress);
+        }
+    }
 }
 
 /**
@@ -414,10 +438,11 @@ void MainWindow::closeEvent (QCloseEvent *event) {
                                                                 QMessageBox::No | QMessageBox::Yes,
                                                                 QMessageBox::No);
 
-    if (res_btn != QMessageBox::Yes) {
-        event->ignore();
-    } else {
+    if (res_btn == QMessageBox::Yes) {
         event->accept();
+        analysis_window->close();
+    } else {
+       event->ignore();
     }
 }
 
@@ -442,17 +467,17 @@ void MainWindow::on_bookmark_button_clicked() {
     QImage frame = mvideo_player->get_current_frame_unscaled();
     QString video_file_name = QString::fromStdString(mvideo_player->get_file_name());
     // Add bookmarks-folder to the project-folder.
-    Project* proj = file_handler->get_project(((MyQTreeWidgetItem*)playing_video->parent())->id);
-    QDir dir = file_handler->get_dir(proj->dir_bookmarks);
+    Project* proj = project_manager->get_project(((MyQTreeWidgetItem*)playing_video->parent())->id);
+    QDir dir (QString::fromStdString(proj->m_dir_bookmarks));
     // Get bookmark description
     QString bookmark_text("");
     bool ok;
     bookmark_text = bookmark_view->get_input_text("", &ok);
     if(!ok) return;
     Bookmark* bookmark = new Bookmark(time, frame_number, frame, video_file_name, dir.absolutePath(), bookmark_text);
-    ID id = proj->add_bookmark(playing_video->id, bookmark);
-    bookmark_view->add_bookmark(playing_video->id, id, bookmark);
-    playing_video->bookmarks.push_back(id);
+//    ID id = proj->add_bookmark(playing_video->id, bookmark);
+//    bookmark_view->add_bookmark(playing_video->id, id, bookmark);
+//    playing_video->bookmarks.push_back(id);
     set_status_bar("Bookmark created.");
 }
 
@@ -460,7 +485,7 @@ void MainWindow::on_bookmark_button_clicked() {
  * @brief MainWindow::on_action_add_project_triggered
  */
 void MainWindow::on_action_add_project_triggered() {
-    MakeProject *make_project = new MakeProject(this, this->file_handler, this->file_handler->get_work_space().absolutePath().toStdString());
+    MakeProject *make_project = new MakeProject(this, this->project_manager, this->file_handler->get_work_space().absolutePath().toStdString());
     make_project->show();
     set_status_bar("Adding project");
 }
@@ -666,48 +691,80 @@ void MainWindow::on_action_zoom_out_triggered() {
 }
 
 /**
- * @brief MainWindow::prepare_menu
+ * @brief MainWindow::right_click_project_tree_menu
  * @param pos
  * Creates context menu on right-click in tree view
  */
-void MainWindow::prepare_menu(const QPoint & pos) {
+void MainWindow::right_click_project_tree_menu(const QPoint & pos) {
     QTreeWidget *tree = ui->project_tree;
     MyQTreeWidgetItem *item = (MyQTreeWidgetItem*)tree->itemAt( pos );
     QMenu menu(this);
 
-    QAction *create_project = new QAction(QIcon(""), tr("&Create project"), this);
-    QAction *load_project = new QAction(QIcon(""), tr("&Load project"), this);
-    create_project->setStatusTip(tr("Create project"));
-    load_project->setStatusTip(tr("Load project"));
-    menu.addAction(create_project);
-    menu.addAction(load_project);
-    connect(create_project, SIGNAL(triggered()), this, SLOT(on_action_add_project_triggered()));
-    connect(load_project, SIGNAL(triggered()), this, SLOT(on_action_load_triggered()));
     if(item != nullptr) {
         if(item->type == TYPE::PROJECT) {
-            QAction *add_video = new QAction(QIcon(""), tr("&Add video"), this);
-            QAction *delete_project = new QAction(QIcon(""), tr("&Delete project"), this);
+            //Rightclick on project to add video to it
+            QAction *add_video = new QAction(QIcon(""), tr("&Add video"), this); 
             add_video->setStatusTip(tr("Add video"));
-            delete_project->setStatusTip(tr("Delete project"));
             menu.addAction(add_video);
-            menu.addAction(delete_project);
             connect(add_video, SIGNAL(triggered()), this, SLOT(on_action_add_video_triggered()));
+            //Rightclick on project to delete it
+            QAction *delete_project = new QAction(QIcon(""), tr("&Delete project"), this);
+            delete_project->setStatusTip(tr("Delete project"));
+            menu.addAction(delete_project);
             connect(delete_project, SIGNAL(triggered()), this, SLOT(on_action_delete_triggered()));
+
         } else if(item->type == TYPE::VIDEO) {
+            //Rightclick on video to play it
             QAction *load_video = new QAction(QIcon(""), tr("&Play video"), this);
-            QAction *delete_video = new QAction(QIcon(""), tr("&Remove video"), this);
             load_video->setStatusTip(tr("Play video"));
-            delete_video->setStatusTip(tr("Remove video from project"));
             menu.addAction(load_video);
-            menu.addAction(delete_video);
             connect(load_video, SIGNAL(triggered()), this, SLOT(play_video()));
+            //Rightclick on video to remove it
+            QAction *delete_video = new QAction(QIcon(""), tr("&Remove video"), this);
+            delete_video->setStatusTip(tr("Remove video from project"));
+            menu.addAction(delete_video);
             connect(delete_video, SIGNAL(triggered()), this, SLOT(on_action_delete_triggered()));
+            //Rightclick on video to perform analysis on it
+            QAction *do_analysis = new QAction(QIcon(""), tr("&Perform analysis"), this);
+            do_analysis->setStatusTip(tr("Perform an analysis on video"));
+            menu.addAction(do_analysis);
+            connect(do_analysis, SIGNAL(triggered()), this, SLOT(on_action_perform_analysis_triggered()));
+            //Rightclick on video to clear all analysis areas
+            QAction *clear_analysis_overlay = new QAction(QIcon(""), tr("&Clear analysis overlay"), this);
+            clear_analysis_overlay->setStatusTip(tr("Clear the video from all analysis areas"));
+            menu.addAction(clear_analysis_overlay);
+            connect(clear_analysis_overlay, SIGNAL(triggered()), this, SLOT(on_action_clear_analysis_overlay_triggered()));
+        } else if(item->type == TYPE::ANALYSIS) {
+            //Rightclick on analysis to abort it
+            QAction *abort_analysis = new QAction(QIcon(""), tr("&Abort analysis"), this);
+            abort_analysis->setStatusTip(tr("Abort the analysis and remove it"));
+            menu.addAction(abort_analysis);
+            connect(abort_analysis, SIGNAL(triggered()), this, SLOT(on_action_delete_triggered()));
+            //Rightclick on analysis to set analysis area to video
+            QAction *set_analysis_area_to_video = new QAction(QIcon(""), tr("&Set analysis area"), this);
+            set_analysis_area_to_video->setStatusTip(tr("Set this analysis area on the video"));
+            menu.addAction(set_analysis_area_to_video);
+            connect(set_analysis_area_to_video, SIGNAL(triggered()), this, SLOT(on_action_set_analysis_area_to_video_triggered()));
+
         }
+        //Rightclick to close project
         QAction *close_project = new QAction(QIcon(""), tr("&Close project"), this);
         close_project->setStatusTip(tr("Close project"));
         menu.addAction(close_project);
         connect(close_project, SIGNAL(triggered()), this, SLOT(on_action_close_project_triggered()));
+
     }
+    //Rightclick anywhere to create project
+    QAction *create_project = new QAction(QIcon(""), tr("&Create project"), this);
+    create_project->setStatusTip(tr("Create project"));
+    menu.addAction(create_project);
+    connect(create_project, SIGNAL(triggered()), this, SLOT(on_action_add_project_triggered()));
+    //Rightclick anywhere to load project
+    QAction *load_project = new QAction(QIcon(""), tr("&Load project"), this);
+    load_project->setStatusTip(tr("Load project"));
+    menu.addAction(load_project);
+    connect(load_project, SIGNAL(triggered()), this, SLOT(on_action_load_triggered()));
+
     QPoint pt(pos);
     menu.exec( tree->mapToGlobal(pos) );
 }
@@ -742,13 +799,13 @@ void MainWindow::on_action_add_video_triggered() {
         project = ui->project_tree->selectedItems().first();
         MyQTreeWidgetItem *my_project = (MyQTreeWidgetItem*) project;
         if (my_project->type == TYPE::PROJECT){
-            Project *proj = this->file_handler->get_project(my_project->id);
-            std::string video_dir_path = this->file_handler->get_dir(proj->dir_videos).absolutePath().toStdString();
+            Project *proj = this->project_manager->get_project(my_project->id);
+            std::string video_dir_path = proj->m_dir_videos;
             QString q_video_file_path = QFileDialog::getOpenFileName(this, tr("Choose video"), video_dir_path.c_str(),
                                                        tr("Videos (*.avi *.mkv *.mov *.mp4 *.3gp *.flv *.webm *.ogv *.m4v)"));
             if(!q_video_file_path.isEmpty()) { // Check if you have selected something.
                 std::string video_file_path = q_video_file_path.toStdString();
-                ID id = file_handler->add_video(proj, video_file_path);
+                ID id = project_manager->add_video(proj, video_file_path);
                 add_video_to_tree(proj->get_videos().at(id));
                 set_status_bar("Video " + video_file_path + " added.");
             }
@@ -782,7 +839,7 @@ void MainWindow::play_video() {
 
     // Get the VideoProject containing info abuot the video to load.
     MyQTreeWidgetItem *proj_item = (MyQTreeWidgetItem*)get_project_from_object(my_video);
-    Project* proj = file_handler->get_project(proj_item->id);
+    Project* proj = project_manager->get_project(proj_item->id);
     VideoProject* video_proj = proj->get_video(my_video->id);
 
     mvideo_player->load_video(my_video->name.toStdString(), video_proj->get_overlay());
@@ -811,7 +868,7 @@ void MainWindow::on_action_save_triggered() {
     if(ui->project_tree->selectedItems().size() == 1) {
         item = ui->project_tree->selectedItems().first();
         my_project = (MyQTreeWidgetItem*)get_project_from_object(item);
-        this->file_handler->save_project(my_project->id);
+        this->project_manager->save_project(my_project->id);
         std::string text = "Saved project " + my_project->name.toStdString();
         set_status_bar(text);
     } else {
@@ -823,11 +880,11 @@ void MainWindow::on_action_save_triggered() {
  * @brief MainWindow::on_action_load_triggered
  */
 void MainWindow::on_action_load_triggered() {
-    QString dir = QFileDialog::getOpenFileName(this, tr("Choose project"),this->file_handler->get_work_space().absolutePath().toStdString().c_str(),tr("*.json"));
+    QString dir = QFileDialog::getOpenFileName(this, tr("Choose project"),this->file_handler->get_work_space().absolutePath().toStdString().c_str(),tr("*.json;*.dat"));
     if(!dir.isEmpty()) { // Check if you have selected something.
-        Project* load_proj= this->file_handler->load_project(dir.toStdString());
+        Project* load_proj= this->project_manager->load_project(dir.toStdString());
         add_project_to_tree(load_proj);
-        set_status_bar("Project " + load_proj->name + " loaded.");
+        set_status_bar("Project " + load_proj->m_name + " loaded.");
     }
 }
 
@@ -837,13 +894,13 @@ void MainWindow::on_action_load_triggered() {
  * also adds all videos of the project to the tree
  */
 void MainWindow::add_project_to_tree(Project* proj) {
-    MyQTreeWidgetItem *project_in_tree = new MyQTreeWidgetItem(TYPE::PROJECT, QString::fromStdString(proj->name), proj->id);
-    project_in_tree->setText(0, QString::fromStdString(proj->name));
+    MyQTreeWidgetItem *project_in_tree = new MyQTreeWidgetItem(TYPE::PROJECT, QString::fromStdString(proj->m_name), proj->m_id);
+    project_in_tree->setText(0, QString::fromStdString(proj->m_name));
     ui->project_tree->addTopLevelItem(project_in_tree);
     ui->project_tree->clearSelection();
     project_in_tree->setSelected(true);
     for(auto vid = proj->get_videos().begin(); vid != proj->get_videos().end(); ++vid){
-        VideoProject* video = vid->second;
+        VideoProject* video = *vid;
         add_video_to_tree(video);
     }
 }
@@ -855,7 +912,7 @@ void MainWindow::add_project_to_tree(Project* proj) {
 void MainWindow::add_video_to_tree(VideoProject* video) {
     QTreeWidgetItem *project;
     project = ui->project_tree->selectedItems().first();
-    QTreeVideoItem *video_in_tree = new QTreeVideoItem(TYPE::VIDEO, QString::fromStdString(video->get_video()->file_path), video->get_video()->id);
+    QTreeVideoItem *video_in_tree = new QTreeVideoItem(TYPE::VIDEO, QString::fromStdString(video->get_video()->file_path), video->id);
     video_in_tree->set_text_from_filepath(video->get_video()->file_path);
     project->addChild(video_in_tree);
     project->setExpanded(true);
@@ -866,6 +923,57 @@ void MainWindow::add_video_to_tree(VideoProject* video) {
         ID id = it2->first;
         bookmark_view->add_bookmark(video_in_tree->id, id,bm);
     }
+    // Add Analyses
+    std::map<ID,Analysis> analyses = video->get_analyses();
+    for(auto it2 = analyses.begin(); it2 != analyses.end(); it2++){
+        Analysis analysis = it2->second;
+        ID id = it2->first;
+        MyQTreeWidgetItem* analysis_in_tree = new MyQTreeWidgetItem(ANALYSIS, analysis.name, id);
+        add_analysis_to_tree(analysis_in_tree, video_in_tree);
+    }
+}
+
+/**
+ * @brief MainWindow::add_analysis_to_tree
+ * @param analysis_in_tree to add
+ * @param video_in_tree adding to
+ */
+void MainWindow::add_analysis_to_tree(MyQTreeWidgetItem *analysis_in_tree, MyQTreeWidgetItem *video_in_tree) {
+    analysis_in_tree->set_text(analysis_in_tree->name);
+    video_in_tree->addChild(analysis_in_tree);
+    video_in_tree->setExpanded(true);
+}
+
+/**
+ * @brief MainWindow::add_analysis_to_queue
+ * @param type
+ * @param name
+ * @param video_in_tree
+ */
+void MainWindow::add_analysis_to_queue(ANALYSIS_TYPE type, QString name, MyQTreeWidgetItem *video_in_tree, bool use_analysis_area){
+    MyQTreeWidgetItem *analysis_in_tree;
+    analysis_in_tree = new MyQTreeWidgetItem(TYPE::ANALYSIS, name);
+    if(current_analysis == nullptr) {
+        if(use_analysis_area)
+        m_acontroller = new AnalysisController(video_in_tree->name.toStdString(),
+                                               type, *mvideo_player->get_analysis_area_polygon(),
+                                               ui->action_invert_analysis_area->isChecked());
+        else m_acontroller = new AnalysisController(video_in_tree->name.toStdString(), type);
+        m_acontroller->start();
+        setup_analysis(m_acontroller);
+        current_analysis = analysis_in_tree;
+        current_analysis_progress = -1;
+    } else {
+        AnalysisController *analysis_controller;
+        if(use_analysis_area)
+        analysis_controller = new AnalysisController(video_in_tree->name.toStdString(),
+                                               type, *mvideo_player->get_analysis_area_polygon(),
+                                               ui->action_invert_analysis_area->isChecked());
+        else analysis_controller = new AnalysisController(video_in_tree->name.toStdString(), type);
+        analysis_queue->enqueue(analysis_in_tree);
+        analysis_queue_map[analysis_in_tree] = analysis_controller;
+    }
+    add_analysis_to_tree(analysis_in_tree, video_in_tree);
 }
 
 /**
@@ -874,10 +982,11 @@ void MainWindow::add_video_to_tree(VideoProject* video) {
  * filehandler workspace accordingly.
  */
 void MainWindow::on_action_choose_workspace_triggered() {
-    QString dir = QFileDialog::getExistingDirectory(this, tr("Choose Workspace"),this->file_handler->get_work_space().absolutePath().toStdString().c_str());
+    const std::string workspace = this->file_handler->get_work_space().absolutePath().toStdString();
+    QString dir = QFileDialog::getExistingDirectory(this, tr("Choose Workspace"), workspace.c_str());
     if (!dir.isEmpty()) {
         this->file_handler->set_work_space(dir.toStdString() + "/");
-        set_status_bar("New wokspace set to " + this->file_handler->work_space);
+        set_status_bar("New wokspace set to " + workspace);
     }
 }
 
@@ -901,11 +1010,21 @@ void MainWindow::on_action_delete_triggered() {
             if (my_item->type == TYPE::VIDEO) {
                 my_project = (MyQTreeWidgetItem*) get_project_from_object(item);
                 QTreeVideoItem* video_item = (QTreeVideoItem*)my_item;
-                remove_bookmark_of_video(video_item);
-            this->file_handler->remove_video_from_project(my_project->id, my_item->id); // Remove video from project
+                remove_analysis_of_video(my_item);
+                remove_bookmarks_of_video(video_item);
+                this->project_manager->remove_video_from_project(my_project->id, my_item->id); // Remove video from project
             } else if (my_item->type == TYPE::PROJECT) {
+                remove_analysis_of_project(my_item);
                 remove_bookmarks_of_project(my_item);
-                this->file_handler->delete_project(my_item->id);
+                this->project_manager->delete_project(my_item->id);
+            } else if (my_item->type == TYPE::ANALYSIS) {
+                if(analysis_queue->contains(my_item))
+                    remove_analysis_from_queue(my_item);
+                else if(my_item == current_analysis)
+                    abort_current_analysis();
+                else {
+                    remove_analysis_from_file_handler(my_item);
+                }
             }
             remove_item_from_tree(my_item);
             set_status_bar("Remove item");
@@ -923,7 +1042,7 @@ void MainWindow::on_action_delete_triggered() {
 void MainWindow::remove_bookmarks_of_project(MyQTreeWidgetItem* project_item) {
     for(int i = 0; i < project_item->childCount(); i++) {
         QTreeVideoItem* video_item = (QTreeVideoItem*)project_item->child(i);
-        remove_bookmark_of_video(video_item);
+        remove_bookmarks_of_video(video_item);
     }
 }
 
@@ -932,10 +1051,50 @@ void MainWindow::remove_bookmarks_of_project(MyQTreeWidgetItem* project_item) {
  * removes the bookmarks in the bookmark_view
  * @param video_item to remove bookmarks from
  */
-void MainWindow::remove_bookmark_of_video(QTreeVideoItem* video_item) {
+void MainWindow::remove_bookmarks_of_video(QTreeVideoItem* video_item) {
     for(auto it = video_item->bookmarks.begin(); it != video_item->bookmarks.end(); it++){
         bookmark_view->remove_bookmark(video_item->id, *it);
     }
+}
+
+/**
+ * @brief MainWindow::remove_analysis_of_project
+ * removes the analyses from the queue
+ * @param project_item
+ */
+void MainWindow::remove_analysis_of_project(MyQTreeWidgetItem* project_item) {
+    for(int i = 0; i < project_item->childCount(); i++) {
+        QTreeWidgetItem* video_item = project_item->child(i);
+        remove_analysis_of_video(video_item);
+    }
+}
+
+/**
+ * @brief MainWindow::remove_analysis_of_video
+ * removes the analyses from the queue
+ * @param video_item
+ */
+void MainWindow::remove_analysis_of_video(QTreeWidgetItem* video_item) {
+    for(int i = 0; i < video_item->childCount(); i++) {
+        MyQTreeWidgetItem *analysis_in_tree = (MyQTreeWidgetItem*)video_item->child(i);
+        if (!remove_analysis_from_queue(analysis_in_tree)){ //removes analysis from queue, else enters if-statement
+            if(current_analysis == analysis_in_tree) {
+                abort_current_analysis();
+            } else {
+                remove_analysis_from_file_handler(analysis_in_tree);
+            }
+        }
+    }
+}
+
+/**
+ * @brief MainWindow::remove_analysis_from_file_handler
+ * @param analysis_in_tree to be removed
+ */
+void MainWindow::remove_analysis_from_file_handler(MyQTreeWidgetItem *analysis_in_tree) {
+    ID project_id = ((MyQTreeWidgetItem*) analysis_in_tree->parent()->parent())->id;
+    ID video_id = ((MyQTreeWidgetItem*) analysis_in_tree->parent())->id;
+    project_manager->get_project(project_id)->get_video(video_id)->remove_analysis(analysis_in_tree->id);
 }
 
 /**
@@ -944,6 +1103,48 @@ void MainWindow::remove_bookmark_of_video(QTreeVideoItem* video_item) {
  */
 void MainWindow::remove_item_from_tree(MyQTreeWidgetItem *my_item) {
     delete my_item;
+}
+
+/**
+ * @brief MainWindow::remove_analysis_from_queue
+ * @param my_item to be removed
+ * Removes the item from the queue.
+ */
+bool MainWindow::remove_analysis_from_queue(MyQTreeWidgetItem *my_item) {
+    int index = analysis_queue->indexOf(my_item);
+    if(index >= 0) {
+        analysis_queue->removeAt(index);
+        delete analysis_queue_map[my_item];
+        analysis_queue_map.erase(my_item);
+        analysis_window->remove_analysis_from_list(index+1); // + 1 because of current_analysis has index 0 in analysis_window
+        return true;
+    } else return false;
+}
+
+/**
+ * @brief MainWindow::abort_current_analysis
+ * aborts the thread that the analysis is on
+ */
+void MainWindow::abort_current_analysis() {
+    emit abort_analysis();
+    current_analysis = nullptr;
+}
+
+/**
+ * @brief MainWindow::start_next_analysis
+ * starts the next analysis in the queue
+ */
+void MainWindow::start_next_analysis() {
+    if(analysis_queue->isEmpty()) current_analysis = nullptr;
+    else{
+        current_analysis = analysis_queue->dequeue();
+        m_acontroller = analysis_queue_map[current_analysis];
+        m_acontroller->start();
+        setup_analysis(m_acontroller);
+        current_analysis_progress = -1;
+        analysis_queue_map.erase(current_analysis);
+    }
+    analysis_window->set_progress_bar(0);
 }
 
 /**
@@ -1162,6 +1363,25 @@ void MainWindow::on_action_invert_analysis_area_triggered() {
 }
 
 /**
+ * @brief MainWindow::on_action_do_analysis_triggered
+ */
+void MainWindow::on_action_perform_analysis_triggered() {
+    QTreeWidgetItem *video;
+    if(ui->project_tree->selectedItems().size() == 1) {
+        video = ui->project_tree->selectedItems().first();
+        MyQTreeWidgetItem *my_video = (MyQTreeWidgetItem*) video;
+        if (my_video->type == TYPE::VIDEO){
+            analysis_window->set_current_video(my_video);
+            if(analysis_window->isHidden()) analysis_window->show();
+            else analysis_window->activateWindow();
+        } else {
+            set_status_bar("No video selected.");
+        }
+    } else {
+        set_status_bar("Multiple or no projects selected.");
+    }
+}
+/**
  * @brief MainWindow::on_action_create_report_triggered
  * Invoked when the Create report button is clicked.
  * This will create a new document in Word.
@@ -1173,9 +1393,9 @@ void MainWindow::on_action_create_report_triggered() {
         // Get current project.
         item = ui->project_tree->selectedItems().first();
         my_project = (MyQTreeWidgetItem*)get_project_from_object(item);
-        Project* proj = file_handler->get_project(my_project->id);
+        Project* proj = project_manager->get_project(my_project->id);
         if(proj->is_saved()){
-            ReportGenerator report_generator = ReportGenerator(proj, file_handler);
+            ReportGenerator report_generator = ReportGenerator(proj);
             report_generator.create_report();
         } else {
           QMessageBox::question(this, "Project Modified", tr("Please save project before you can export a report.\n"),
@@ -1186,7 +1406,8 @@ void MainWindow::on_action_create_report_triggered() {
     }
 }
 
-/** @brief MainWindow::on_action_close_project_triggered
+/**
+ * @brief MainWindow::on_action_close_project_triggered
  *  Remove project from the tree without deleting.
  */
 void MainWindow::on_action_close_project_triggered() {
@@ -1196,8 +1417,9 @@ void MainWindow::on_action_close_project_triggered() {
         item = ui->project_tree->selectedItems().first();
         my_project = (MyQTreeWidgetItem*) get_project_from_object(item);
         set_status_bar("Closed " + my_project->name.toStdString());
-        file_handler->close_project(my_project->id);
+        project_manager->close_project(my_project->id);
         remove_bookmarks_of_project(my_project);
+        remove_analysis_of_project(my_project);
         remove_item_from_tree(my_project);
     } else {
         set_status_bar("Multiple or nothing selected.");
@@ -1246,6 +1468,32 @@ void MainWindow::on_next_POI_button_clicked() {
 }
 
 /**
+ * @brief MainWindow::on_action_clear_analysis_overlay_triggered
+ */
+void MainWindow::on_action_clear_analysis_overlay_triggered() {
+    mvideo_player->clear_analysis_overlay();
+}
+
+/**
+ * @brief MainWindow::on_action_set_analysis_area_to_video_triggered
+ */
+void MainWindow::on_action_set_analysis_area_to_video_triggered()
+{
+    MyQTreeWidgetItem *analysis_in_tree;
+    if(ui->project_tree->selectedItems().size() == 1) {
+        analysis_in_tree =(MyQTreeWidgetItem*)ui->project_tree->selectedItems().first();
+        if (analysis_in_tree->type == TYPE::ANALYSIS) {
+            QTreeVideoItem *video_in_tree = (QTreeVideoItem*)analysis_in_tree->parent();
+            if(video_in_tree == playing_video) {
+                ID p_id = ((MyQTreeWidgetItem*)video_in_tree->parent())->id;
+                Analysis analysis = project_manager->get_project(p_id)->get_video(video_in_tree->id)->get_analysis(analysis_in_tree->id);
+                emit set_analysis_results(analysis);
+            }
+        }
+    }
+}
+
+/*
  * @brief MainWindow::on_action_change_bookmark_triggered
  * Lets the user change the bookmark description.
  */

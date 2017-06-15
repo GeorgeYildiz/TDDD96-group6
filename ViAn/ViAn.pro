@@ -16,7 +16,12 @@ TEMPLATE = app
 #
 # GENERAL
 #
-SOURCES += main.cpp
+SOURCES += main.cpp \
+    projectmanager.cpp \
+    Filehandler/saveablenode.cpp \
+    Filehandler/saveable.cpp \
+    Filehandler/jsonnode.cpp
+
 
 #
 # TEST
@@ -30,7 +35,10 @@ HEADERS += Test/test_video_player.h \
     Test/filehandlertest.h \
     Test/test_mainwindow.h \
     Test/test_report_generator.h \
-    Test/overlayintegrationtest.h
+    Test/overlayintegrationtest.h \
+    projectmanager.h \
+    Filehandler/saveablenode.h \
+    Filehandler/jsonnode.h
 
 #
 # LIBRARY
@@ -48,8 +56,8 @@ SOURCES += GUI/mainwindow.cpp \
     GUI/bookmarkitem.cpp \
     GUI/reportgenerator.cpp \
     GUI/makeproject.cpp \
-    GUI/fpsdialog.cpp
-
+    GUI/fpsdialog.cpp \
+    GUI/analysiswindow.cpp \
 
 
 HEADERS  += GUI/mainwindow.h \
@@ -58,12 +66,14 @@ HEADERS  += GUI/mainwindow.h \
     GUI/qtreeitems.h \
     GUI/reportgenerator.h \
     GUI/bookmarkview.h \
-    GUI/bookmarkitem.h \
     GUI/makeproject.h \
-    GUI/fpsdialog.h
+    GUI/bookmarkitem.h \
+    GUI/fpsdialog.h \
+    GUI/analysiswindow.h \
 
 FORMS    += GUI/mainwindow.ui \
-    GUI/makeproject.ui
+    GUI/makeproject.ui \
+    GUI/analysiswindow.ui
 
 RESOURCES += resources.qrc
 #
@@ -95,6 +105,7 @@ HEADERS += Video/video_player.h \
     Video/shapes/text.h \
     Video/shapes/zoomrectangle.h \
     Video/shapes/analysarea.h
+
 win32 {
     INCLUDEPATH += C:\opencv\release\install\include
     LIBS += C:\opencv\release\bin\libopencv_core320.dll
@@ -119,46 +130,42 @@ unix {
 # START: FILEHANDLER
 #
 SOURCES += Filehandler/filehandler.cpp \
-    Filehandler/project.cpp \
-    Filehandler/video.cpp \
-    Filehandler/videoproject.cpp \
-    Filehandler/bookmark.cpp \
-    Filehandler/saveable.cpp \
-    Filehandler/analysis.cpp \
-    Filehandler/report.cpp
+
+
 
 HEADERS  += Filehandler/filehandler.h \
-    Filehandler/project.h \
-    Filehandler/dir.h \
-    Filehandler/video.h \
-    Filehandler/videoproject.h \
-    Filehandler/bookmark.h  \
     Filehandler/saveable.h \
-    Filehandler/analysis.h \
-    Filehandler/report.h
 
-win32{
 
-    SOURCES += Filehandler/stringhelper.cpp\
-      Filehandler/win32dir.cpp
-
-    HEADERS += Filehandler/stringhelper.h
-}
-
-macx {
-    SOURCES += Filehandler/macdir.cpp
-}
-
-linux {
-    #SOURCES += Filehandler/linuxdir.cpp
-}
-unix {
-    SOURCES += Filehandler/linuxdir.cpp
-}
 
 #
 # END: FILEHANDLER
 #
+
+#
+# Project
+#
+SOURCES += Project/report.cpp \
+    Project/project.cpp \
+    Project/video.cpp \
+    Project/videoproject.cpp \
+    Project/bookmark.cpp \
+    Project/Analysis/analysis.cpp \
+    Project/Analysis/ooi.cpp \
+    Project/Analysis/poi.cpp
+
+
+HEADERS += Project/project.h \
+    Project/video.h \
+    Project/videoproject.h \
+    Project/bookmark.h  \
+    Project/report.h \
+    Project/Analysis/analysis.h \
+    Project/Analysis/ooi.h \
+    Project/Analysis/poi.h
+
+
+
 
 #
 # ANALYSIS

@@ -1,21 +1,32 @@
 #ifndef SAVABLE_H
 #define SAVABLE_H
+#include <vector>
+#include "saveablenode.h"
+// QT
 #include <QJsonObject>
+#include <QFile>
+#include <QDir>
+#include <QTextStream>
+#include <QJsonDocument>
 /**
  * @brief The Saveable class
  * The saveable class is an abstract class
  * used to guarantee an objects ability to be saved
  * as a json or binary in filehandler.
  */
-class Saveable
-{
+typedef int ID;
+class SaveableTree
+{    
+    std::map<std::string,std::vector<SaveableNode> > m_map_saveables; // Map of directories and corresponding saveables
 public:
-    std::string save_name;
-    Saveable();
-    virtual ~Saveable();
-    virtual void read(const QJsonObject& json) = 0;
-    virtual void write(QJsonObject& json) = 0;
+    SaveableTree();
+    // Saveable methods    
+    bool save_tree();
+    bool load_tree(const std::string& full_path);
+    bool load_nodes();
+    bool delete_tree();
 
+    virtual ~SaveableTree();
 };
 
 #endif // SAVABLE_H
