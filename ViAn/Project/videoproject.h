@@ -8,7 +8,7 @@
 #include <QFile>
 #include "Video/overlay.h"
 #include "bookmark.h"
-#include "Filehandler/json_item.h"
+#include "Filehandler/jsonnode.h"
 #include "video.h"
 #include "Project/Analysis/analysis.h"
 #include "Project/report.h"
@@ -18,7 +18,7 @@
  * Class for storing video and all its belonging components
  * such as analyses, drawings and documentation.
  */
-class VideoProject : public JsonItem{
+class VideoProject : public JsonNode{
     std::map<ID,Bookmark*> bookmarks;
     std::map<ID,Analysis> analyses;
     Overlay* overlay = new Overlay();
@@ -37,7 +37,7 @@ public:
     VideoProject(Video* v); //Needs to have a video
     VideoProject();
     virtual std::string get_type_info();
-    virtual VideoProject* clone() const { return new VideoProject(*this); }
+    virtual VideoProject* clone() const;
     Video* get_video();
     Overlay* get_overlay();
     std::map<ID,Bookmark*> get_bookmarks();

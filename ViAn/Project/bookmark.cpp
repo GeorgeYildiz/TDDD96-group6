@@ -33,6 +33,11 @@ Bookmark::Bookmark() {
     description = QString();
 }
 
+std::string Bookmark::get_type_info()
+{
+
+}
+
 /**
  * @brief Bookmark::get_time
  * @return Returns the time in the video where the bookmark points to (in millisecs).

@@ -5,6 +5,11 @@
  */
 POI::POI(){}
 
+std::string POI::get_type_info()
+{
+
+}
+
 /**
  * @brief POI::add_detections
  * Adds OOIs for a specific frame in a POI.

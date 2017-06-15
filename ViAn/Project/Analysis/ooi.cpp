@@ -36,6 +36,11 @@ OOI::OOI(cv::Rect rect) {
     lower_right = std::make_pair(rect.x + rect.width, rect.y + rect.height);
 }
 
+std::string OOI::get_type_info()
+{
+
+}
+
 /**
  * @brief OOI::read
  * Reads OOI from json format.

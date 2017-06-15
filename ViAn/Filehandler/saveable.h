@@ -1,7 +1,6 @@
 #ifndef SAVABLE_H
 #define SAVABLE_H
 #include <vector>
-#include "json_item.h"
 #include "saveablenode.h"
 // QT
 #include <QJsonObject>

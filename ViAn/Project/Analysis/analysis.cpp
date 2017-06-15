@@ -17,6 +17,12 @@ Analysis::Analysis(const Analysis &obj) {
     name = obj.name;
 }
 
+std::string Analysis::get_type_info()
+{
+
+}
+
+
 /**
  * @brief Analysis::set_name
  * @param QString name

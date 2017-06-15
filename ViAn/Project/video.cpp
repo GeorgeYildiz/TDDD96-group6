@@ -15,6 +15,11 @@ Video::Video(std::string file_path){
     this->file_path = file_path;
 }
 
+std::string Video::get_type_info()
+{
+
+}
+
 /**
  * @brief operator ==
  * @param v1

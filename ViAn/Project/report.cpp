@@ -14,6 +14,11 @@ Report::Report(std::string file_path){
 Report::Report(){
 }
 
+std::string Report::get_type_info()
+{
+
+}
+
 /**
  * @brief Report::read
  * @param json

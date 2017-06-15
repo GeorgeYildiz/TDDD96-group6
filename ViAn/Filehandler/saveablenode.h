@@ -2,6 +2,7 @@
 #define SAVEABLENODE_H
 
 // QT
+#include <iostream>
 #include <QJsonObject>
 #include <QFile>
 #include <QDir>
@@ -9,29 +10,35 @@
 #include <QJsonDocument>
 #include <QJsonArray>
 // Vian
-#include "json_item.h"
+#include "jsonnode.h"
 
 typedef int ID;
-class SaveableNode
+
+
+class TypeFactory
+{
+    std::map<std::string, JsonNode*> m_type_map;
+public:
+    TypeFactory();
+    JsonNode *get(const std::string & id) const;
+    void set(const std::string & id, JsonNode* item);
+};
+
+class SaveableNode : public JsonNode
 {
     TypeFactory factory;
 protected:
     std::string m_directory = "";
     std::string m_file_name = "";
-    std::vector<JsonItem*> m_json_children;
-
 public:
     enum SAVE_FORMAT {JSON, BINARY};    // Formats supported by save_project
-    static const SAVE_FORMAT DEFAULT_SAVE_FORMAT = JSON;
 
 public:        
     SaveableNode();
     virtual ~SaveableNode();
-    ID add_child(JsonItem* item);
-    void remove_child(ID id);
 
-    bool load_node(const std::string &full_path, const SAVE_FORMAT &save_format = DEFAULT_SAVE_FORMAT);
-    bool save_node(const std::string& file_name, const std::string& dir_path, const SAVE_FORMAT& save_format = DEFAULT_SAVE_FORMAT);
+    bool load_node(const std::string &full_path, const SAVE_FORMAT &save_format = JSON);
+    bool save_node(const std::string& file_name, const std::string& dir_path, const SAVE_FORMAT& save_format = JSON);
     bool delete_node();
 };
 

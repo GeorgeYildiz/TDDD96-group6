@@ -110,30 +110,30 @@ void VideoProject::read(const QJsonObject& json){
  * Write videoproject parameters to json object.
  */
 void VideoProject::write(QJsonObject& json){
-    this->video->write(json);
-    QJsonArray json_bookmarks;
-    // Needs to delete bookmarks before exporting the new ones.
-    delete_artifacts();
-    for(auto it = bookmarks.begin(); it != bookmarks.end(); it++){
-        QJsonObject json_bookmark;
-        Bookmark* temp = it->second;
-        temp->write(json_bookmark);
-        json_bookmarks.append(json_bookmark);
-    }
-    json["bookmarks"] = json_bookmarks;
-    // Write analyses to json
-    QJsonArray json_analyses;
-    for(auto it2 = analyses.begin(); it2 != analyses.end(); it2++){
-        QJsonObject json_analysis;
-        Analysis an = it2->second;
-        an.write(json_analysis);
-        json_analyses.append(json_analysis);
-    }
-    json["analyses"] = json_analyses;
+      this->video->write(json);
+//    QJsonArray json_bookmarks;
+//    // Needs to delete bookmarks before exporting the new ones.
+//    delete_artifacts();
+//    for(auto it = bookmarks.begin(); it != bookmarks.end(); it++){
+//        QJsonObject json_bookmark;
+//        Bookmark* temp = it->second;
+//        temp->write(json_bookmark);
+//        json_bookmarks.append(json_bookmark);
+//    }
+//    json["bookmarks"] = json_bookmarks;
+//    // Write analyses to json
+//    QJsonArray json_analyses;
+//    for(auto it2 = analyses.begin(); it2 != analyses.end(); it2++){
+//        QJsonObject json_analysis;
+//        Analysis an = it2->second;
+//        an.write(json_analysis);
+//        json_analyses.append(json_analysis);
+//    }
+//    json["analyses"] = json_analyses;
 
-    QJsonObject json_overlay;
-    this->overlay->write(json_overlay);
-    json["overlay"] = json_overlay;
+//    QJsonObject json_overlay;
+//    this->overlay->write(json_overlay);
+//    json["overlay"] = json_overlay;
 }
 
 /**
@@ -143,6 +143,7 @@ void VideoProject::write(QJsonObject& json){
  */
 ID VideoProject::add_bookmark(Bookmark *bookmark){
     this->bookmarks.insert(std::make_pair(id_bookmark, bookmark));
+    add_child(bookmark);
     return id_bookmark++;
 }
 
@@ -154,6 +155,7 @@ ID VideoProject::add_bookmark(Bookmark *bookmark){
  */
 ID VideoProject::add_analysis(Analysis& analysis){
     this->analyses.insert(std::make_pair(this->id_analysis, analysis));
+    add_child(&analysis);
     return this->id_analysis++;
 }
 

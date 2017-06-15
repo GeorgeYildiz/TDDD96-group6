@@ -5,9 +5,9 @@
 #include <sstream>
 #include <QJsonObject>
 #include <QString>
-#include "Filehandler/json_item.h"
+#include "Filehandler/jsonnode.h"
 typedef int ID;
-class Video : public JsonItem{
+class Video : public JsonNode{
 
 public:
     Video();
@@ -15,6 +15,8 @@ public:
     virtual Video* clone() const { return new Video(*this); }
     virtual std::string get_type_info();
     std::string file_path;       
+
+
     void read(const QJsonObject& json);
     void write(QJsonObject& json);
     friend bool operator==(Video v1, Video v2);

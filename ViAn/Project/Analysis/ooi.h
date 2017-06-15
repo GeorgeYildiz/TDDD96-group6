@@ -6,10 +6,10 @@
 #include <QObject>
 #include <vector>
 #include <map>
-#include "Filehandler/json_item.h"
+#include "Filehandler/jsonnode.h"
 #include "opencv2/core/core.hpp"
 
-class OOI : public JsonItem{
+class OOI : public JsonNode{
     int frame;
     std::string file_path;
     std::pair<int, int> upper_left;

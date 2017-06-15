@@ -52,12 +52,12 @@ Project* ProjectManager::create_project(const std::string& proj_name,
                                         const std::string& vid_path)
 {
     Project* proj =  new Project(this, this->project_id, proj_name);
-    proj->dir = dir_path +"/"+ proj_name;
-    proj->dir_bookmarks = proj->dir + "/Bookmarks";
-    proj->dir_videos = vid_path;
+    proj->m_dir = dir_path +"/"+ proj_name;
+    proj->m_dir_bookmarks = proj->m_dir + "/Bookmarks";
+    proj->m_dir_videos = vid_path;
     add_project(proj);                          // Add project to file sytstem
     proj->save_project();                         // Save project file
-    open_project(proj->id);                     // Open project
+    open_project(proj->m_id);                     // Open project
     return proj;
 }
 
@@ -71,7 +71,7 @@ bool ProjectManager::delete_project(ID proj_id){
     Project* temp = get_project(proj_id);
     this->proj_map_lock.lock();
     if(this->projects.erase(proj_id)){
-        close_project(temp->id);
+        close_project(temp->m_id);
 // Logic which remove system files should not be here, should be deleted separately
 //        temp->delete_artifacts();
 //        QFile file;
@@ -98,7 +98,7 @@ bool ProjectManager::delete_project(ID proj_id){
  */
 ID ProjectManager::add_video(Project* proj, std::string file_path){
     Video* v = new Video(file_path);
-    return proj->add_child(v); // video id set in proj->add_video
+    return proj->add_video(v); // video id set in proj->add_video
 }
 
 /**
@@ -125,7 +125,7 @@ Project* ProjectManager::load_project(std::string full_project_path){
      Project* proj = new Project(this);
      proj->load_project(full_project_path); // Decide format internally, here for flexibility
      proj->save_project();
-     proj->id = add_project(proj);
+     proj->m_id = add_project(proj);
      return proj;
 }
 
@@ -177,8 +177,8 @@ void ProjectManager::close_project(ID id){
 bool ProjectManager::proj_equals(Project& proj, Project& proj2){
     bool video_equals =  std::equal(proj.get_videos().begin(), proj.get_videos().end(),
                proj2.get_videos().begin(),
-               [](const std::pair<ID,VideoProject*> v, const std::pair<ID,VideoProject*> v2){return *(v.second->get_video()) == *(v2.second->get_video());}); // lambda function comparing using video==
+               [](VideoProject* v, VideoProject* v2){return *(v->get_video()) == *(v2->get_video());}); // lambda function comparing using video==
                                                                                                                       // by dereferencing pointers in vector
-    return proj.name == proj2.name &&
+    return proj.m_name == proj2.m_name &&
            video_equals;
 }

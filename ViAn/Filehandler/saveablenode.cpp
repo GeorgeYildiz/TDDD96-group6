@@ -1,11 +1,5 @@
 #include "saveablenode.h"
 
-SaveableNode::SaveableNode(const std::string file_name, const std::string dir_path)
-{
-    m_directory = dir_path;
-    m_file_name = file_name;
-}
-
 SaveableNode::SaveableNode()
 {
 
@@ -14,18 +8,19 @@ SaveableNode::~SaveableNode()
 {
 
 }
-
-ID SaveableNode::add_child(JsonItem *item)
+TypeFactory::TypeFactory()
 {
-    m_json_children.push_back(item);
-    return m_json_children.size();
+
 }
 
-void SaveableNode::remove_child(ID id)
+JsonNode *TypeFactory::get(const std::string &id) const
 {
-    JsonItem* child = m_json_children.at(id);
-    m_json_children.erase(m_json_children.begin()+id);
-    delete child;
+    return m_type_map.at(id);
+}
+
+void TypeFactory::set(const std::string &id, JsonNode *item)
+{
+    m_type_map.insert(std::make_pair(id,item));
 }
 
 /**
@@ -36,18 +31,20 @@ void SaveableNode::remove_child(ID id)
  * @return Saves a file to provided directory
  */
 bool SaveableNode::save_node(const std::string& file_name, const std::string& dir_path, const SAVE_FORMAT& save_format){
-    QDir dir(dir_path);
-    if (!dir.exists(dir_path))
+    QString q_dir_path = QString::fromStdString(dir_path);
+    QDir dir(q_dir_path);
+    if (!dir.exists(q_dir_path))
         dir.mkpath(QString::fromStdString(dir_path));
+    std::cout << std::endl << dir_path + "/" + file_name + ".json" << std::endl;
     QFile save_file(save_format == JSON
                     ? QString::fromStdString(dir_path + "/" + file_name + ".json")
                     : QString::fromStdString(dir_path + "/" + file_name + ".dat"));
-
     if(!save_file.open(QIODevice::WriteOnly)){
         qWarning("Couldn't open save file.");
         return false;
     }
     QJsonObject document_data;
+    this->write(document_data);
     QJsonArray children;
     for(auto it = m_json_children.begin(); it != m_json_children.end(); it++){
         QJsonObject child;
@@ -84,14 +81,15 @@ bool SaveableNode::load_node(const std::string& full_path, const SAVE_FORMAT& sa
         ? QJsonDocument::fromJson(save_data)
         : QJsonDocument::fromBinaryData(save_data));
     QJsonObject json = load_doc.object();
+    this->read(json);
     QJsonArray json_children = json["children"].toArray();
     for (int i = 0; i < json_children.size(); ++i) {
-        QJsonObject json_child = json_children[i].toObject();
-        std::string type = json_child["typeid"].toString().toStdString();
+        QJsonObject json_node = json_children[i].toObject();
+        std::string type = json_node["typeid"].toString().toStdString();
         TypeFactory f;
-        JsonItem* json_item = f.get(type);
+        JsonNode* json_item = f.get(type);
         // How do we know type?
-        json_item->read(json_child);
+        json_item->read(json_node);
         add_child(json_item);
     }
     // Set m_dir here
@@ -108,4 +106,3 @@ bool SaveableNode::delete_node()
     QFile file(QString::fromStdString(m_file_name));
     file.remove();
 }
-

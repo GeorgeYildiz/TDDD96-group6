@@ -1,8 +1,8 @@
 #ifndef REPORT_H
 #define REPORT_H
 #include <string>
-#include "Filehandler/json_item.h"
-class Report : public JsonItem{
+#include "Filehandler/jsonnode.h"
+class Report : public JsonNode{
     std::string file_path;
 public:
     Report(std::string file_path);
