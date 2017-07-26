@@ -6,9 +6,8 @@
  * @param proj, the current project that we are creating document for.
  * @param file_handler, the file_handler that is used to get path information for saving.
  */
-ReportGenerator::ReportGenerator(Project* proj, FileHandler *file_handler) {
+ReportGenerator::ReportGenerator(Project* proj) {
     this->proj = proj;
-    this->file_handler = file_handler;
 }
 
 /**
@@ -47,7 +46,7 @@ void ReportGenerator::create_report() {
 
             //5. SAVE AND CLOSE FILE
             QString file_path = save_report(active_document);
-            this->proj->add_report(file_path.toStdString());
+            this->proj->add_report(new Report(file_path.toStdString()));
         }
         close_report(doc, word);
     }else{
@@ -64,11 +63,11 @@ void ReportGenerator::create_report() {
  * on other places aswell.
  */
 void ReportGenerator::create_list_of_names() {
-    std::map<ID, VideoProject*> videos = proj->get_videos();
+    std::vector<VideoProject*> videos = proj->get_videos();
 
     // get all bookmarks for a project by iterating over each videos bookmarks.
-    for(std::pair<ID, VideoProject*> video : videos) {
-        std::map<ID, Bookmark *> bookmark_list = video.second->get_bookmarks();
+    for(auto it = videos.begin(); it != videos.end(); it++) {
+        std::map<ID, Bookmark *> bookmark_list = (*it)->get_bookmarks();
         for(std::pair<ID,Bookmark*> vid_bm_pair : bookmark_list) {
             Bookmark* video_bookmark = vid_bm_pair.second;
             all_bookmarks.push_back(video_bookmark);
@@ -134,7 +133,7 @@ QString ReportGenerator::calculate_time(int ms) {
 void ReportGenerator::add_bookmarks(QAxObject* selection) {
     QAxObject* shapes = selection->querySubObject( "InlineShapes" );
     for (Bookmark* bookmark : all_bookmarks) {
-        QString pic_path = bookmark->get_file_path();
+        QString pic_path = "QString::fromStdString(bookmark)";
         //Fix to make path work with windows word
         //application when spaces are involved
         pic_path.replace("/", "\\\\");
@@ -151,11 +150,11 @@ void ReportGenerator::add_bookmarks(QAxObject* selection) {
         //adds description beneath image
         QString frame_nr = QString("Frame number: %1").arg(bookmark->get_frame_number());
         QString time = QString("Time: %1").arg(calculate_time(bookmark->get_time()));
-        QString bm_description = bookmark->get_description();
+        QString bm_description = QString::fromStdString(bookmark->get_description());
         QString description = "";
 
         if (!bm_description.isEmpty()) {
-            description = QString("Description: %1").arg(bookmark->get_description());
+            description = QString("Description: %1").arg(bm_description);
         }
         selection->dynamicCall( "InsertParagraphAfter()" );
         selection->dynamicCall("InsertAfter(const QString&)", time);
@@ -193,8 +192,8 @@ std::string ReportGenerator::date_time_generator() {
  */
 QString ReportGenerator::save_report(QAxObject* active_document) {
     std::string dt = date_time_generator();
-    std::string proj_path = file_handler->get_dir(proj->dir).absolutePath().toStdString();
-    std::string path = proj_path.append("/").append(proj->name).append("_").append(dt).append(".docx");
+    std::string proj_path = proj->getDir();
+    std::string path = proj_path.append("/").append(proj->getName()).append("_").append(dt).append(".docx");
     active_document->dynamicCall("SaveAs (const QString&)", QString::fromStdString(path));
     return QString::fromStdString(path);
 }

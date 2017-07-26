@@ -5,22 +5,20 @@
 #include <ActiveQt/QAxObject>
 #include <ActiveQt/QAxWidget>
 #include <QString>
-#include "Filehandler/filehandler.h"
+#include "Project/project.h"
 #include "dirent.h"
 #include <ctime>
-
 class ReportGenerator {
 
 public:
     friend class test_report_generator;
-    explicit ReportGenerator(Project* proj, FileHandler* file_handler);
+    explicit ReportGenerator(Project* proj);
     ~ReportGenerator();
     void create_report();
 
 private:
     Project* proj;
-    QAxObject* word;
-    FileHandler *file_handler;
+    QAxObject* word;   
     std::vector<Bookmark*> all_bookmarks;
     const double IMAGE_WIDTH_REFERENCE = 272.0;
 

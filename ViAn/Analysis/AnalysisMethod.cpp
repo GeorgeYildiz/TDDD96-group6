@@ -31,7 +31,6 @@ void AnalysisMethod::set_include_exclude_area(std::vector<cv::Point> points, boo
 }
 
 
-
 /**
  * @brief AnalysisMethod::sample_current_frame
  * Checks if the current frame is to be analysed.
@@ -51,7 +50,7 @@ Analysis AnalysisMethod::run_analysis() {
         return m_analysis;
     }
     calculate_scaling_factor();
-    std::vector<OOI> detections;
+    std::vector<DetectionBox> detections;
     num_frames = capture.get(CV_CAP_PROP_FRAME_COUNT);
     POI* m_POI = new POI();
     while(!aborted && capture.read(frame)) {
@@ -66,24 +65,17 @@ Analysis AnalysisMethod::run_analysis() {
             // in a frame into the correct POIs.
             if (detections.empty() && detecting) {
                 m_POI->set_end_frame(current_frame_index - 1);
-                m_analysis.add_POI(*m_POI);
+                m_analysis.add_interval(m_POI);
                 m_POI = new POI();
                 detecting = false;
             } else if (!detections.empty()) {
                 detecting = true;
                 if (scaling_needed) {
-                    for (OOI detection : detections) {
+                    for (DetectionBox detection : detections) {
                         detection.scale_coordinates(1.0/scaling_ratio);
                     }
                 }
                 m_POI->add_detections(current_frame_index, detections);
-            }
-
-            // Makes sure that a POI that stretches to the end of the
-            // video gets an end frame.
-            if (current_frame_index == (num_frames-1) && detecting) {
-                m_POI->set_end_frame(current_frame_index);
-                m_analysis.add_POI(*m_POI);
             }
         } else if (!detections.empty()) {
             /* If the current frame is not sampled, the detections from the previously
@@ -97,8 +89,15 @@ Analysis AnalysisMethod::run_analysis() {
             // TODO do pause stuff
             paused = false;
         }
+
         emit send_progress(get_progress());
         ++current_frame_index;
+    }
+    // Makes sure that a POI that stretches to the end of the
+    // video gets an end frame.
+    if (detecting) {
+        m_POI->set_end_frame(current_frame_index);
+        m_analysis.add_interval(m_POI);
     }
     capture.release();
     return m_analysis;
@@ -110,6 +109,7 @@ Analysis AnalysisMethod::run_analysis() {
  */
 int AnalysisMethod::get_progress() {
     return current_frame_index*100/num_frames;
+
 }
 
 /**
