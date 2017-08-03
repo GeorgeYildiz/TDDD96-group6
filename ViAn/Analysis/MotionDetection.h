@@ -13,6 +13,7 @@
 class MotionDetection : public AnalysisMethod {
 public:
     MotionDetection(std::string source_file);
+    ~MotionDetection();
 
 private:
     cv::Mat foreground_mask, background, blurred_frame, diff_frame, result, prev_frame, dilation_kernel;
@@ -20,7 +21,7 @@ private:
     const cv::Size BLUR_SIZE = cv::Size(31,31);
 
     void setup_analysis() override;
-    std::vector<OOI> analyse_frame() override;
+    std::vector<DetectionBox> analyse_frame() override;
 
     const int DILATION_DEGREE = 16;
     const int SMALLEST_OBJECT_SIZE = 500;
@@ -29,6 +30,7 @@ private:
     const int BACKGROUND_HISTORY = 500;
     const int MOG2_THRESHOLD = 50;
     const bool DETECT_SHADOWS = false;
+
 
 signals:
     void save_analysis(Analysis analysis);

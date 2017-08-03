@@ -7,7 +7,7 @@
 #include "opencv2/opencv.hpp"
 #include "opencv2/core/core.hpp"
 #include "opencv2/videoio/videoio.hpp"
-#include "Filehandler/analysis.h"
+#include "Project/Analysis/analysis.h"
 
 class AnalysisMethod : public QThread {
     Q_OBJECT
@@ -17,7 +17,7 @@ public:
     void set_include_exclude_area(std::vector<cv::Point> points, bool exclude_polygon);
 
     virtual void setup_analysis() = 0;
-    virtual std::vector<OOI> analyse_frame() = 0;
+    virtual std::vector<DetectionBox> analyse_frame() = 0;
 
     bool sample_current_frame();
     bool load_video();
@@ -36,8 +36,9 @@ protected:
     const int FULL_HD_HEIGHT = 1080;
 
     int num_frames = -1;
-    unsigned int sample_freq = 5;
+    unsigned int sample_freq = 30;
     int current_frame_index = 0;    // The current frame number
+
     int scaled_width = -1;
     int scaled_height = -1;
     float scaling_ratio = 1.0;
@@ -56,8 +57,6 @@ protected:
 
 signals:
     void send_progress(int progress);
-
-
 };
 
 #endif // ANALYSISMETHOD_H

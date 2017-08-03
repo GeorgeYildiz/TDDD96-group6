@@ -16,21 +16,81 @@ TEMPLATE = app
 #
 # GENERAL
 #
-SOURCES += main.cpp
+SOURCES += main.cpp \
+    reportgenerator.cpp \
+    GUI/TreeItems/itemtypes.cpp \
+    GUI/Toolbars/maintoolbar.cpp \
+    GUI/Toolbars/drawingtoolbar.cpp \
+    utility.cpp \
+    GUI/drawscrollarea.cpp \
+    Video/zoomer.cpp \
+    GUI/analysisslider.cpp \
+    GUI/projectdialog.cpp \
+    Project/Test/videoprojecttest.cpp \
+    GUI/bookmarkcategory.cpp \
+    imagegenerator.cpp \
+    GUI/bookmarklist.cpp \
+    GUI/statusbar.cpp \
+    GUI/analysiswidget.cpp \
+    GUI/manipulatordialog.cpp \
+    Video/frameprocessor.cpp \
+    Project/projecttreestate.cpp \
+    GUI/tagdialog.cpp \
+    imageexporter.cpp \
+    GUI/frameexporterdialog.cpp \
+    Project/Analysis/tag.cpp \
+    Video/videocontroller.cpp \
+    Video/videoplayer.cpp \
+    GUI/recentprojectdialog.cpp \
+    Project/recentproject.cpp \
+    Project/Analysis/basicanalysis.cpp \
+    Project/Analysis/analysisinterval.cpp \
+    Filehandler/writeable.cpp \
+    Project/Analysis/analysisproxy.cpp \
+    Project/Analysis/detectionbox.cpp
 
 #
 # TEST
 #
-SOURCES += Test/test_video_player.cpp\
-    Test/filehandlertest.cpp\
-    Test/test_mainwindow.cpp \
-    Test/test_report_generator.cpp \
-    Test/overlayintegrationtest.cpp
-HEADERS += Test/test_video_player.h \
-    Test/filehandlertest.h \
-    Test/test_mainwindow.h \
+SOURCES +=\
+    Test/test_report_generator.cpp
+
+HEADERS += reportgenerator.h\
     Test/test_report_generator.h \
-    Test/overlayintegrationtest.h
+    GUI/TreeItems/itemtypes.h \
+    GUI/Toolbars/maintoolbar.h \
+    GUI/Toolbars/drawingtoolbar.h \
+    utility.h \
+    GUI/drawscrollarea.h \
+    Video/zoomer.h \
+    GUI/analysisslider.h \
+    GUI/projectdialog.h \
+    Project/Test/videoprojecttest.h \
+    GUI/bookmarkcategory.h \
+    imagegenerator.h \
+    GUI/bookmarklist.h \
+    GUI/statusbar.h \
+    GUI/analysiswidget.h \
+    GUI/manipulatordialog.h \
+    Video/frameprocessor.h \
+    Project/projecttreestate.h \
+    GUI/tagdialog.h \
+    imageexporter.h \
+    GUI/frameexporterdialog.h \
+    Project/Analysis/tag.h \
+    Video/videocontroller.h \
+    Video/videoplayer.h \
+    GUI/recentprojectdialog.h \
+    Project/recentproject.h \
+    Project/Analysis/basicanalysis.h \
+    Project/Analysis/analysisinterval.h \
+    Filehandler/writeable.h \
+    Project/Analysis/analysisproxy.h \
+    Project/Analysis/detectionbox.h \
+    table.h \
+    AxReport/axtable.h \
+    AxReport/axrange.h \
+    AxReport/axcell.h
 
 #
 # LIBRARY
@@ -42,28 +102,24 @@ HEADERS += Library/customdialog.h
 # GUI
 #
 SOURCES += GUI/mainwindow.cpp \
-    GUI/icononbuttonhandler.cpp \
-    GUI/qtreeitems.cpp \
-    GUI/bookmarkview.cpp \
     GUI/bookmarkitem.cpp \
-    GUI/reportgenerator.cpp \
-    GUI/makeproject.cpp \
-    GUI/fpsdialog.cpp
-
+    GUI/fpsdialog.cpp \
+    GUI/videowidget.cpp \
+    GUI/framewidget.cpp \
+    GUI/projectwidget.cpp \
+    GUI/bookmarkwidget.cpp
 
 
 HEADERS  += GUI/mainwindow.h \
-    GUI/icononbuttonhandler.h \
     GUI/action.h \
-    GUI/qtreeitems.h \
-    GUI/reportgenerator.h \
-    GUI/bookmarkview.h \
     GUI/bookmarkitem.h \
-    GUI/makeproject.h \
-    GUI/fpsdialog.h
+    GUI/fpsdialog.h \
+    GUI/videowidget.h \
+    GUI/framewidget.h \
+    GUI/projectwidget.h \
+    GUI/bookmarkwidget.h
 
-FORMS    += GUI/mainwindow.ui \
-    GUI/makeproject.ui
+FORMS    +=
 
 RESOURCES += resources.qrc
 #
@@ -71,7 +127,7 @@ RESOURCES += resources.qrc
 # VIDEOPLAYER
 # OPENCV
 #
-SOURCES += Video/video_player.cpp \
+SOURCES += \
     Video/overlay.cpp \
     Video/analysisoverlay.cpp \
     Video/shapes/arrow.cpp \
@@ -82,8 +138,9 @@ SOURCES += Video/video_player.cpp \
     Video/shapes/shape.cpp \
     Video/shapes/text.cpp \
     Video/shapes/zoomrectangle.cpp \
-    Video/shapes/analysarea.cpp
-HEADERS += Video/video_player.h \
+    Video/shapes/analysarea.cpp \
+    Video/framemanipulator.cpp
+HEADERS += \
     Video/overlay.h \
     Video/analysisoverlay.h \
     Video/shapes/arrow.h \
@@ -94,7 +151,9 @@ HEADERS += Video/video_player.h \
     Video/shapes/shape.h \
     Video/shapes/text.h \
     Video/shapes/zoomrectangle.h \
-    Video/shapes/analysarea.h
+    Video/shapes/analysarea.h \
+    Video/framemanipulator.h
+
 win32 {
     INCLUDEPATH += C:\opencv\release\install\include
     LIBS += C:\opencv\release\bin\libopencv_core320.dll
@@ -118,47 +177,44 @@ unix {
 #
 # START: FILEHANDLER
 #
-SOURCES += Filehandler/filehandler.cpp \
-    Filehandler/project.cpp \
-    Filehandler/video.cpp \
-    Filehandler/videoproject.cpp \
-    Filehandler/bookmark.cpp \
+SOURCES += \
     Filehandler/saveable.cpp \
-    Filehandler/analysis.cpp \
-    Filehandler/report.cpp
 
-HEADERS  += Filehandler/filehandler.h \
-    Filehandler/project.h \
-    Filehandler/dir.h \
-    Filehandler/video.h \
-    Filehandler/videoproject.h \
-    Filehandler/bookmark.h  \
+
+
+HEADERS  += \
     Filehandler/saveable.h \
-    Filehandler/analysis.h \
-    Filehandler/report.h
 
-win32{
 
-    SOURCES += Filehandler/stringhelper.cpp\
-      Filehandler/win32dir.cpp
-
-    HEADERS += Filehandler/stringhelper.h
-}
-
-macx {
-    SOURCES += Filehandler/macdir.cpp
-}
-
-linux {
-    #SOURCES += Filehandler/linuxdir.cpp
-}
-unix {
-    SOURCES += Filehandler/linuxdir.cpp
-}
 
 #
 # END: FILEHANDLER
 #
+
+#
+# Project
+#
+SOURCES += Project/Test/projecttestsuite.cpp \
+    Project/report.cpp \
+    Project/project.cpp \
+    Project/video.cpp \
+    Project/videoproject.cpp \
+    Project/bookmark.cpp \
+    Project/Analysis/analysis.cpp \
+    Project/Analysis/poi.cpp
+
+
+HEADERS +=Project/Test/projecttestsuite.h \
+    Project/project.h \
+    Project/video.h \
+    Project/videoproject.h \
+    Project/bookmark.h  \
+    Project/report.h \
+    Project/Analysis/analysis.h \
+    Project/Analysis/poi.h
+
+
+
 
 #
 # ANALYSIS

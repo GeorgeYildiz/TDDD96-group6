@@ -1,19 +1,28 @@
 #ifndef BOOKMARKITEM_H
 #define BOOKMARKITEM_H
-#include "Filehandler/bookmark.h"
+#include "Project/bookmark.h"
 #include <QListWidgetItem>
+#include <QMenu>
+#include <QObject>
 
 class BookmarkItem : public QListWidgetItem {
+    QString hover_text;
 public:
-    BookmarkItem(Bookmark *bookmark, QListWidget *view);
+    BookmarkItem(Bookmark *bookmark, int type = 1);
     ~BookmarkItem();
     Bookmark* get_bookmark();
     int get_frame_number();
-    void update_description(QString text);
+    QString get_file_path();
+    void update_description(const QString &text);    
+    void set_thumbnail(std::string thum_path);
+    BookmarkItem* copy();
+    QString getDescription() const;
+
 private:
-    void create_thumbnail(QImage &frame);
     const int BOOKMARK_THUMBNAIL_HEIGHT = 64;
     Bookmark* bookmark;
+protected:
+//    void mousePressEvent(QMouseEvent* event) override;
 };
 
 #endif // BOOKMARKITEM_H
